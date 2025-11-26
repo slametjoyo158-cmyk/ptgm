@@ -9,7 +9,9 @@
         // Catatan: Semua inisialisasi Firebase telah dihapus.
         // ID pengguna sekarang dihasilkan dan disimpan secara lokal di browser.
 
-        let currentUserId = null; // ID Pengguna Lokal
+        let currentUserId = null; // ID Sesi Lokal Browser
+        let studentName = "";
+        let studentNIS = "";
 
         // Data Soal Kuis (Tidak berubah)
         const quizData = [
@@ -66,6 +68,14 @@
         const submitButton = document.getElementById('submit-button');
         const nextButton = document.getElementById('next-button');
         const prevButton = document.getElementById('prev-button');
+        
+        // Elemen baru untuk login dan hasil
+        const nameInput = document.getElementById('name-input');
+        const nisInput = document.getElementById('nis-input');
+        const loginErrorMessage = document.getElementById('login-error-message');
+        const resultNameDisplay = document.getElementById('result-name');
+        const resultNISDisplay = document.getElementById('result-nis');
+        const scoreRecapContainer = document.getElementById('score-recap-container');
 
 
         // --- Utility Functions ---
@@ -95,9 +105,63 @@
             return html;
         }
 
+        // --- Score Recap Logic ---
+
+        const renderScoreRecap = (scores) => {
+            scoreRecapContainer.innerHTML = ''; // Clear previous recap
+
+            if (scores.length === 0) {
+                scoreRecapContainer.innerHTML = '<p class="text-gray-500">Belum ada riwayat skor yang tersimpan.</p>';
+                return;
+            }
+
+            // Urutkan skor berdasarkan tanggal menurun (terbaru dulu)
+            scores.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            let html = '<h3 class="text-xl font-semibold text-gray-800 mb-3 mt-6 border-b pb-2">Rekap 5 Skor Terakhir Anda</h3>';
+            
+            html += '<div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg">';
+            html += '<thead class="bg-gray-50">';
+            html += '<tr><th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th><th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NIS</th><th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Skor</th><th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th></tr>';
+            html += '</thead>';
+            html += '<tbody class="bg-white divide-y divide-gray-200">';
+
+            // Hanya tampilkan hingga 5 entri terakhir
+            scores.slice(0, 5).forEach(entry => {
+                html += `<tr>
+                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900">${entry.name}</td>
+                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">${entry.nis}</td>
+                    <td class="px-3 py-2 whitespace-nowrap text-sm font-bold text-indigo-600">${entry.score}/${entry.total}</td>
+                    <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-500">${entry.date.split(',')[0]}</td>
+                </tr>`;
+            });
+
+            html += '</tbody></table></div>';
+            
+            if (scores.length > 5) {
+                 html += '<p class="text-xs text-gray-500 mt-2">Menampilkan 5 skor terbaru dari total ' + scores.length + ' skor.</p>';
+            }
+
+            scoreRecapContainer.innerHTML = html;
+        }
+
+
         // --- Quiz Logic ---
 
         const startQuiz = () => {
+            studentName = nameInput.value.trim();
+            studentNIS = nisInput.value.trim();
+
+            if (studentName === "" || studentNIS === "") {
+                loginErrorMessage.classList.remove('hidden');
+                return;
+            } else {
+                loginErrorMessage.classList.add('hidden');
+            }
+
+            // Simpan identitas agar terisi otomatis di sesi berikutnya
+            localStorage.setItem('quiz_identity', JSON.stringify({ name: studentName, nis: studentNIS }));
+
             currentQuestionIndex = 0;
             score = 0;
             answers.fill(null);
@@ -182,10 +246,30 @@
                 }
             }
             score = correctCount;
+            
+            // 1. Simpan Riwayat Skor
+            const scoreEntry = {
+                name: studentName,
+                nis: studentNIS,
+                score: correctCount,
+                total: quizData.length,
+                date: new Date().toLocaleString('id-ID'),
+                sessionId: currentUserId 
+            };
+            
+            let scores = JSON.parse(localStorage.getItem('quiz_scores')) || [];
+            scores.push(scoreEntry);
+            localStorage.setItem('quiz_scores', JSON.stringify(scores));
 
+            // 2. Tampilkan Hasil
             quizContainer.classList.add('hidden');
+            resultNameDisplay.textContent = studentName;
+            resultNISDisplay.textContent = studentNIS;
             finalScore.textContent = `${score} / ${quizData.length}`;
             resultContainer.classList.remove('hidden');
+            
+            // 3. Render Rekap Skor
+            renderScoreRecap(scores); 
         }
 
         // --- Timer Logic ---
@@ -240,15 +324,24 @@
         // --- User Session Logic (using localStorage) ---
 
         const initUserSession = () => {
-            let storedUserId = localStorage.getItem('quiz_user_id');
+            // 1. Inisialisasi ID Sesi Lokal
+            let storedUserId = localStorage.getItem('quiz_session_id');
             if (!storedUserId) {
-                // Generate a simple UUID if it doesn't exist
                 storedUserId = crypto.randomUUID();
-                localStorage.setItem('quiz_user_id', storedUserId);
+                localStorage.setItem('quiz_session_id', storedUserId);
             }
             currentUserId = storedUserId;
-            // Tampilkan ID pengguna lokal
-            userIdDisplay.textContent = `ID Pengguna: ${currentUserId}`;
+            // Tampilkan ID sesi yang dipotong
+            userIdDisplay.textContent = `ID Sesi (Lokal): ${currentUserId.substring(0, 8)}...`;
+
+            // 2. Muat identitas terakhir (Nama & NIS)
+            const storedIdentity = JSON.parse(localStorage.getItem('quiz_identity'));
+            if (storedIdentity) {
+                studentName = storedIdentity.name || "";
+                studentNIS = storedIdentity.nis || "";
+                nameInput.value = studentName;
+                nisInput.value = studentNIS;
+            }
             
             // Langsung tampilkan container login karena tidak perlu menunggu autentikasi
             loginContainer.classList.remove('hidden');
@@ -303,23 +396,37 @@
         
         <!-- User ID Display -->
         <div class="text-center mb-4 text-sm text-gray-600">
-            <!-- ID pengguna dimuat oleh JavaScript secara sinkron menggunakan localStorage -->
-            <span id="user-id-display" class="bg-gray-200 p-2 rounded-lg inline-block font-mono text-xs">ID Pengguna: Memuat...</span>
+            <!-- ID Sesi Lokal dipotong agar tidak terlalu panjang -->
+            <span id="user-id-display" class="bg-gray-200 p-2 rounded-lg inline-block font-mono text-xs">ID Sesi (Lokal): Memuat...</span>
         </div>
 
         <!-- Halaman Login/Mulai (Default View) -->
-        <!-- Dimulai tersembunyi, lalu ditampilkan setelah ID pengguna lokal dimuat -->
         <div id="login-container" class="quiz-card bg-white p-6 sm:p-10 rounded-xl text-center hidden">
             <h1 class="text-3xl font-bold text-indigo-700 mb-4">Kuis Enkapsulasi Java</h1>
             <p class="text-gray-600 mb-6">Mata Pelajaran: Pemrograman Berbasis Grafis, Teks, dan Multimedia</p>
-            <div class="p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 mb-6 rounded-lg">
+
+            <!-- Input Identitas Siswa -->
+            <div class="space-y-4 mb-6 text-left">
+                <div>
+                    <label for="name-input" class="block text-sm font-medium text-gray-700">Nama Lengkap</label>
+                    <input type="text" id="name-input" placeholder="Masukkan Nama Anda" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+                <div>
+                    <label for="nis-input" class="block text-sm font-medium text-gray-700">NIS (Nomor Induk Siswa)</label>
+                    <input type="text" id="nis-input" placeholder="Masukkan NIS Anda" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+            </div>
+            
+            <p id="login-error-message" class="text-red-500 mb-4 hidden font-semibold">⚠️ Mohon isi Nama Lengkap dan NIS sebelum memulai kuis.</p>
+
+            <div class="p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 mb-6 rounded-lg text-left">
                 <p class="font-semibold">Perhatian:</p>
-                <ul class="list-disc list-inside text-left ml-4 text-sm">
+                <ul class="list-disc list-inside text-sm ml-4">
                     <li>Durasi pengerjaan adalah **1 menit** untuk 30 soal.</li>
                     <li>Jika Anda berpindah tab atau keluar dari jendela, kuis akan **diulang dari awal**.</li>
-                    <li>Penyalinan teks/screenshot dinonaktifkan.</li>
                 </ul>
             </div>
+            
             <button id="start-quiz-button" class="w-full sm:w-auto px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition duration-300 shadow-lg shadow-indigo-300 transform hover:scale-[1.02]">
                 Mulai Kuis Sekarang (1 Menit)
             </button>
@@ -337,7 +444,6 @@
 
             <div class="min-h-[120px] mb-6">
                 <p id="question-text" class="text-gray-800 text-xl leading-relaxed whitespace-pre-line"></p>
-                <!-- Code display removed for simplicity but question logic remains -->
             </div>
 
             <!-- Opsi Jawaban -->
@@ -362,11 +468,22 @@
         <!-- Halaman Hasil -->
         <div id="result-container" class="quiz-card bg-white p-6 sm:p-10 rounded-xl text-center hidden">
             <h2 class="text-4xl font-extrabold text-green-600 mb-4">Kuis Selesai!</h2>
-            <p class="text-xl text-gray-700 mb-6">Skor Akhir Anda:</p>
+            
+            <div class="text-left mb-6 border-b pb-4">
+                <p class="text-lg text-gray-700 font-semibold">Nama: <span id="result-name" class="text-indigo-600"></span></p>
+                <p class="text-lg text-gray-700 font-semibold">NIS: <span id="result-nis" class="text-indigo-600"></span></p>
+            </div>
+
+            <p class="text-xl text-gray-700 mb-3">Skor Akhir Anda:</p>
             <div class="text-7xl font-bold mb-8 text-indigo-700">
                 <span id="final-score">0 / 30</span>
             </div>
-            <p class="text-gray-600 mb-8">Luar biasa! Silakan ulangi untuk meningkatkan pemahaman Anda tentang Enkapsulasi Java.</p>
+            
+            <!-- Rekap Skor (Table) -->
+            <div id="score-recap-container" class="text-left mb-8">
+                <!-- Tabel rekap akan dimasukkan di sini oleh JS -->
+            </div>
+
             <button id="restart-button" class="w-full sm:w-auto px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition duration-300 shadow-lg shadow-indigo-300 transform hover:scale-[1.02]">
                 Ulangi Kuis
             </button>
