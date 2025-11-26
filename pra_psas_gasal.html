@@ -50,8 +50,9 @@
         let currentQuestionIndex = 0;
         let score = 0;
         const answers = Array(quizData.length).fill(null);
-        const TIME_LIMIT = 60; // 60 seconds (1 minute)
-        let timeLeft = TIME_LIMIT;
+        // Waktu diperbarui: 2 menit (120 detik) per soal
+        const TIME_LIMIT_PER_QUESTION = 120; // 120 seconds (2 minutes) per question
+        let timeLeft = TIME_LIMIT_PER_QUESTION;
         let timerInterval;
 
         // --- DOM Elements ---
@@ -165,14 +166,13 @@
             currentQuestionIndex = 0;
             score = 0;
             answers.fill(null);
-            timeLeft = TIME_LIMIT;
             
             loginContainer.classList.add('hidden');
             resultContainer.classList.add('hidden');
             quizContainer.classList.remove('hidden');
             
+            // Timer dimulai di renderQuestion
             renderQuestion();
-            startTimer();
         }
 
         const renderQuestion = () => {
@@ -183,6 +183,9 @@
 
             const currentQuestion = quizData[currentQuestionIndex];
             
+            // PENTING: Reset dan Mulai Timer setiap kali soal baru di-render
+            startTimer(); 
+
             // Render Soal
             questionText.innerHTML = renderQuestionText(currentQuestion.q);
             
@@ -222,6 +225,8 @@
         }
 
         const goToNextQuestion = () => {
+            clearInterval(timerInterval); // Hentikan timer soal ini
+
             if (currentQuestionIndex < quizData.length - 1) {
                 currentQuestionIndex++;
                 renderQuestion();
@@ -231,6 +236,8 @@
         }
 
         const goToPrevQuestion = () => {
+            clearInterval(timerInterval); // Hentikan timer soal ini
+
             if (currentQuestionIndex > 0) {
                 currentQuestionIndex--;
                 renderQuestion();
@@ -272,10 +279,18 @@
             renderScoreRecap(scores); 
         }
 
-        // --- Timer Logic ---
+        // --- Timer Logic (Updated for per-question timer) ---
 
         const startTimer = () => {
             clearInterval(timerInterval); // Bersihkan interval lama
+            timeLeft = TIME_LIMIT_PER_QUESTION; // Reset waktu untuk soal baru
+            
+            // Tampilkan waktu awal (2:00)
+            const initialMinutes = Math.floor(timeLeft / 60);
+            const initialSeconds = timeLeft % 60;
+            timerDisplay.textContent = `${String(initialMinutes).padStart(2, '0')}:${String(initialSeconds).padStart(2, '0')}`;
+            timerDisplay.classList.remove('text-red-600');
+
             timerInterval = setInterval(() => {
                 timeLeft--;
                 const minutes = Math.floor(timeLeft / 60);
@@ -290,7 +305,8 @@
 
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
-                    submitQuiz();
+                    // Waktu habis untuk soal ini, pindah ke soal berikutnya
+                    goToNextQuestion(); 
                 }
             }, 1000);
         }
@@ -422,13 +438,13 @@
             <div class="p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 mb-6 rounded-lg text-left">
                 <p class="font-semibold">Perhatian:</p>
                 <ul class="list-disc list-inside text-sm ml-4">
-                    <li>Durasi pengerjaan adalah **1 menit** untuk 30 soal.</li>
+                    <li>Durasi pengerjaan adalah **2 menit per soal**. Waktu akan otomatis berlanjut ke soal berikutnya jika habis.</li>
                     <li>Jika Anda berpindah tab atau keluar dari jendela, kuis akan **diulang dari awal**.</li>
                 </ul>
             </div>
             
             <button id="start-quiz-button" class="w-full sm:w-auto px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition duration-300 shadow-lg shadow-indigo-300 transform hover:scale-[1.02]">
-                Mulai Kuis Sekarang (1 Menit)
+                Mulai Kuis Sekarang
             </button>
         </div>
 
@@ -438,7 +454,7 @@
             <div class="flex justify-between items-center mb-4 border-b pb-3">
                 <span id="progress-display" class="text-lg font-semibold text-indigo-600">Soal 1 dari 30</span>
                 <div class="text-2xl font-extrabold text-red-500 bg-red-100 p-2 rounded-md shadow-inner">
-                    <span id="timer-display">01:00</span>
+                    <span id="timer-display">02:00</span>
                 </div>
             </div>
 
