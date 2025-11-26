@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Enkapsulasi Java (PGTMM)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+        // Import modul Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // Global variable placeholder (must be used as per instruction)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { /* placeholder config */ };
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Inisialisasi Firebase dan servis
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        
+        // Log Level untuk debugging (opsional)
+        setLogLevel('Debug');
+
+        let currentUserId = null;
+        let authReady = false;
+
+        // Data Soal Kuis
+        const quizData = [
+            { q: "Enkapsulasi di Java bertujuan untuk…", options: ["Menjalankan program tanpa error", "Menyembunyikan data agar hanya dapat diakses melalui metode tertentu", "Membuat objek otomatis saat kompilasi", "Menghapus variabel yang tidak terpakai", "Mengubah tipe data menjadi lebih aman"], correctIndex: 1 },
+            { q: "Manakah contoh deklarasi variabel dengan enkapsulasi yang benar?", options: ["public int saldo;", "protected saldo = 0;", "private int saldo;", "saldo private int;", "int saldo = private;"], correctIndex: 2 },
+            { q: "Keyword this dalam Java digunakan untuk…", options: ["Mengakses variabel lokal", "Menghapus objek", "Menunjuk variabel objek saat nama parameter sama dengan variabel instance", "Membuat class baru", "Mengatur nilai default"], correctIndex: 2 },
+            { q: "Perhatikan kode berikut:\n\npublic void setNama(String nama) {\n\t\tnama = nama;\n}\n\nMengapa nilai nama tidak tersimpan?", options: ["private tidak boleh digunakan untuk String", "Variabel nama harus final", "Setter harus static", "Harus menggunakan this.nama = nama;", "Parameter harus berupa int"], correctIndex: 3 },
+            { q: "Untuk mendapatkan nilai variabel private int umur;, kelas harus memiliki…", options: ["Setter", "Getter", "Konstruktor default", "Static method", "Scanner input"], correctIndex: 1 },
+            { q: "Manakah contoh setter yang benar menggunakan this?", options: ["nilai = this.nilai;", "int this.nilai = nilai;", "this.nilai = nilai;", "nilai = nilai;", "return this.nilai;"], correctIndex: 2 },
+            { q: "Jika variabel bertipe private, maka variabel tersebut dapat diakses…", options: ["Semua kelas tanpa batas", "Hanya di dalam kelas itu sendiri", "Di semua subclass", "Di semua package", "Di method main saja"], correctIndex: 1 },
+            { q: "Baris this.harga = harga; berfungsi…", options: ["Menghapus data lama", "Mengubah tipe data harga", "Mengisi variabel instance harga dengan nilai parameter harga", "Menjadikan harga bersifat publik", "Mengatur agar harga tidak null"], correctIndex: 2 },
+            { q: "Jika variabel tidak dienkapsulasi dan dibiarkan public, maka…", options: ["Keamanan data meningkat", "Variabel tidak bisa diubah dari luar kelas", "Nilai variabel dapat diubah tanpa pengontrolan", "Kode menjadi lebih efisien", "Objek tidak perlu dibuat"], correctIndex: 2 },
+            { q: "Yang bukan manfaat enkapsulasi adalah…", options: ["Mengontrol akses ke variabel", "Melindungi data", "Mengurangi penyalahgunaan data", "Membuka akses bebas ke variabel agar mudah dimodifikasi", "Mencegah perubahan nilai tanpa izin"], correctIndex: 3 },
+            { q: "Cara memanggil setter dari main yang benar adalah…", options: ["Buku.setJudul(\"Java\");", "Buku b; setJudul(\"Java\");", "new Buku().judul = \"Java\";", "Buku b = new Buku(); b.setJudul(\"Java\");", "setJudul(\"Java\");"], correctIndex: 3 },
+            { q: "Jika variabel private int usia; tidak memiliki getter, maka…", options: ["Nilai usia tetap dapat dibaca dari objek", "Nilai usia hanya dapat dibaca melalui setter", "Nilai usia tidak dapat dibaca dari luar kelas", "Nilai usia otomatis berubah ke 1", "Nilai usia otomatis di-reset"], correctIndex: 2 },
+            { q: "Kode: s.setUmur(17); System.out.println(s.getUmur());\n\nKelas Siswa minimal harus memiliki…", options: ["Setter saja", "Getter saja", "Getter dan Setter", "Method static", "Konstruktor berparameter"], correctIndex: 2 },
+            { q: "Urutan langkah penggunaan enkapsulasi yang umum adalah…", options: ["Variabel private -> Getter/setter -> Membuat objek -> Memanggil getter/setter", "Membuat objek -> Variabel private -> Getter/setter -> Memanggil getter/setter", "Memanggil getter/setter -> Variabel private -> Getter/setter -> Membuat objek", "Getter/setter -> Variabel private -> Membuat objek -> Memanggil getter/setter", "Variabel private -> Membuat objek -> Memanggil getter/setter -> Getter/setter"], correctIndex: 0 },
+            { q: "Pemanggilan System.out.println(p.stok); dengan variabel stok private akan menyebabkan…", options: ["Output 0 pasti muncul", "Output stok selalu tampil", "Program error", "Stok berubah otomatis", "Nilai stok bertambah sendiri"], correctIndex: 2 },
+            { q: "Method untuk mengubah nilai variabel private adalah…", options: ["Getter", "Setter", "Konstruktor", "toString()", "Main"], correctIndex: 1 },
+            { q: "Pemanggilan setter yang benar di main adalah…", options: ["Motor.setWarna(\"Merah\");", "Motor m; m.setWarna(\"Merah\");", "Motor m = new Motor(); m.setWarna(\"Merah\");", "String warna = m.setWarna();", "new setWarna(\"Merah\");"], correctIndex: 2 },
+            { q: "Kode: a.setSaldo(50000); System.out.println(a.getSaldo());\n\nOutputnya adalah…", options: ["Error", "Tidak menampilkan apa-apa", "50000", "saldo", "\"Saldo berhasil disimpan\""], correctIndex: 2 },
+            { q: "Kode: User u = new User(); System.out.println(u.getUsername());\n\nJika variabel private String username; tidak memiliki setter dan diinisialisasi secara default di konstruktor (misalnya ke null), outputnya adalah…", options: ["Error", "0", "null", "username", "kosong string \"\""], correctIndex: 2 },
+            { q: "Contoh pemanggilan getter yang benar adalah…", options: ["getNama();", "System.out.println(getNama());", "System.out.println(d.nama);", "System.out.println(d.getNama());", "d.nama();"], correctIndex: 3 },
+            { q: "Perhatikan kode berikut:\n\nclass Guru {\n\t\tprivate String nama;\n\t\tpublic Guru(String nama) {\n\t\t\t\tnama = nama;\n\t\t}\n}\n\nMasalah pada kode di atas adalah…", options: ["Konstruktor tidak boleh memiliki parameter", "Harus menambahkan getter sebelum konstruktor", "Assignment salah karena harus menggunakan this.nama = nama;", "Variabel private tidak boleh dibuat di dalam konstruktor", "Konstruktor harus bernama setNama"], correctIndex: 2 },
+            { q: "Perhatikan kode berikut:\n\nclass Siswa {\n\t\tprivate int umur;\n\t\tpublic setUmur(int umur) {\n\t\t\t\tthis.umur = umur;\n\t\t}\n}\n\nError terjadi karena…", options: ["Variabel umur harus bertipe double", "Method setter tidak memiliki tipe kembalian (seharusnya void)", "Setter tidak boleh menggunakan this", "Private harus diganti protected", "Nama variabel harus huruf besar"], correctIndex: 1 },
+            { q: "Perhatikan kode:\n\nclass Produk {\n\t\tprivate double harga;\n\t\tpublic double getHarga() {\n\t\t\t\treturn harga;\n\t\t}\n}\n\nLalu di main:\nProduk p = new Produk(5000);\nSystem.out.println(p.getHarga());\n\nError terjadi karena…", options: ["getHarga() tidak mengembalikan nilai harga", "Konstruktor dengan parameter tidak ada di kelas Produk", "Getter harus static", "Harga harus public agar dapat diakses", "Tipe data harga harus integer"], correctIndex: 1 },
+            { q: "Perhatikan kode:\n\npublic void setNama(String nama) {\n\t\tthis.name = nama;\n}\n\nMasalah pada kode di atas adalah…", options: ["Variabel nama harus public", "Keyword this tidak boleh digunakan", "Nama variabel privat yang di-assign (name) tidak konsisten dengan nama variabel yang mungkin dimiliki (nama)", "Setter tidak boleh bertipe void", "Setter harus berada di dalam main"], correctIndex: 2 },
+            { q: "Perhatikan kode berikut:\n\nclass User {\n\t\tprivate String username;\n\t\tpublic User() {\n\t\t\t\tthis.username = \"Guest\";\n\t\t}\n\t\tpublic String getUsername() {\n\t\t\t\treturn Username;\n\t\t}\n}\n\nKetika getUsername() dipanggil, hasilnya error karena…", options: ["Getter tidak boleh mengembalikan String", "Penamaan variabel salah huruf besar-kecil (Username ≠ username)", "Konstruktor salah", "Private tidak berlaku untuk String", "Harus menggunakan setter dulu"], correctIndex: 1 },
+            { q: "Perhatikan kode:\n\nclass Akun {\n\t\tprivate double saldo;\n\t\tpublic void setSaldo(double s) {\n\t\t\t\tsaldo = s;\n\t\t}\n}\n\nDi main:\nAkun a = new Akun();\nSystem.out.println(a.saldo);\n\nMasalah utamanya adalah…", options: ["Pointer saldo tidak ada", "Harus memakai konstruktor default", "saldo private tidak bisa diakses langsung", "saldo harus double[]", "Getter mengharuskan saldo static"], correctIndex: 2 },
+            { q: "Perhatikan kode:\n\nclass Motor {\n\t\tprivate String warna;\n\t\tpublic String getWarna(String warna) {\n\t\t\t\treturn this.warna;\n\t\t}\n}\n\nMasalah pada kode di atas adalah…", options: ["Getter tidak boleh memiliki parameter", "Getter wajib static", "Getter harus mengubah nilai warna", "Getter harus menghapus nilai lama", "Getter harus ada di main"], correctIndex: 0 },
+            { q: "Perhatikan kode:\n\nclass Laptop {\n\t\tprivate String merk;\n\t\tpublic Laptop() {\n\t\t\t\tmerk = Asus;\n\t\t}\n}\n\nMasalah pada konstruktor adalah…", options: ["Konstruktor tidak boleh menginisialisasi", "Asus harus dalam tanda kutip", "merk tidak boleh private", "Konstruktor harus memiliki parameter", "Tipe data merk harus int"], correctIndex: 1 },
+            { q: "Perhatikan kode:\n\nclass Pegawai {\n\t\tprivate int gaji;\n\t\tpublic int getGaji() {\n\t\t\t\treturn gaji;\n\t\t}\n\t\tpublic void setGaji(int gaji) {\n\t\t\t\tgajii = gaji;\n\t\t}\n}\n\nKetika setter dipanggil, nilai gaji tidak berubah karena…", options: ["Getter harus dipanggil dulu", "Konstruktor harus mengisi nilai awal", "Terdapat salah penulisan variabel (gajii ≠ gaji)", "Setter harus mengembalikan nilai", "Tidak ada keyword this"], correctIndex: 2 },
+            { q: "Perhatikan kode berikut:\n\nclass Mahasiswa {\n\t\tprivate String nama;\n\t\tpublic Mahasiswa(String nama) {\n\t\t\t\tthis.nama = nama;\n\t\t}\n\t\tpublic void Mahasiswa(String nama) {\n\t\t\t\tthis.nama = nama;\n\t\t}\n}\n\nMasalah pada kode di atas adalah…", options: ["Konstruktor harus punya return", "Konstruktor tidak boleh menggunakan parameter", "Ada method bernama Mahasiswa yang bukan konstruktor karena ada void", "Nama variabel harus private int", "Method kedua harus static"], correctIndex: 2 }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        const answers = Array(quizData.length).fill(null);
+        const TIME_LIMIT = 60; // 60 seconds (1 minute)
+        let timeLeft = TIME_LIMIT;
+        let timerInterval;
+
+        // --- DOM Elements ---
+        const appContainer = document.getElementById('app-container');
+        const loginContainer = document.getElementById('login-container');
+        const quizContainer = document.getElementById('quiz-container');
+        const resultContainer = document.getElementById('result-container');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const timerDisplay = document.getElementById('timer-display');
+        const progressDisplay = document.getElementById('progress-display');
+        const userIdDisplay = document.getElementById('user-id-display');
+        const finalScore = document.getElementById('final-score');
+        const restartButton = document.getElementById('restart-button');
+        const submitButton = document.getElementById('submit-button');
+        const nextButton = document.getElementById('next-button');
+        const prevButton = document.getElementById('prev-button');
+        const codeDisplay = document.getElementById('code-display');
+
+
+        // --- Utility Functions ---
+
+        // Fungsi untuk menormalisasi string (menghapus spasi, newlines, tabs)
+        const normalizeString = (str) => {
+            return str.replace(/\s+/g, ' ').trim();
+        }
+
+        // Fungsi untuk merender teks soal, mengkonversi \n ke <br> dan membungkus kode
+        const renderQuestionText = (text) => {
+            // Memisahkan teks yang dianggap kode (dalam block seperti class/method)
+            const parts = text.split(/(\nclass .*?\}|\npublic void .*?\})/gs);
+            let html = '';
+            parts.forEach(part => {
+                if (part && part.startsWith('\nclass') || part.startsWith('\npublic void')) {
+                    // Ini adalah blok kode, render di dalam div khusus
+                    const formattedCode = part.trim()
+                        .replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;') // Mengganti tab dengan spasi
+                        .replace(/\n/g, '<br>');
+                    html += `<div class="bg-gray-800 text-white p-3 mt-2 mb-2 rounded-lg shadow-inner text-sm font-mono overflow-auto">${formattedCode}</div>`;
+                } else if (part) {
+                    // Ini adalah teks biasa, ganti newline dengan <br>
+                    html += part.replace(/\n/g, '<br>');
+                }
+            });
+            return html;
+        }
+
+        // --- Quiz Logic ---
+
+        const startQuiz = () => {
+            currentQuestionIndex = 0;
+            score = 0;
+            answers.fill(null);
+            timeLeft = TIME_LIMIT;
+            
+            loginContainer.classList.add('hidden');
+            resultContainer.classList.add('hidden');
+            quizContainer.classList.remove('hidden');
+            
+            renderQuestion();
+            startTimer();
+        }
+
+        const renderQuestion = () => {
+            if (currentQuestionIndex >= quizData.length) {
+                submitQuiz();
+                return;
+            }
+
+            const currentQuestion = quizData[currentQuestionIndex];
+            
+            // Render Soal
+            questionText.innerHTML = renderQuestionText(currentQuestion.q);
+            
+            // Render Opsi Jawaban
+            optionsContainer.innerHTML = '';
+            currentQuestion.options.forEach((option, index) => {
+                const isSelected = answers[currentQuestionIndex] === index;
+                const button = document.createElement('button');
+                
+                button.className = `w-full text-left p-3 my-2 rounded-lg border-2 transition duration-300 shadow-md ${
+                    isSelected 
+                        ? 'bg-indigo-500 border-indigo-600 text-white transform scale-[1.01]' 
+                        : 'bg-white border-gray-200 text-gray-800 hover:bg-indigo-50 hover:border-indigo-400'
+                }`;
+                button.innerHTML = `<span class="font-bold mr-2">${String.fromCharCode(65 + index)}.</span> ${option}`;
+                button.onclick = () => selectAnswer(index);
+                optionsContainer.appendChild(button);
+            });
+
+            // Update Progress dan Navigasi
+            progressDisplay.textContent = `Soal ${currentQuestionIndex + 1} dari ${quizData.length}`;
+            prevButton.disabled = currentQuestionIndex === 0;
+            nextButton.textContent = currentQuestionIndex === quizData.length - 1 ? 'Selesai (Submit)' : 'Soal Berikutnya';
+            submitButton.classList.add('hidden');
+            if (currentQuestionIndex === quizData.length - 1) {
+                submitButton.classList.remove('hidden');
+                nextButton.classList.add('hidden');
+            } else {
+                submitButton.classList.add('hidden');
+                nextButton.classList.remove('hidden');
+            }
+        }
+
+        const selectAnswer = (index) => {
+            answers[currentQuestionIndex] = index;
+            renderQuestion(); // Re-render untuk menampilkan pilihan yang baru
+        }
+
+        const goToNextQuestion = () => {
+            if (currentQuestionIndex < quizData.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+            } else if (currentQuestionIndex === quizData.length - 1) {
+                submitQuiz();
+            }
+        }
+
+        const goToPrevQuestion = () => {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion();
+            }
+        }
+
+        const submitQuiz = () => {
+            clearInterval(timerInterval);
+            let correctCount = 0;
+            for (let i = 0; i < quizData.length; i++) {
+                if (answers[i] === quizData[i].correctIndex) {
+                    correctCount++;
+                }
+            }
+            score = correctCount;
+
+            quizContainer.classList.add('hidden');
+            finalScore.textContent = `${score} / ${quizData.length}`;
+            resultContainer.classList.remove('hidden');
+        }
+
+        // --- Timer Logic ---
+
+        const startTimer = () => {
+            clearInterval(timerInterval); // Bersihkan interval lama
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                
+                if (timeLeft <= 10) {
+                    timerDisplay.classList.add('text-red-600');
+                } else {
+                    timerDisplay.classList.remove('text-red-600');
+                }
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    submitQuiz();
+                }
+            }, 1000);
+        }
+
+        // --- Anti-Cheating & Focus Loss Logic ---
+
+        const handleFocusChange = () => {
+            if (document.hidden || !document.hasFocus()) {
+                // Tampilkan pesan modal sebelum reload
+                const modal = document.getElementById('cheat-modal');
+                modal.classList.remove('hidden');
+                
+                // Beri waktu sebentar untuk melihat pesan, lalu reload
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000); // Reload setelah 1 detik
+            }
+        };
+
+        const setupAntiCheating = () => {
+            // 1. Tab/Focus Loss Reload
+            document.addEventListener('visibilitychange', handleFocusChange);
+            window.addEventListener('blur', handleFocusChange);
+
+            // 2. Disable Copy/Screenshot (Text Selection)
+            document.addEventListener('copy', (e) => e.preventDefault());
+            document.addEventListener('contextmenu', (e) => e.preventDefault());
+            // CSS user-select: none; ditambahkan di tag style
+        }
+        
+        // --- Authentication & Initialization ---
+
+        const initAuth = async () => {
+            try {
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Firebase Auth Error:", error);
+                // Fallback to anonymous sign-in if custom token fails
+                try {
+                    await signInAnonymously(auth);
+                } catch (anonError) {
+                    console.error("Anonymous Sign-in Failed:", anonError);
+                }
+            }
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            authReady = true;
+            if (user) {
+                currentUserId = user.uid;
+                userIdDisplay.textContent = `ID Pengguna: ${currentUserId}`;
+                loginContainer.classList.remove('hidden'); // Tampilkan layar login/mulai
+                document.getElementById('loading-state').classList.add('hidden');
+            } else {
+                userIdDisplay.textContent = `ID Pengguna: Belum Terotentikasi`;
+                document.getElementById('loading-state').classList.remove('hidden');
+            }
+        });
+        
+        // --- Event Listeners and Setup ---
+
+        window.onload = () => {
+            initAuth();
+            setupAntiCheating();
+
+            // Set up button listeners
+            document.getElementById('start-quiz-button').onclick = startQuiz;
+            restartButton.onclick = startQuiz;
+            submitButton.onclick = submitQuiz;
+            nextButton.onclick = goToNextQuestion;
+            prevButton.onclick = goToPrevQuestion;
+        };
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f7;
+            /* Anti-copy CSS */
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+        .quiz-card {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        /* Custom scrollbar for small code block */
+        #question-text div {
+            max-height: 150px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Modal Anti-Cheating -->
+    <div id="cheat-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 backdrop-blur-sm transition-opacity duration-300">
+        <div class="bg-red-600 text-white p-6 rounded-xl shadow-2xl max-w-sm text-center">
+            <h3 class="text-2xl font-bold mb-2">PERINGATAN!</h3>
+            <p class="text-lg">Fokus window hilang. Kuis akan diulang dari awal untuk menjaga integritas tes.</p>
+        </div>
+    </div>
+    
+    <!-- Main Application Container -->
+    <div id="app-container" class="w-full max-w-2xl">
+        
+        <!-- Loading State -->
+        <div id="loading-state" class="text-center p-10 bg-white rounded-xl quiz-card hidden">
+            <p class="text-xl font-semibold text-indigo-600">Memuat sesi kuis...</p>
+        </div>
+
+        <!-- User ID Display -->
+        <div class="text-center mb-4 text-sm text-gray-600">
+            <span id="user-id-display" class="bg-gray-200 p-2 rounded-lg inline-block font-mono text-xs">ID Pengguna: Memuat...</span>
+        </div>
+
+        <!-- Halaman Login/Mulai (Default View) -->
+        <div id="login-container" class="quiz-card bg-white p-6 sm:p-10 rounded-xl text-center hidden">
+            <h1 class="text-3xl font-bold text-indigo-700 mb-4">Kuis Enkapsulasi Java</h1>
+            <p class="text-gray-600 mb-6">Mata Pelajaran: Pemrograman Berbasis Grafis, Teks, dan Multimedia</p>
+            <div class="p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 mb-6 rounded-lg">
+                <p class="font-semibold">Perhatian:</p>
+                <ul class="list-disc list-inside text-left ml-4 text-sm">
+                    <li>Durasi pengerjaan adalah **1 menit** untuk 30 soal.</li>
+                    <li>Jika Anda berpindah tab atau keluar dari jendela, kuis akan **diulang dari awal**.</li>
+                    <li>Penyalinan teks/screenshot dinonaktifkan.</li>
+                </ul>
+            </div>
+            <button id="start-quiz-button" class="w-full sm:w-auto px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition duration-300 shadow-lg shadow-indigo-300 transform hover:scale-[1.02]">
+                Mulai Kuis Sekarang (1 Menit)
+            </button>
+        </div>
+
+        <!-- Halaman Kuis -->
+        <div id="quiz-container" class="quiz-card bg-white p-6 sm:p-8 rounded-xl hidden">
+            
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <span id="progress-display" class="text-lg font-semibold text-indigo-600">Soal 1 dari 30</span>
+                <div class="text-2xl font-extrabold text-red-500 bg-red-100 p-2 rounded-md shadow-inner">
+                    <span id="timer-display">01:00</span>
+                </div>
+            </div>
+
+            <div class="min-h-[120px] mb-6">
+                <p id="question-text" class="text-gray-800 text-xl leading-relaxed whitespace-pre-line"></p>
+                <div id="code-display" class="mt-4"></div>
+            </div>
+
+            <!-- Opsi Jawaban -->
+            <div id="options-container" class="mb-8">
+                <!-- Opsi akan dimasukkan di sini oleh JS -->
+            </div>
+
+            <!-- Kontrol Navigasi -->
+            <div class="flex justify-between gap-4">
+                <button id="prev-button" class="w-1/3 px-4 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition duration-200 disabled:opacity-50" disabled>
+                    &larr; Sebelumnya
+                </button>
+                <button id="next-button" class="w-2/3 px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition duration-200 shadow-md shadow-indigo-300">
+                    Soal Berikutnya
+                </button>
+                <button id="submit-button" class="w-2/3 px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition duration-200 shadow-md shadow-red-300 hidden">
+                    Selesai (Submit)
+                </button>
+            </div>
+        </div>
+
+        <!-- Halaman Hasil -->
+        <div id="result-container" class="quiz-card bg-white p-6 sm:p-10 rounded-xl text-center hidden">
+            <h2 class="text-4xl font-extrabold text-green-600 mb-4">Kuis Selesai!</h2>
+            <p class="text-xl text-gray-700 mb-6">Skor Akhir Anda:</p>
+            <div class="text-7xl font-bold mb-8 text-indigo-700">
+                <span id="final-score">0 / 30</span>
+            </div>
+            <p class="text-gray-600 mb-8">Luar biasa! Silakan ulangi untuk meningkatkan pemahaman Anda tentang Enkapsulasi Java.</p>
+            <button id="restart-button" class="w-full sm:w-auto px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition duration-300 shadow-lg shadow-indigo-300 transform hover:scale-[1.02]">
+                Ulangi Kuis
+            </button>
+        </div>
+    </div>
+</body>
+</html>
