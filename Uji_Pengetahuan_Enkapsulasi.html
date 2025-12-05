@@ -1,0 +1,471 @@
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { initializeApp } from 'firebase/app';
+import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'firebase/auth';
+import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp, doc, setLogLevel } from 'firebase/firestore';
+
+// --- KONFIGURASI DAN DATA FIREBASE ---
+// Global variables provided by the Canvas environment
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+// Atur log level debug untuk melihat aktivitas firestore di konsol
+if (process.env.NODE_ENV !== 'production') {
+    setLogLevel('error'); // Gunakan 'debug' jika perlu melihat semua log
+}
+
+const initializeFirebase = () => {
+    if (!firebaseConfig) {
+        console.error("Firebase config is missing.");
+        return { db: null, auth: null };
+    }
+    try {
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        return { db, auth };
+    } catch (e) {
+        console.error("Error initializing Firebase:", e);
+        return { db: null, auth: null };
+    }
+};
+
+// --- DATA SOAL ASESMEN ---
+const QUESTIONS = [
+    { q: "Tujuan utama enkapsulasi dalam PBO adalah…", options: ["Membuat class menjadi lebih cepat dieksekusi", "Menyembunyikan data agar tidak diakses langsung dari luar class", "Menghapus variabel yang tidak digunakan", "Mengubah tipe data variabel", "Menggabungkan dua class menjadi satu"], answerIndex: 1 },
+    { q: "Kata kunci yang digunakan untuk menyembunyikan atribut dalam class adalah…", options: ["public", "static", "void", "private", "protected"], answerIndex: 3 },
+    { q: "Atribut yang dienkapsulasi pada class AkunBank adalah…", options: ["saldo, pin, bunga", "namaPemilik, nomorAkun, saldo", "alamat, saldo, password", "namaBank, cabang, nomorAkun", "nomorAkun, pin, bunga"], answerIndex: 1 },
+    { q: "Metode yang digunakan untuk mengambil nilai dari atribut private adalah…", options: ["Setter", "Getter", "Konstruktor", "Scanner", "Static method"], answerIndex: 1 },
+    { q: "Fungsi setter adalah…", options: ["Menghapus objek", "Mengatur nilai atribut private", "Membuat objek baru", "Menjalankan method main", "Mengembalikan nilai saldo"], answerIndex: 1 },
+    { q: "Keyword 'this' digunakan untuk…", options: ["Menghapus variabel", "Mengacu pada objek saat ini", "Membuat objek baru", "Mengubah tipe data", "Mengisi nilai default"], answerIndex: 1 },
+    { q: "Pernyataan yang benar tentang konstruktor adalah…", options: ["Konstruktor boleh diberi tipe kembalian", "Nama konstruktor harus sama dengan nama class", "Konstruktor harus static", "Konstruktor hanya boleh satu", "Konstruktor harus selalu kosong"], answerIndex: 1 },
+    { q: "Konstruktor AkunBank digunakan untuk…", options: ["Menginisialisasi namaPemilik dan nomorAkun", "Mengubah saldo", "Menghapus data akun", "Menjalankan setter", "Menampilkan saldo"], answerIndex: 0 },
+    { q: "Ketika saldo dibiarkan public, risikonya adalah…", options: ["Nilai saldo otomatis menjadi nol", "Saldo bisa diubah sembarang dari luar class", "Getter tidak bisa dipakai", "Konstruktor tidak bisa dipanggil", "Error kompilasi"], answerIndex: 1 },
+    { q: "Pada metode deposit, aturan validasi yang benar adalah…", options: ["jumlah harus negatif", "jumlah boleh nol", "jumlah harus > 0", "jumlah harus kelipatan 1000", "jumlah bebas tanpa syarat"], answerIndex: 2 },
+    { q: "Pada penarikan, transaksi gagal jika…", options: ["jumlah = saldo", "jumlah < saldo", "jumlah > saldo", "jumlah = 0", "saldo = 0"], answerIndex: 2 },
+    { q: "Tipe data yang tepat untuk saldo akun bank adalah…", options: ["int", "float", "byte", "double", "String"], answerIndex: 3 },
+    { q: "Pernyataan deposit berikut yang benar adalah…", options: ["saldo = saldo – jumlah", "saldo = saldo + jumlah", "jumlah = jumlah + saldo", "saldo = jumlah", "jumlah = saldo"], answerIndex: 1 },
+    { q: "Fungsi method cetakInfoAkun() adalah…", options: ["Mengambil nilai saldo", "Mencetak informasi lengkap akun", "Mengubah nomor akun", "Menghapus objek akun", "Membuat objek baru"], answerIndex: 1 },
+    { q: "Jika baris akun1.saldo dicoba diakses dari main, maka…", options: ["Berhasil tanpa error", "Hanya berjalan jika saldo static", "Akan muncul error kompilasi", "Akan menampilkan saldo default", "Menghasilkan output kosong"], answerIndex: 2 },
+    { q: "Error terjadi jika setter ditulis seperti ini: public setSaldo(double s) { saldo = s; }. Kesalahannya adalah…", options: ["Harus static", "Harus memiliki tipe kembalian void", "Parameter salah", "Nama method salah", "Tipe data harus int"], answerIndex: 1 },
+    { q: "Getter yang benar untuk atribut namaPemilik adalah…", options: ["public void getNamaPemilik()", "public String namaPemilik()", "public String getNamaPemilik()", "String getNamaPemilik(String n)", "private String getNamaPemilik()"], answerIndex: 2 },
+    { q: "Jika konstruktor tidak diberi parameter tetapi atribut harus diisi, maka…", options: ["Nilai tidak bisa diakses", "Nilai harus diisi lewat setter", "Program tidak bisa dijalankan", "Getter tidak berguna", "Harus membuat dua konstruktor"], answerIndex: 1 },
+    { q: "Tujuan validasi penarikan adalah…", options: ["Mengizinkan saldo negatif", "Mencegah saldo minus", "Menghapus saldo lama", "Menggandakan saldo", "Mengubah nomor rekening"], answerIndex: 1 },
+    { q: "Kode berikut termasuk… private String nomorAkun;", options: ["Deklarasi variabel public", "Deklarasi getter", "Enkapsulasi atribut", "Pembuatan konstruktor", "Method setter"], answerIndex: 2 },
+    // DEBUGGING & PEMAHAMAN KODE
+    { q: "public AkunBank(String nama, String no) { namaPemilik = nama; }. Kesalahannya adalah…", options: ["Konstruktor tidak boleh memakai parameter", "nomorAkun tidak diinisialisasi", "namaPemilik harus public", "Tipe data salah", "Harus menggunakan this"], answerIndex: 1 },
+    { q: "public String getSaldo() { return saldo; }. Kesalahannya…", options: ["Getter harus void", "return harus double, bukan String", "saldo harus public", "saldo harus String", "Getter harus static"], answerIndex: 1 },
+    { q: "public void setNamaPemilik() { this.namaPemilik = namaPemilik; }. Kesalahannya adalah…", options: ["Tidak ada parameter untuk menerima nilai baru", "Setter harus int", "Setter harus mengembalikan sesuatu", "Tidak boleh menggunakan this", "Getter harus dibuat dulu"], answerIndex: 0 },
+    { q: "public boolean deposit(double jumlah) { saldo += jumlah; return true; }. Masalahnya adalah…", options: ["saldo harus dikurangi", "Tidak ada validasi jumlah > 0", "Harus bertipe void", "Parameter salah", "deposit harus static"], answerIndex: 1 },
+    { q: "public boolean penarikan(double jumlah) { if (jumlah < saldo) return false; saldo -= jumlah; return true; }. Kesalahan logika adalah…", options: ["Harus return false jika saldo cukup", "Penarikan harus menambah saldo", "Syarat < seharusnya >", "Parameter harus int", "Konstruktor harus dibuat dulu"], answerIndex: 2 },
+    // MULAI RESET CHECKPOINT (Soal ke-25)
+    { q: "Tujuan method cetakHasilTransaksi() adalah…", options: ["Menjalankan deposit", "Menjalankan penarikan", "Menampilkan hasil transaksi di konsol", "Mengubah saldo", "Menjalankan setter"], answerIndex: 2 },
+    { q: "Jika kode berikut dijalankan: AkunBank a = new AkunBank('Budi', '001'); System.out.println(a.getNamaPemilik());. Maka output adalah…", options: ["Error", "null", "“Budi”", "0", "Tidak muncul apa-apa"], answerIndex: 2 },
+    { q: "Mengapa saldo tidak boleh diakses langsung dari main?", options: ["Karena saldo harus static", "Karena saldo wajib publik", "Karena saldo dienkapsulasi (private)", "Karena saldo tidak bertipe String", "Karena setter belum dibuat"], answerIndex: 2 },
+    { q: "Jika deposit dilakukan dengan jumlah = -1000, maka…", options: ["Saldo berkurang", "Saldo menjadi negatif", "Deposit gagal (false)", "Deposit berhasil", "Program error"], answerIndex: 2 },
+    { q: "Method penarikan benar jika…", options: ["jumlah > 0 dan jumlah ≤ saldo", "jumlah boleh 0", "jumlah bebas", "jumlah selalu ditolak", "jumlah selalu diterima"], answerIndex: 0 },
+    // Lanjutan Soal
+    { q: "Jika saldo awal 100.000 lalu deposit 50.000, maka saldo menjadi…", options: ["100.000", "50.000", "150.000", "200.000", "0"], answerIndex: 2 },
+    { q: "Jika saldo 20.000 dan ingin menarik 50.000 maka…", options: ["Berhasil", "Saldo menjadi negatif", "Gagal (jumlah melebihi saldo)", "Program berhenti", "Saldo jadi nol"], answerIndex: 2 },
+    { q: "Perintah untuk membuat objek baru AkunBank adalah…", options: ["AkunBank();", "new AkunBank;", "AkunBank a = new AkunBank('A', '01');", "AkunBank a();", "create AkunBank;"], answerIndex: 2 },
+    { q: "Data yang cocok disimpan dalam nomorAkun adalah…", options: ["Nama lengkap", "Tanggal lahir", "String identifikasi rekening", "Saldo terakhir", "Boolean status"], answerIndex: 2 },
+    { q: "PBO mengajarkan bahwa enkapsulasi penting karena…", options: ["Mempercepat komputasi", "Membuat variabel menjadi global", "Mencegah akses sembarang dari luar class", "Menghilangkan error otomatis", "Mengubah tipe data otomatis"], answerIndex: 2 },
+    { q: "Jika getter salah ketik: return salddo;. Maka akan terjadi…", options: ["Saldo ditambah otomatis", "Program tetap berjalan", "Error variabel tidak dikenal", "Hasil output 0", "Hasil output kosong"], answerIndex: 2 },
+    { q: "Yang termasuk logika bisnis bank adalah…", options: ["saldo harus nol", "saldo boleh negatif", "penarikan tidak boleh melebihi saldo", "deposit bebas angka minus", "semua transaksi otomatis disetujui"], answerIndex: 2 },
+    { q: "Class AkunBankApp bertujuan untuk…", options: ["Menyimpan saldo", "Memvalidasi konstruktor", "Mengelola output hasil transaksi", "Membuat objek", "Memperbaiki bug konstruktor"], answerIndex: 2 },
+    { q: "Class Main berfungsi sebagai…", options: ["Tempat menyimpan atribut", "Tempat eksekusi program", "Penyimpan saldo utama", "Pengganti setter", "Penggabung class"], answerIndex: 1 },
+    { q: "Mengapa wajib melakukan 'Uji Data Hiding'?", options: ["Untuk memastikan setter bekerja", "Untuk memastikan saldo tidak bisa diakses langsung", "Untuk menambah fitur baru", "Untuk membuat saldo menjadi public", "Untuk menghapus konstruktor"], answerIndex: 1 },
+];
+
+const TIME_PER_QUESTION = 20; // Waktu dalam detik
+const RESET_CHECKPOINT_Q = 25; // Soal ke-25
+const MIN_CORRECT_TO_PASS = 20; // Minimum jawaban benar untuk melanjutkan setelah Q25
+
+// --- KOMPONEN UI KHUSUS ---
+
+const MessageModal = ({ message, type, onClose }) => (
+    <div className={`fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50`}>
+        <div className={`bg-white rounded-xl shadow-2xl p-6 md:p-8 w-full max-w-md transform transition-all duration-300 ${type === 'fail' ? 'border-4 border-red-500' : 'border-4 border-green-500'}`}>
+            <h3 className="text-2xl font-bold mb-3">
+                {type === 'fail' ? 'ASESSMEN DIRESET!' : 'SELESAI!'}
+            </h3>
+            <p className="text-gray-700 mb-6">{message}</p>
+            <button
+                onClick={onClose}
+                className={`w-full py-3 rounded-lg font-semibold text-white transition duration-200 ${type === 'fail' ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'}`}
+            >
+                {type === 'fail' ? 'Kembali ke Login' : 'Lihat Hasil Akhir'}
+            </button>
+        </div>
+    </div>
+);
+
+
+// --- KOMPONEN UTAMA ---
+
+const App = () => {
+    const [{ db, auth }, setFirebase] = useState({ db: null, auth: null });
+    const [userId, setUserId] = useState(null);
+    const [isAuthReady, setIsAuthReady] = useState(false);
+    const [user, setUser] = useState({ name: '', nis: '' });
+    const [quizState, setQuizState] = useState({
+        isLoggedIn: false,
+        currentQuestion: 0,
+        score: 0,
+        answers: Array(QUESTIONS.length).fill(null),
+        timeRemaining: TIME_PER_QUESTION,
+        isFinished: false,
+        showModal: false,
+        modalMessage: '',
+        modalType: '',
+    });
+    const [history, setHistory] = useState([]);
+    const timerRef = useRef(null);
+
+    // 1. FIREBASE INITIALIZATION & AUTH
+    useEffect(() => {
+        const { db, auth } = initializeFirebase();
+        if (db && auth) {
+            setFirebase({ db, auth });
+
+            // Otomatis sign-in atau sign-in anonim
+            const authenticate = async () => {
+                try {
+                    if (initialAuthToken) {
+                        const userCredential = await signInWithCustomToken(auth, initialAuthToken);
+                        setUserId(userCredential.user.uid);
+                    } else {
+                        const userCredential = await signInAnonymously(auth);
+                        setUserId(userCredential.user.uid);
+                    }
+                } catch (error) {
+                    console.error("Firebase Auth Error:", error);
+                    // Fallback to anonymous if custom token fails
+                    try {
+                        const userCredential = await signInAnonymously(auth);
+                        setUserId(userCredential.user.uid);
+                    } catch (anonError) {
+                         console.error("Anonymous Sign-in Failed:", anonError);
+                    }
+                } finally {
+                    setIsAuthReady(true);
+                }
+            };
+            authenticate();
+        } else {
+            setIsAuthReady(true);
+        }
+    }, []);
+
+    // 2. FETCH HISTORY (Firestore Snapshot Listener)
+    useEffect(() => {
+        if (!isAuthReady || !db || !userId) return;
+
+        // Path: /artifacts/{appId}/public/data/quiz_history
+        const historyCollection = collection(db, 'artifacts', appId, 'public', 'data', 'quiz_history');
+        const q = query(historyCollection, orderBy('timestamp', 'desc'), limit(10));
+
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const fetchedHistory = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data(),
+                timestamp: doc.data().timestamp ? new Date(doc.data().timestamp.toDate()).toLocaleString() : 'N/A'
+            }));
+            setHistory(fetchedHistory);
+        }, (error) => {
+            console.error("Error fetching quiz history: ", error);
+        });
+
+        return () => unsubscribe();
+    }, [isAuthReady, db, userId]);
+
+    // 3. QUIZ LOGIC (Timer and Checkpoint)
+
+    // Callback untuk mereset kuis
+    const resetQuiz = useCallback(() => {
+        setQuizState(prev => ({
+            ...prev,
+            isLoggedIn: false,
+            currentQuestion: 0,
+            score: 0,
+            answers: Array(QUESTIONS.length).fill(null),
+            timeRemaining: TIME_PER_QUESTION,
+            isFinished: false,
+            showModal: false,
+            modalMessage: '',
+            modalType: '',
+        }));
+        setUser({ name: '', nis: '' });
+    }, []);
+
+    // Timer logic
+    useEffect(() => {
+        if (!quizState.isLoggedIn || quizState.isFinished) {
+            clearInterval(timerRef.current);
+            return;
+        }
+
+        timerRef.current = setInterval(() => {
+            setQuizState(prev => {
+                const newTime = prev.timeRemaining - 1;
+                if (newTime <= 0) {
+                    // Pindah ke soal berikutnya setelah timer habis
+                    if (prev.currentQuestion < QUESTIONS.length - 1) {
+                        return { ...prev, currentQuestion: prev.currentQuestion + 1, timeRemaining: TIME_PER_QUESTION };
+                    } else {
+                        // Jika soal terakhir, selesaikan kuis
+                        return { ...prev, isFinished: true, showModal: true, modalType: 'success', modalMessage: `Selamat ${user.name}, Anda telah menyelesaikan asesmen. Skor total Anda akan segera diproses.` };
+                    }
+                }
+                return { ...prev, timeRemaining: newTime };
+            });
+        }, 1000);
+
+        return () => clearInterval(timerRef.current);
+    }, [quizState.isLoggedIn, quizState.isFinished, user.name]);
+
+    // Checkpoint Logic (Soal ke-25)
+    useEffect(() => {
+        if (quizState.currentQuestion === RESET_CHECKPOINT_Q - 1 && quizState.isLoggedIn && !quizState.isFinished) {
+            // Cek skor setelah menjawab soal ke-24, sebelum tampil soal ke-25
+            const currentScore = quizState.answers.slice(0, RESET_CHECKPOINT_Q - 1).reduce((acc, selected, index) => {
+                return acc + (selected === QUESTIONS[index].answerIndex ? 1 : 0);
+            }, 0);
+
+            if (currentScore < MIN_CORRECT_TO_PASS) {
+                // Trigger reset!
+                setQuizState(prev => ({
+                    ...prev,
+                    isFinished: true, // Hentikan timer
+                    showModal: true,
+                    modalType: 'fail',
+                    modalMessage: `Skor benar saat ini (${currentScore}) kurang dari batas minimum (${MIN_CORRECT_TO_PASS}) hingga soal ke-${RESET_CHECKPOINT_Q - 1}. Asesmen direset.`,
+                }));
+                // Reset setelah modal ditutup
+            }
+        }
+    }, [quizState.currentQuestion, quizState.isLoggedIn, quizState.isFinished, quizState.answers]);
+
+
+    // 4. HANDLERS
+
+    const handleLogin = (e) => {
+        e.preventDefault();
+        if (user.name.trim() && user.nis.trim()) {
+            setQuizState(prev => ({ ...prev, isLoggedIn: true, timeRemaining: TIME_PER_QUESTION }));
+        }
+    };
+
+    const handleAnswer = (selectedIndex) => {
+        const currentQ = quizState.currentQuestion;
+        const isCorrect = selectedIndex === QUESTIONS[currentQ].answerIndex;
+        
+        setQuizState(prev => {
+            // Catat Jawaban
+            const newAnswers = [...prev.answers];
+            newAnswers[currentQ] = selectedIndex;
+
+            // Hitung skor (hanya soal ini)
+            const newScore = prev.score + (isCorrect ? 1 : 0);
+
+            // Pindah ke soal berikutnya
+            if (currentQ < QUESTIONS.length - 1) {
+                // Reset timer dan pindah
+                return { 
+                    ...prev, 
+                    currentQuestion: currentQ + 1, 
+                    answers: newAnswers, 
+                    score: newScore,
+                    timeRemaining: TIME_PER_QUESTION // Reset timer
+                };
+            } else {
+                // Selesaikan Kuis
+                return { 
+                    ...prev, 
+                    answers: newAnswers,
+                    score: newScore,
+                    isFinished: true,
+                    showModal: true,
+                    modalType: 'success',
+                    modalMessage: `Selamat ${user.name}, Anda telah menyelesaikan asesmen. Skor total Anda akan segera diproses.`,
+                };
+            }
+        });
+    };
+
+    const submitResult = useCallback(async () => {
+        if (!db || !userId) return;
+
+        const totalCorrect = quizState.answers.reduce((acc, selected, index) => {
+            return acc + (selected === QUESTIONS[index].answerIndex ? 1 : 0);
+        }, 0);
+
+        const totalScore = (totalCorrect / QUESTIONS.length) * 100;
+        const resultData = {
+            userId: userId, // User ID dari Firebase Auth
+            name: user.name,
+            nis: user.nis,
+            totalScore: totalScore.toFixed(2),
+            totalCorrect: totalCorrect,
+            totalQuestions: QUESTIONS.length,
+            timestamp: serverTimestamp(),
+            // Tidak menyimpan jawaban per soal untuk privasi riwayat
+        };
+
+        try {
+            const historyCollection = collection(db, 'artifacts', appId, 'public', 'data', 'quiz_history');
+            await addDoc(historyCollection, resultData);
+            console.log("Result saved successfully!");
+        } catch (e) {
+            console.error("Error adding document: ", e);
+        }
+    }, [db, userId, user.name, user.nis, quizState.answers]);
+
+    // Submit result when finished
+    useEffect(() => {
+        if (quizState.isFinished && quizState.modalType === 'success') {
+            submitResult();
+        }
+    }, [quizState.isFinished, quizState.modalType, submitResult]);
+
+    // Handle modal close
+    const handleModalClose = () => {
+        if (quizState.modalType === 'fail') {
+            resetQuiz();
+        }
+        setQuizState(prev => ({ ...prev, showModal: false }));
+    };
+
+    // --- RENDER FUNCTIONS ---
+
+    const renderLogin = () => (
+        <div className="flex flex-col items-center justify-center p-6 bg-white shadow-xl rounded-xl w-full max-w-md">
+            <h2 className="text-2xl font-extrabold text-indigo-700 mb-6 border-b-2 pb-2">Aplikasi Asesmen Enkapsulasi</h2>
+            <form onSubmit={handleLogin} className="w-full space-y-4">
+                <input
+                    type="text"
+                    placeholder="Nama Lengkap"
+                    value={user.name}
+                    onChange={(e) => setUser(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                    required
+                />
+                <input
+                    type="text"
+                    placeholder="NIS (Nomor Induk Siswa)"
+                    value={user.nis}
+                    onChange={(e) => setUser(prev => ({ ...prev, nis: e.target.value }))}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                    required
+                />
+                <button
+                    type="submit"
+                    className="w-full py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition duration-200 shadow-md"
+                >
+                    Mulai Asesmen
+                </button>
+            </form>
+            <p className="mt-4 text-sm text-gray-500">Total Soal: {QUESTIONS.length}</p>
+        </div>
+    );
+
+    const renderQuiz = () => {
+        const qIndex = quizState.currentQuestion;
+        const currentQData = QUESTIONS[qIndex];
+        const isCheckpoint = qIndex === RESET_CHECKPOINT_Q - 1; // Soal terakhir sebelum checkpoint
+
+        return (
+            <div className="flex flex-col p-6 bg-white shadow-xl rounded-xl w-full max-w-2xl min-h-[400px]">
+                {/* Header Kuis & Timer */}
+                <div className="flex justify-between items-center mb-4 pb-2 border-b">
+                    <div className="text-lg font-semibold text-gray-700">Soal {qIndex + 1} dari {QUESTIONS.length}</div>
+                    <div className={`text-2xl font-extrabold px-4 py-1 rounded-full shadow-lg ${quizState.timeRemaining <= 5 ? 'bg-red-500 text-white animate-pulse' : 'bg-indigo-500 text-white'}`}>
+                        {quizState.timeRemaining}s
+                    </div>
+                </div>
+
+                {/* Status Siswa */}
+                <div className="text-sm mb-4 text-gray-500">
+                    <p>Nama: <span className="font-medium text-gray-800">{user.name}</span> | NIS: <span className="font-medium text-gray-800">{user.nis}</span></p>
+                    {isCheckpoint && (
+                         <p className="text-sm font-bold text-red-600 mt-2">
+                            Peringatan: Ini adalah soal terakhir sebelum Checkpoint Reset!
+                        </p>
+                    )}
+                </div>
+
+                {/* Pertanyaan */}
+                <div className="text-xl font-medium mb-6 text-gray-800">
+                    {currentQData.q}
+                </div>
+
+                {/* Pilihan Jawaban */}
+                <div className="space-y-3">
+                    {currentQData.options.map((option, index) => (
+                        <button
+                            key={index}
+                            onClick={() => handleAnswer(index)}
+                            className="w-full text-left p-4 border border-gray-200 rounded-lg bg-gray-50 hover:bg-indigo-100 transition duration-200 text-gray-700 font-medium shadow-sm"
+                        >
+                            <span className="font-bold mr-3 text-indigo-600">
+                                {String.fromCharCode(65 + index)}.
+                            </span>
+                            {option}
+                        </button>
+                    ))}
+                </div>
+            </div>
+        );
+    };
+
+    const renderHistory = () => (
+        <div className="mt-8 p-6 bg-white shadow-xl rounded-xl w-full max-w-2xl">
+            <h2 className="text-xl font-bold text-indigo-700 mb-4 border-b pb-2">Riwayat Asesmen (10 Hasil Terbaru)</h2>
+            {history.length > 0 ? (
+                <div className="space-y-3">
+                    {history.map((item, index) => (
+                        <div key={item.id} className="p-3 bg-gray-50 rounded-lg shadow-sm border-l-4 border-indigo-400">
+                            <p className="font-bold text-gray-800">Nama: {item.name} ({item.nis})</p>
+                            <p className="text-sm text-gray-600">Skor Akhir: <span className="font-extrabold text-lg text-green-700">{item.totalScore}%</span></p>
+                            <p className="text-xs text-gray-500">Waktu: {item.timestamp}</p>
+                            <p className="text-xs text-gray-500 mt-1">ID Pengguna: {item.userId}</p>
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <p className="text-gray-500">Belum ada riwayat asesmen yang tersimpan.</p>
+            )}
+        </div>
+    );
+
+    // --- MAIN RENDER ---
+    return (
+        <div className="min-h-screen bg-gray-100 p-4 sm:p-8 flex flex-col items-center">
+            <h1 className="text-3xl font-extrabold text-gray-800 mb-6">Asesmen Uji Pengetahuan PBO: Enkapsulasi</h1>
+
+            {!isAuthReady && (
+                <div className="text-lg font-semibold text-gray-600">Memuat layanan Firebase...</div>
+            )}
+
+            {isAuthReady && (
+                <>
+                    <div className="w-full max-w-2xl flex flex-col items-center">
+                        {!quizState.isLoggedIn && !quizState.isFinished && renderLogin()}
+                        {quizState.isLoggedIn && !quizState.isFinished && renderQuiz()}
+                    </div>
+                    {renderHistory()}
+                </>
+            )}
+
+            {quizState.showModal && (
+                <MessageModal
+                    message={quizState.modalMessage}
+                    type={quizState.modalType}
+                    onClose={handleModalClose}
+                />
+            )}
+        </div>
+    );
+};
+
+export default App;
