@@ -10,6 +10,7 @@
         input[type="radio"]:checked + .option-content { border-color: #3b82f6; background-color: #eff6ff; }
         .animate-fade-in { animation: fadeIn 0.5s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .code-block { font-family: 'Courier New', Courier, monospace; }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen font-sans">
@@ -56,7 +57,7 @@
             <div id="question-box">
                 <h2 id="question-text" class="text-xl font-semibold text-gray-800 mb-6"></h2>
                 <div id="options-container" class="space-y-3">
-                    <!-- Options will be injected here -->
+                    <!-- Options injected here -->
                 </div>
             </div>
 
@@ -80,22 +81,20 @@
         </div>
 
         <!-- Learning Material Section (Hidden by default) -->
-        <div id="material-container" class="hidden space-y-8 animate-fade-in">
+        <div id="material-container" class="hidden space-y-8 animate-fade-in pb-20">
             <div class="bg-blue-800 text-white p-8 rounded-xl shadow-lg">
                 <h2 class="text-3xl font-bold mb-4">Materi: Error Handling di Java</h2>
-                <p class="text-blue-100">Selamat! Kamu telah menguasai konsep Enkapsulasi. Sekarang mari pelajari bagaimana menangani kesalahan dalam program.</p>
+                <p class="text-blue-100">Mari pelajari bagaimana menangani kesalahan agar program tidak berhenti tiba-tiba.</p>
             </div>
 
             <!-- Bagian 1: Jenis Exception -->
             <section class="bg-white p-8 rounded-xl shadow-md">
                 <h3 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2 text-blue-600">1. Mengenal Jenis Exception (Error)</h3>
-                <p class="text-gray-700 mb-4">Dalam pemrograman Java, kesalahan atau *exception* secara garis besar dibagi menjadi tiga kategori utama:</p>
-                
                 <div class="grid md:grid-cols-3 gap-6">
                     <div class="border p-4 rounded-lg bg-red-50">
                         <h4 class="font-bold text-red-700">Syntax Error</h4>
-                        <p class="text-sm text-gray-600 mb-2 italic">Kesalahan tata bahasa kode.</p>
-                        <p class="text-xs font-mono bg-white p-2 border border-red-200">System.out.printl("Hi") // Kurang huruf 'n'</p>
+                        <p class="text-sm text-gray-600 mb-2 italic">Kesalahan aturan penulisan.</p>
+                        <p class="text-xs font-mono bg-white p-2 border border-red-200">int x = 10 // Tanpa titik koma</p>
                     </div>
                     <div class="border p-4 rounded-lg bg-orange-50">
                         <h4 class="font-bold text-orange-700">Runtime Error</h4>
@@ -104,30 +103,75 @@
                     </div>
                     <div class="border p-4 rounded-lg bg-yellow-50">
                         <h4 class="font-bold text-yellow-700">Logic Error</h4>
-                        <p class="text-sm text-gray-600 mb-2 italic">Program jalan, tapi output salah.</p>
-                        <p class="text-xs font-mono bg-white p-2 border border-yellow-200">luas = panjang + lebar; // Harusnya dikali</p>
+                        <p class="text-sm text-gray-600 mb-2 italic">Alur logika salah (bug).</p>
+                        <p class="text-xs font-mono bg-white p-2 border border-yellow-200">keliling = p * l; // Harusnya (p+l)*2</p>
                     </div>
                 </div>
             </section>
 
-            <!-- Bagian 2: Try-Catch -->
+            <!-- Bagian 2: Kenapa harus Try-Catch? -->
             <section class="bg-white p-8 rounded-xl shadow-md">
-                <h3 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2 text-blue-600">2. Struktur Try-Catch</h3>
-                <p class="text-gray-700 mb-4">Blok <code class="bg-gray-100 px-1 rounded text-red-500">try</code> digunakan untuk menaruh kode yang berpotensi error, sedangkan <code class="bg-gray-100 px-1 rounded text-red-500">catch</code> menangkap dan menangani error tersebut.</p>
+                <h3 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2 text-blue-600">2. Mekanisme Try-Catch</h3>
+                <p class="text-gray-700 mb-4 font-semibold">Mengapa kita butuh blok `catch`?</p>
+                <div class="bg-indigo-50 p-4 rounded-lg border-l-4 border-indigo-500 mb-6">
+                    <p class="text-sm text-indigo-900 italic">
+                        Tanpa <b>catch</b>, jika terjadi error di tengah program, Java akan menghentikan seluruh proses secara paksa (crash). Dengan <b>catch</b>, kita "menangkap" error tersebut dan memberikan instruksi alternatif, sehingga program tetap bisa lanjut berjalan.
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8 mb-6">
+                    <div class="space-y-2">
+                        <p class="text-xs font-bold text-red-600">❌ TANPA CATCH (Program Berhenti/Mati)</p>
+                        <div class="bg-gray-800 text-white p-4 rounded-lg text-xs font-mono">
+                            System.out.println("Mulai");<br>
+                            int x = 10 / 0; <span class="text-red-400">// ERROR DISINI</span><br>
+                            System.out.println("Selesai"); <span class="text-gray-500">// Tidak akan pernah dijalankan</span>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <p class="text-xs font-bold text-green-600">✅ DENGAN TRY-CATCH (Program Selamat)</p>
+                        <div class="bg-gray-800 text-white p-4 rounded-lg text-xs font-mono">
+                            try {<br>
+                            &nbsp;&nbsp;int x = 10 / 0;<br>
+                            } catch (Exception e) {<br>
+                            &nbsp;&nbsp;System.out.println("Ada error!");<br>
+                            }<br>
+                            System.out.println("Selesai"); <span class="text-green-400">// TETAP DIJALANKAN</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Bagian 3: Soal Latihan -->
+            <section class="bg-white p-8 rounded-xl shadow-md border-2 border-blue-100">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4 text-blue-600">✍️ Soal Latihan Singkat</h3>
+                <p class="text-sm text-gray-600 mb-6">Coba jawab pertanyaan berikut untuk menguji pemahamanmu tentang Error Handling.</p>
                 
-                <div class="bg-gray-800 text-gray-100 p-6 rounded-lg font-mono text-sm">
-                    <span class="text-blue-400">try</span> {<br>
-                    &nbsp;&nbsp;<span class="text-gray-400">// Kode yang mungkin error</span><br>
-                    &nbsp;&nbsp;<span class="text-yellow-400">int</span> hasil = 10 / 0;<br>
-                    } <span class="text-blue-400">catch</span> (ArithmeticException e) {<br>
-                    &nbsp;&nbsp;<span class="text-gray-400">// Menangani error</span><br>
-                    &nbsp;&nbsp;System.out.println(<span class="text-green-400">"Terjadi kesalahan: Tidak bisa membagi dengan nol!"</span>);<br>
-                    }
+                <div class="space-y-6">
+                    <div class="p-4 bg-gray-50 rounded-lg">
+                        <p class="font-bold text-gray-800 mb-3">1. Apa yang terjadi jika sebuah program Java mengalami runtime error tetapi tidak menggunakan blok try-catch?</p>
+                        <div class="space-y-2">
+                            <button onclick="checkPractice(1, 'a')" class="w-full text-left p-3 border rounded hover:bg-white transition text-sm">A. Java akan memperbaiki kodenya secara otomatis.</button>
+                            <button onclick="checkPractice(1, 'b')" class="w-full text-left p-3 border rounded hover:bg-white transition text-sm">B. Program akan berhenti (crash) dan baris kode setelahnya tidak dijalankan.</button>
+                            <button onclick="checkPractice(1, 'c')" class="w-full text-left p-3 border rounded hover:bg-white transition text-sm">C. Program akan melompati baris yang error dan lanjut ke baris berikutnya.</button>
+                        </div>
+                        <p id="practice-res-1" class="mt-2 text-sm font-bold hidden"></p>
+                    </div>
+
+                    <div class="p-4 bg-gray-50 rounded-lg">
+                        <p class="font-bold text-gray-800 mb-3">2. Di bagian blok manakah kita menuliskan kode untuk menampilkan pesan peringatan jika terjadi error?</p>
+                        <div class="space-y-2">
+                            <button onclick="checkPractice(2, 'a')" class="w-full text-left p-3 border rounded hover:bg-white transition text-sm">A. Blok try</button>
+                            <button onclick="checkPractice(2, 'b')" class="w-full text-left p-3 border rounded hover:bg-white transition text-sm">B. Blok catch</button>
+                            <button onclick="checkPractice(2, 'c')" class="w-full text-left p-3 border rounded hover:bg-white transition text-sm">C. Blok public</button>
+                        </div>
+                        <p id="practice-res-2" class="mt-2 text-sm font-bold hidden"></p>
+                    </div>
                 </div>
             </section>
 
             <div class="text-center">
-                <button onclick="location.reload()" class="text-blue-600 hover:underline">Keluar & Ulangi Asesmen</button>
+                <button onclick="location.reload()" class="text-blue-600 hover:underline">Keluar & Selesai</button>
             </div>
         </div>
     </div>
@@ -175,10 +219,8 @@
             e.preventDefault();
             userData.name = document.getElementById('username').value;
             userData.nis = document.getElementById('nis').value;
-
             document.getElementById('display-user').innerText = `Siswa: ${userData.name}`;
             document.getElementById('display-nis').innerText = `NIS: ${userData.nis}`;
-
             loginContainer.classList.add('hidden');
             quizContainer.classList.remove('hidden');
             loadQuestion();
@@ -203,7 +245,6 @@
                 `;
                 oContainer.appendChild(label);
             });
-
             counter.innerText = `Soal ${currentQuestion + 1} / ${questions.length}`;
             progressFill.style.width = `${((currentQuestion) / questions.length) * 100}%`;
         }
@@ -211,34 +252,23 @@
         function selectOption(idx) {
             selectedOption = idx;
             document.getElementById('next-btn').disabled = false;
-            
             const labels = document.querySelectorAll('.option-label');
             labels.forEach((l, i) => {
-                if(i === idx) {
-                    l.classList.add('border-blue-500', 'bg-blue-50');
-                } else {
-                    l.classList.remove('border-blue-500', 'bg-blue-50');
-                }
+                if(i === idx) { l.classList.add('border-blue-500', 'bg-blue-50'); }
+                else { l.classList.remove('border-blue-500', 'bg-blue-50'); }
             });
         }
 
         function handleNext() {
-            if (selectedOption === questions[currentQuestion].a) {
-                score++;
-            }
-
+            if (selectedOption === questions[currentQuestion].a) { score++; }
             currentQuestion++;
-            if (currentQuestion < questions.length) {
-                loadQuestion();
-            } else {
-                showResult();
-            }
+            if (currentQuestion < questions.length) { loadQuestion(); }
+            else { showResult(); }
         }
 
         function showResult() {
             quizContainer.classList.add('hidden');
             resultContainer.classList.remove('hidden');
-            
             const pass = score >= 18;
             const resIcon = document.getElementById('result-icon');
             const resTitle = document.getElementById('result-title');
@@ -247,17 +277,17 @@
 
             document.getElementById('res-name').innerText = userData.name;
             document.getElementById('res-nis').innerText = `NIS: ${userData.nis}`;
-            resScore.innerText = `Skor Anda: ${score} / ${questions.length} (${(score/questions.length)*100}%)`;
+            resScore.innerText = `Skor Anda: ${score} / ${questions.length}`;
 
             if (pass) {
                 resIcon.innerText = "🎉";
                 resTitle.innerText = "Luar Biasa!";
                 resTitle.className = "text-2xl font-bold mb-2 text-green-600";
-                actBtn.innerText = "Buka Materi Error Handling";
+                actBtn.innerText = "Pelajari Error Handling";
                 actBtn.onclick = showMaterial;
             } else {
                 resIcon.innerText = "📚";
-                resTitle.innerText = "Coba Lagi!";
+                resTitle.innerText = "Belum Lulus!";
                 resTitle.className = "text-2xl font-bold mb-2 text-orange-600";
                 actBtn.innerText = "Ulangi Asesmen";
                 actBtn.onclick = () => location.reload();
@@ -268,6 +298,23 @@
             resultContainer.classList.add('hidden');
             materialContainer.classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function checkPractice(soalNum, answer) {
+            const resEl = document.getElementById(`practice-res-${soalNum}`);
+            resEl.classList.remove('hidden', 'text-green-600', 'text-red-600');
+            
+            let isCorrect = false;
+            if (soalNum === 1 && answer === 'b') isCorrect = true;
+            if (soalNum === 2 && answer === 'b') isCorrect = true;
+
+            if (isCorrect) {
+                resEl.innerText = "Benar! Bagus sekali.";
+                resEl.classList.add('text-green-600');
+            } else {
+                resEl.innerText = "Belum tepat. Coba ingat lagi fungsi catch!";
+                resEl.classList.add('text-red-600');
+            }
         }
     </script>
 </body>
