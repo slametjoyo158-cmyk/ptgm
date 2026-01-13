@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asesmen Diagnostik & Materi Java</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .option-label:hover { background-color: #f3f4f6; }
+        input[type="radio"]:checked + .option-content { border-color: #3b82f6; background-color: #eff6ff; }
+        .animate-fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+
+    <div id="app" class="max-w-4xl mx-auto py-10 px-4">
+        <!-- Header -->
+        <header class="text-center mb-10">
+            <h1 class="text-3xl font-bold text-gray-800">Asesmen Diagnostik Java</h1>
+            <p class="text-gray-600 mt-2">Topik: Enkapsulasi (Prasyarat Error Handling)</p>
+        </header>
+
+        <!-- Login Section -->
+        <div id="login-container" class="bg-white rounded-xl shadow-md p-8 max-w-md mx-auto animate-fade-in">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Login Siswa</h2>
+            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                    <input type="text" id="username" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Masukkan nama Anda">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">NIS (Nomor Induk Siswa)</label>
+                    <input type="text" id="nis" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Masukkan NIS Anda">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold hover:bg-blue-700 transition">
+                    Mulai Asesmen
+                </button>
+            </form>
+        </div>
+
+        <!-- Quiz Section (Hidden by default) -->
+        <div id="quiz-container" class="hidden bg-white rounded-xl shadow-md p-8 animate-fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <p id="display-user" class="text-sm font-bold text-blue-600"></p>
+                    <p id="display-nis" class="text-xs text-gray-500"></p>
+                </div>
+                <div id="question-counter" class="text-gray-500 text-sm font-medium"></div>
+            </div>
+            
+            <div id="progress-bar" class="w-full bg-gray-200 rounded-full h-2.5 mb-6">
+                <div id="progress-fill" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+            </div>
+
+            <div id="question-box">
+                <h2 id="question-text" class="text-xl font-semibold text-gray-800 mb-6"></h2>
+                <div id="options-container" class="space-y-3">
+                    <!-- Options will be injected here -->
+                </div>
+            </div>
+
+            <div class="mt-8 flex justify-end">
+                <button id="next-btn" onclick="handleNext()" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50">
+                    Lanjut
+                </button>
+            </div>
+        </div>
+
+        <!-- Result Section (Hidden by default) -->
+        <div id="result-container" class="hidden bg-white rounded-xl shadow-md p-8 text-center animate-fade-in">
+            <div id="result-icon" class="mb-4 text-6xl"></div>
+            <h2 id="result-title" class="text-2xl font-bold mb-2"></h2>
+            <div id="user-info-result" class="mb-4 p-3 bg-gray-50 rounded-lg inline-block">
+                <p id="res-name" class="font-bold text-gray-800"></p>
+                <p id="res-nis" class="text-sm text-gray-500"></p>
+            </div>
+            <p id="result-score" class="text-lg text-gray-600 mb-6"></p>
+            <button id="action-btn" class="bg-blue-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-700 transition"></button>
+        </div>
+
+        <!-- Learning Material Section (Hidden by default) -->
+        <div id="material-container" class="hidden space-y-8 animate-fade-in">
+            <div class="bg-blue-800 text-white p-8 rounded-xl shadow-lg">
+                <h2 class="text-3xl font-bold mb-4">Materi: Error Handling di Java</h2>
+                <p class="text-blue-100">Selamat! Kamu telah menguasai konsep Enkapsulasi. Sekarang mari pelajari bagaimana menangani kesalahan dalam program.</p>
+            </div>
+
+            <!-- Bagian 1: Jenis Exception -->
+            <section class="bg-white p-8 rounded-xl shadow-md">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2 text-blue-600">1. Mengenal Jenis Exception (Error)</h3>
+                <p class="text-gray-700 mb-4">Dalam pemrograman Java, kesalahan atau *exception* secara garis besar dibagi menjadi tiga kategori utama:</p>
+                
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="border p-4 rounded-lg bg-red-50">
+                        <h4 class="font-bold text-red-700">Syntax Error</h4>
+                        <p class="text-sm text-gray-600 mb-2 italic">Kesalahan tata bahasa kode.</p>
+                        <p class="text-xs font-mono bg-white p-2 border border-red-200">System.out.printl("Hi") // Kurang huruf 'n'</p>
+                    </div>
+                    <div class="border p-4 rounded-lg bg-orange-50">
+                        <h4 class="font-bold text-orange-700">Runtime Error</h4>
+                        <p class="text-sm text-gray-600 mb-2 italic">Kesalahan saat program berjalan.</p>
+                        <p class="text-xs font-mono bg-white p-2 border border-orange-200">int x = 10 / 0; // ArithmeticException</p>
+                    </div>
+                    <div class="border p-4 rounded-lg bg-yellow-50">
+                        <h4 class="font-bold text-yellow-700">Logic Error</h4>
+                        <p class="text-sm text-gray-600 mb-2 italic">Program jalan, tapi output salah.</p>
+                        <p class="text-xs font-mono bg-white p-2 border border-yellow-200">luas = panjang + lebar; // Harusnya dikali</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Bagian 2: Try-Catch -->
+            <section class="bg-white p-8 rounded-xl shadow-md">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2 text-blue-600">2. Struktur Try-Catch</h3>
+                <p class="text-gray-700 mb-4">Blok <code class="bg-gray-100 px-1 rounded text-red-500">try</code> digunakan untuk menaruh kode yang berpotensi error, sedangkan <code class="bg-gray-100 px-1 rounded text-red-500">catch</code> menangkap dan menangani error tersebut.</p>
+                
+                <div class="bg-gray-800 text-gray-100 p-6 rounded-lg font-mono text-sm">
+                    <span class="text-blue-400">try</span> {<br>
+                    &nbsp;&nbsp;<span class="text-gray-400">// Kode yang mungkin error</span><br>
+                    &nbsp;&nbsp;<span class="text-yellow-400">int</span> hasil = 10 / 0;<br>
+                    } <span class="text-blue-400">catch</span> (ArithmeticException e) {<br>
+                    &nbsp;&nbsp;<span class="text-gray-400">// Menangani error</span><br>
+                    &nbsp;&nbsp;System.out.println(<span class="text-green-400">"Terjadi kesalahan: Tidak bisa membagi dengan nol!"</span>);<br>
+                    }
+                </div>
+            </section>
+
+            <div class="text-center">
+                <button onclick="location.reload()" class="text-blue-600 hover:underline">Keluar & Ulangi Asesmen</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "Apa tujuan utama dari enkapsulasi dalam Java?", o: ["Meningkatkan kecepatan eksekusi", "Menyembunyikan detail implementasi data", "Membuat kelas menjadi public", "Menghapus bug secara otomatis", "Mengurangi penggunaan memori"], a: 1 },
+            { q: "Keyword mana yang digunakan untuk membatasi akses agar hanya bisa diakses di dalam kelas itu sendiri?", o: ["public", "protected", "default", "private", "static"], a: 3 },
+            { q: "Metode yang digunakan untuk mengambil nilai dari variabel private disebut...", o: ["Setter", "Getter", "Constructor", "Wrapper", "Scanner"], a: 1 },
+            { q: "Metode yang digunakan untuk mengubah nilai dari variabel private disebut...", o: ["Setter", "Getter", "Modifier", "Deleter", "Initializer"], a: 0 },
+            { q: "Data hiding adalah bagian dari konsep...", o: ["Polimorfisme", "Inheritance", "Enkapsulasi", "Abstraction", "Interface"], a: 2 },
+            { q: "Standar penamaan getter untuk variabel 'name' adalah...", o: ["takeName()", "fetchName()", "getName()", "name()", "inputName()"], a: 2 },
+            { q: "Kapan kita sebaiknya menggunakan enkapsulasi?", o: ["Hanya saat membuat game", "Hanya saat kelas memiliki banyak variabel", "Setiap kali merancang class di Java", "Saat ingin membuat error syntax", "Hanya saat menggunakan database"], a: 2 },
+            { q: "Apa dampak jika semua variabel dalam sebuah kelas dibuat 'public'?", o: ["Program lebih aman", "Keamanan data berkurang", "Program berjalan lebih cepat", "Kode jadi lebih rapi", "Error handling jadi otomatis"], a: 1 },
+            { q: "Apa kegunaan parameter dalam metode setter?", o: ["Untuk menghapus data", "Untuk mencetak data", "Untuk mengirimkan nilai baru ke variabel private", "Untuk menghentikan loop", "Untuk mendefinisikan tipe data class"], a: 2 },
+            { q: "Manakah deklarasi variabel yang benar untuk menerapkan enkapsulasi?", o: ["public String nama;", "private String nama;", "static String nama;", "void String nama;", "protected String nama;"], a: 1 },
+            { q: "Enkapsulasi sering diibaratkan sebagai sebuah...", o: ["Mesin jet", "Kapsul obat", "Pintu gerbang", "Jendela terbuka", "Kaca transparan"], a: 1 },
+            { q: "Apa yang terjadi jika kita mencoba mengakses variabel 'private' dari kelas lain?", o: ["Program hang", "Output menjadi null", "Compile-time error", "Runtime error", "Logic error"], a: 2 },
+            { q: "Keyword 'this' dalam setter biasanya digunakan untuk...", o: ["Menghapus objek", "Membedakan variabel instans dengan parameter", "Memanggil class induk", "Mengakhiri program", "Membuat objek baru"], a: 1 },
+            { q: "Keuntungan enkapsulasi dari sisi pemeliharaan kode (maintenance) adalah...", o: ["Kode jadi lebih panjang", "Perubahan internal class tidak merusak kode di luar", "Tidak butuh komentar", "Variable jadi tidak terbatas", "Memory leak hilang"], a: 1 },
+            { q: "Getter harus selalu memiliki tipe kembalian (return type) yang...", o: ["Void", "Sama dengan tipe variabelnya", "Selalu String", "Selalu Boolean", "Selalu Integer"], a: 1 },
+            { q: "Setter biasanya memiliki tipe kembalian...", o: ["String", "Integer", "Void", "Double", "Object"], a: 2 },
+            { q: "Variabel 'protected' dapat diakses oleh...", o: ["Hanya class itu sendiri", "Hanya class di luar package", "Class di package yang sama dan subclass-nya", "Semua orang di internet", "Hanya metode main"], a: 2 },
+            { q: "Tujuan memberikan validasi di dalam metode setter adalah...", o: ["Agar kode terlihat keren", "Mencegah data tidak valid masuk ke variabel", "Memperlambat proses input", "Menghapus data lama", "Mencetak log ke konsol"], a: 1 },
+            { q: "Jika sebuah class hanya memiliki Getter dan tidak memiliki Setter, maka class tersebut bersifat...", o: ["Mutable", "Immutable (Read-only)", "Static", "Abstract", "Final"], a: 1 },
+            { q: "Enkapsulasi membantu dalam...", o: ["Loose Coupling", "Tight Coupling", "No Coupling", "System Coupling", "High Coupling"], a: 0 }
+        ];
+
+        let userData = { name: '', nis: '' };
+        let currentQuestion = 0;
+        let score = 0;
+        let selectedOption = null;
+
+        const loginContainer = document.getElementById('login-container');
+        const quizContainer = document.getElementById('quiz-container');
+        const resultContainer = document.getElementById('result-container');
+        const materialContainer = document.getElementById('material-container');
+        
+        const qText = document.getElementById('question-text');
+        const oContainer = document.getElementById('options-container');
+        const counter = document.getElementById('question-counter');
+        const progressFill = document.getElementById('progress-fill');
+
+        function handleLogin(e) {
+            e.preventDefault();
+            userData.name = document.getElementById('username').value;
+            userData.nis = document.getElementById('nis').value;
+
+            document.getElementById('display-user').innerText = `Siswa: ${userData.name}`;
+            document.getElementById('display-nis').innerText = `NIS: ${userData.nis}`;
+
+            loginContainer.classList.add('hidden');
+            quizContainer.classList.remove('hidden');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = questions[currentQuestion];
+            qText.innerText = q.q;
+            oContainer.innerHTML = '';
+            selectedOption = null;
+            document.getElementById('next-btn').disabled = true;
+
+            q.o.forEach((opt, idx) => {
+                const label = document.createElement('label');
+                label.className = 'option-label flex items-center p-4 border-2 border-gray-200 rounded-xl cursor-pointer transition relative';
+                label.innerHTML = `
+                    <input type="radio" name="option" value="${idx}" class="hidden" onclick="selectOption(${idx})">
+                    <span class="option-content flex items-center w-full">
+                        <span class="w-8 h-8 flex items-center justify-center rounded-full border-2 border-gray-300 mr-4 text-sm font-bold">${String.fromCharCode(65 + idx)}</span>
+                        <span class="text-gray-700">${opt}</span>
+                    </span>
+                `;
+                oContainer.appendChild(label);
+            });
+
+            counter.innerText = `Soal ${currentQuestion + 1} / ${questions.length}`;
+            progressFill.style.width = `${((currentQuestion) / questions.length) * 100}%`;
+        }
+
+        function selectOption(idx) {
+            selectedOption = idx;
+            document.getElementById('next-btn').disabled = false;
+            
+            const labels = document.querySelectorAll('.option-label');
+            labels.forEach((l, i) => {
+                if(i === idx) {
+                    l.classList.add('border-blue-500', 'bg-blue-50');
+                } else {
+                    l.classList.remove('border-blue-500', 'bg-blue-50');
+                }
+            });
+        }
+
+        function handleNext() {
+            if (selectedOption === questions[currentQuestion].a) {
+                score++;
+            }
+
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            quizContainer.classList.add('hidden');
+            resultContainer.classList.remove('hidden');
+            
+            const pass = score >= 18;
+            const resIcon = document.getElementById('result-icon');
+            const resTitle = document.getElementById('result-title');
+            const resScore = document.getElementById('result-score');
+            const actBtn = document.getElementById('action-btn');
+
+            document.getElementById('res-name').innerText = userData.name;
+            document.getElementById('res-nis').innerText = `NIS: ${userData.nis}`;
+            resScore.innerText = `Skor Anda: ${score} / ${questions.length} (${(score/questions.length)*100}%)`;
+
+            if (pass) {
+                resIcon.innerText = "🎉";
+                resTitle.innerText = "Luar Biasa!";
+                resTitle.className = "text-2xl font-bold mb-2 text-green-600";
+                actBtn.innerText = "Buka Materi Error Handling";
+                actBtn.onclick = showMaterial;
+            } else {
+                resIcon.innerText = "📚";
+                resTitle.innerText = "Coba Lagi!";
+                resTitle.className = "text-2xl font-bold mb-2 text-orange-600";
+                actBtn.innerText = "Ulangi Asesmen";
+                actBtn.onclick = () => location.reload();
+            }
+        }
+
+        function showMaterial() {
+            resultContainer.classList.add('hidden');
+            materialContainer.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
