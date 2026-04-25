@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ujian CBT Java OOP - SMK Bhakti Persada</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .option-card:hover { background-color: #f3f4f6; }
+        .selected-option { background-color: #3b82f6 !important; color: white; }
+        .strict-mode-alert { animation: pulse 2s infinite; }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen font-sans">
+
+    <!-- Login Section -->
+    <div id="login-section" class="flex items-center justify-center min-h-screen">
+        <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md border-b-4 border-blue-600">
+            <div class="text-center mb-8">
+                <h1 class="text-2xl font-bold text-blue-600 uppercase tracking-tight">SMK BHAKTI PERSADA</h1>
+                <p class="text-gray-500 font-medium">Ujian Sumatif Java OOP 2026</p>
+                <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <p class="text-xs text-yellow-700 font-bold">AMBANG BATAS KETAT:</p>
+                    <p class="text-[10px] text-yellow-600 uppercase">Minimal Skor 90 pada soal ke-29 atau mengulang dari awal!</p>
+                </div>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Nama Lengkap</label>
+                    <input type="text" id="student-name" placeholder="Nama Lengkap Siswa" class="w-full mt-1 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">NIS</label>
+                    <input type="text" id="student-nis" placeholder="Nomor Induk Siswa" class="w-full mt-1 p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                </div>
+                <button onclick="startExam()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition shadow-md">Mulai Ujian</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Exam Section -->
+    <div id="exam-section" class="hidden container mx-auto px-4 py-8 max-w-3xl">
+        <div class="bg-white p-6 rounded-xl shadow-md sticky top-4 mb-6 flex justify-between items-center z-10 border-t-4 border-blue-500">
+            <div>
+                <h2 id="display-name" class="font-bold text-gray-800"></h2>
+                <p id="display-nis" class="text-sm text-gray-500"></p>
+            </div>
+            <div class="text-right">
+                <p class="text-xs text-gray-400 uppercase tracking-widest">Waktu Tersisa</p>
+                <p id="timer" class="text-xl font-mono font-bold text-red-500">60:00</p>
+            </div>
+        </div>
+
+        <div id="question-container" class="space-y-6">
+            <!-- Questions injected here -->
+        </div>
+
+        <div class="mt-12 mb-24 text-center">
+            <button onclick="confirmSubmit()" class="bg-blue-600 text-white px-12 py-4 rounded-full font-bold text-lg hover:bg-blue-700 shadow-xl transition-all transform hover:scale-105">Selesai & Kirim Jawaban</button>
+        </div>
+    </div>
+
+    <!-- Modal Peringatan Gagal Syarat -->
+    <div id="fail-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+        <div class="bg-white p-8 rounded-2xl max-w-sm w-full text-center strict-mode-alert">
+            <div class="text-red-500 mb-4 text-6xl">⚠️</div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">SKOR TIDAK MENCUKUPI</h3>
+            <p class="text-gray-600 mb-6">Maaf, skor Anda di soal ke-29 belum mencapai minimal 90. Silakan pelajari kembali materi dan coba lagi.</p>
+            <button onclick="location.reload()" class="w-full bg-red-600 text-white py-3 rounded-lg font-bold">Mengulang Dari Awal</button>
+        </div>
+    </div>
+
+    <!-- Result Section (Rekap Lengkap) -->
+    <div id="result-section" class="hidden flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md text-center border-t-8 border-green-500">
+            <h2 class="text-2xl font-extrabold text-gray-800 mb-6 uppercase tracking-wider">Laporan Hasil Ujian</h2>
+            
+            <!-- Student Profile Recap -->
+            <div class="bg-gray-50 rounded-xl p-4 mb-6 text-left border border-gray-100">
+                <div class="mb-2">
+                    <p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest">Nama Siswa</p>
+                    <p id="recap-name" class="text-lg font-bold text-gray-800 uppercase">-</p>
+                </div>
+                <div>
+                    <p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest">NIS</p>
+                    <p id="recap-nis" class="text-lg font-bold text-gray-800">-</p>
+                </div>
+            </div>
+
+            <div class="relative inline-flex items-center justify-center p-12 mb-8">
+                <div class="absolute inset-0 bg-blue-50 rounded-full scale-110"></div>
+                <div class="relative">
+                    <p class="text-[10px] text-blue-400 uppercase font-bold tracking-tighter">Total Skor</p>
+                    <span id="final-score" class="text-7xl font-black text-blue-600 tracking-tighter">0</span>
+                </div>
+            </div>
+
+            <!-- Detailed Stats -->
+            <div class="grid grid-cols-2 gap-4 text-left mb-8">
+                <div class="p-4 bg-green-50 rounded-xl border border-green-100">
+                    <p class="text-[10px] text-green-600 font-bold uppercase">Benar</p>
+                    <p id="correct-count" class="text-2xl font-black text-green-700">0</p>
+                </div>
+                <div class="p-4 bg-red-50 rounded-xl border border-red-100">
+                    <p class="text-[10px] text-red-600 font-bold uppercase">Salah</p>
+                    <p id="wrong-count" class="text-2xl font-black text-red-700">0</p>
+                </div>
+            </div>
+
+            <div class="pt-6 border-t border-gray-100">
+                <p class="text-xs text-gray-400 mb-4 italic">Silakan ambil screenshot layar ini sebagai bukti nilai.</p>
+                <button onclick="location.reload()" class="bg-gray-800 text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-900 transition w-full">Keluar ke Halaman Login</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "Mengapa class Hewan menggunakan kata kunci 'abstract'?", a: "Agar tidak bisa dibuat objek langsung (instansiasi)", o: ["Agar bisa dibuat objek langsung", "Agar tidak bisa dibuat objek langsung (instansiasi)", "Agar semua variabelnya menjadi private", "Agar otomatis memiliki suara kucing", "Agar program lebih lambat"] },
+            { q: "Manakah penggunaan 'this' yang benar dalam kode Hewan?", a: "Membedakan atribut class dengan parameter method", o: ["Memanggil method dari superclass", "Menghapus objek dari memori", "Membedakan atribut class dengan parameter method", "Membuat class menjadi abstract", "Mengimpor paket java.util"] },
+            { q: "Apa kegunaan 'super(nama, jenisKelamin, umur)' pada class Kucing?", a: "Memanggil constructor milik superclass (Hewan)", o: ["Menghasilkan suara meong", "Memanggil constructor milik superclass (Hewan)", "Membuat variabel baru di class Kucing", "Menghentikan program jika error", "Menghapus data di superclass"] },
+            { q: "Apa yang terjadi jika input umur diisi dengan huruf 'A'?", a: "Program akan menangkap InputMismatchException", o: ["Program tetap berjalan lancar", "Program akan menangkap InputMismatchException", "Program akan menghapus data kucing", "Program akan melempar GajiNegatifException", "Variabel umur otomatis menjadi 0"] },
+            { q: "Fungsi dari @Override pada method tampilInfo() di class Kucing adalah...", a: "Menimpa/mengganti implementasi method dari superclass", o: ["Membuat method baru yang berbeda nama", "Menghapus method di superclass", "Menimpa/mengganti implementasi method dari superclass", "Menandai bahwa method tidak boleh diubah", "Mempercepat eksekusi koding"] },
+            { q: "Potongan kode 'private String nama;' merupakan contoh penerapan...", a: "Enkapsulasi", o: ["Polimorfisme", "Inheritance", "Enkapsulasi", "Abstraksi", "Looping"] },
+            { q: "Kapan perintah 'throw new Exception' dieksekusi dalam program tersebut?", a: "Saat kondisi if (nama.isEmpty()) bernilai true", o: ["Saat program baru dimulai", "Setelah blok finally selesai", "Saat kondisi if (nama.isEmpty()) bernilai true", "Saat user memasukkan angka", "Saat login admin berhasil"] },
+            { q: "Apa fungsi blok 'finally' dalam Error Handling?", a: "Menjalankan kode terlepas dari ada atau tidaknya error", o: ["Menangkap error spesifik", "Melempar error ke class lain", "Menjalankan kode terlepas dari ada atau tidaknya error", "Menghapus semua variabel", "Mencegah program menggunakan Scanner"] },
+            { q: "Dalam kode tersebut, Kucing disebut sebagai...", a: "Subclass / Child Class", o: ["Superclass", "Subclass / Child Class", "Interface", "Abstract Class", "Main Class"] },
+            { q: "Apa output program jika user memasukkan umur -5?", a: "Error: Umur tidak boleh negatif!", o: ["Error: Input Umur harus berupa angka!", "System Selesai", "Error: Umur tidak boleh negatif!", "Umur: -5 tahun", "Meong... Meong..."] },
+            { q: "Method bersuara() di class Hewan tidak memiliki isi (tubuh method) karena...", a: "Merupakan abstract method", o: ["Programmer lupa menulis isinya", "Hewan tidak bisa bersuara", "Merupakan abstract method", "Hanya bisa diisi di class Main", "Sudah otomatis diisi oleh Java"] },
+            { q: "Jika kita ingin memanggil method tampilInfo dari Hewan di dalam Kucing, kita menggunakan...", a: "super.tampilInfo()", o: ["this.tampilInfo()", "parent.tampilInfo()", "super.tampilInfo()", "Hewan.tampilInfo()", "new Hewan().tampilInfo()"] },
+            { q: "Paket (import) mana yang diperlukan untuk menangani error salah tipe data input?", a: "java.util.InputMismatchException", o: ["java.util.Scanner", "java.util.ArrayList", "java.util.InputMismatchException", "java.lang.Exception", "java.io.IOException"] },
+            { q: "Keyword apa yang digunakan agar class Hewan bisa diwariskan ke class Kucing?", a: "extends", o: ["implements", "extends", "inherits", "this", "super"] },
+            { q: "Modifier 'private' memastikan atribut hanya bisa diakses oleh...", a: "Class itu sendiri", o: ["Semua class", "Class itu sendiri", "Hanya subclass", "Hanya class Main", "Hanya oleh Scanner"] },
+            { q: "Mengapa kita perlu memanggil input.nextLine() setelah input.nextInt()?", a: "Membersihkan buffer/newline sisa input angka", o: ["Menghapus error", "Mempercepat program", "Membersihkan buffer/newline sisa input angka", "Memulai ulang scanner", "Agar output lebih rapi"] },
+            { q: "Apa kegunaan e.getMessage() pada blok catch?", a: "Mengambil pesan error yang dilempar oleh throw", o: ["Menghapus error dari memori", "Menampilkan seluruh baris kode yang error", "Mengambil pesan error yang dilempar oleh throw", "Membuat error baru", "Menutup program secara paksa"] },
+            { q: "Apa keuntungan menggunakan Inheritance (Pewarisan) pada kasus Hewan-Kucing?", a: "Reusability (menggunakan kembali kode dari induk)", o: ["Agar kode lebih panjang", "Reusability (menggunakan kembali kode dari induk)", "Mencegah error runtime", "Memperkecil ukuran file .java", "Menghapus kebutuhan akan constructor"] },
+            { q: "Konsep satu method (tampilInfo) memiliki perilaku berbeda di tiap class disebut...", a: "Polimorfisme", o: ["Enkapsulasi", "Polimorfisme", "Abstraksi", "Inheritance", "Exception Handling"] },
+            { q: "Manakah pernyataan yang benar tentang Abstract Class?", a: "Bisa memiliki method biasa dan method abstract", o: ["Tidak bisa memiliki constructor", "Wajib semua method-nya abstract", "Bisa memiliki method biasa dan method abstract", "Bisa dibuat objeknya langsung", "Tidak bisa memiliki atribut private"] },
+            { q: "Dalam catch (Exception e), huruf 'e' merupakan...", a: "Variabel/objek dari class Exception", o: ["Singkatan dari Error", "Variabel/objek dari class Exception", "Perintah untuk exit", "Nama dari method", "Tipe data primitif"] },
+            { q: "Apa yang terjadi jika kita menghapus 'extends Hewan' pada class Kucing?", a: "Class Kucing tidak bisa menggunakan super() dan atribut Hewan", o: ["Program tetap berjalan", "Class Kucing otomatis jadi abstract", "Class Kucing tidak bisa menggunakan super() dan atribut Hewan", "Nama kucing akan hilang", "Error InputMismatchException"] },
+            { q: "Validasi nama tidak boleh kosong sebaiknya diletakkan di...", a: "Blok try sebelum input data lainnya", o: ["Blok catch", "Blok finally", "Blok try sebelum input data lainnya", "Luar class Main", "Di dalam abstract method"] },
+            { q: "Penggunaan 'this.ras = ras' menunjukkan 'ras' pertama adalah...", a: "Atribut dari class Kucing", o: ["Parameter dari constructor", "Atribut dari class Kucing", "Variabel dari superclass", "Method dari Java", "Pesan error"] },
+            { q: "Kapan alur program masuk ke blok 'finally'?", a: "Selalu dijalankan di akhir blok try-catch", o: ["Hanya jika terjadi error", "Hanya jika tidak ada error", "Selalu dijalankan di akhir blok try-catch", "Hanya saat user memilih exit", "Saat koneksi internet putus"] },
+            { q: "Manakah yang merupakan penulisan setter yang benar untuk atribut umur?", a: "public void setUmur(int umur) { this.umur = umur; }", o: ["public int setUmur() { return umur; }", "public void setUmur(int umur) { this.umur = umur; }", "private void setUmur(int u) { umur = u; }", "public setUmur(umur) { this.umur = umur; }", "public void getUmur(int u) { this.umur = u; }"] },
+            { q: "Apa output bersuara() jika objeknya adalah Kucing?", a: "Suara Kucing: Meong... Meong...", o: ["Suara Hewan...", "Suara Kucing: Meong... Meong...", "Meong 2x", "Error: Method Kosong", "Tidak ada output"] },
+            { q: "Apa kepanjangan dari OOP?", a: "Object Oriented Programming", o: ["Object Oriented Programming", "Object Oriented Protocol", "Over Over Power", "Operational Object Programming", "Only One Programming"] },
+            { q: "Tipe data apa yang paling tepat untuk atribut umur hewan?", a: "int", o: ["String", "double", "int", "boolean", "char"] },
+            { q: "Kelebihan utama menggunakan Exception Handling manual (throw) adalah...", a: "Programmer bisa menentukan kriteria error sendiri", o: ["Program tidak perlu pakai RAM", "Programmer bisa menentukan kriteria error sendiri", "Komputer jadi lebih dingin", "Tidak perlu menulis method Main", "Otomatis memperbaiki koding yang salah"] }
+        ];
+
+        let userAnswers = new Array(questions.length).fill(null);
+        let studentName = "";
+        let studentNis = "";
+
+        function startExam() {
+            studentName = document.getElementById('student-name').value;
+            studentNis = document.getElementById('student-nis').value;
+
+            if (!studentName || !studentNis) {
+                alert("Harap isi Nama dan NIS!");
+                return;
+            }
+
+            document.getElementById('display-name').innerText = studentName;
+            document.getElementById('display-nis').innerText = "NIS: " + studentNis;
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('exam-section').classList.remove('hidden');
+            
+            renderQuestions();
+            startTimer(60 * 60);
+        }
+
+        function renderQuestions() {
+            const container = document.getElementById('question-container');
+            container.innerHTML = questions.map((item, index) => `
+                <div id="card-${index}" class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <p class="text-lg font-medium text-gray-800 mb-4">
+                        <span class="text-blue-600 font-bold mr-2">${index + 1}.</span> ${item.q}
+                    </p>
+                    <div class="grid gap-3">
+                        ${item.o.map(option => `
+                            <button 
+                                onclick="selectOption(${index}, '${option}')" 
+                                id="q-${index}-opt-${option}"
+                                class="option-card text-left p-4 border rounded-lg transition-all duration-200 focus:outline-none"
+                            >
+                                ${option}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectOption(qIndex, option) {
+            if (userAnswers[qIndex]) {
+                const prevEl = document.getElementById(`q-${qIndex}-opt-${userAnswers[qIndex]}`);
+                if (prevEl) prevEl.classList.remove('selected-option', 'border-blue-500');
+            }
+            userAnswers[qIndex] = option;
+            document.getElementById(`q-${qIndex}-opt-${option}`).classList.add('selected-option', 'border-blue-500');
+
+            if (qIndex === 28) { 
+                checkStrictCriteria();
+            }
+        }
+
+        function checkStrictCriteria() {
+            let correctUntilNow = 0;
+            for (let i = 0; i <= 28; i++) {
+                if (userAnswers[i] === questions[i].a) {
+                    correctUntilNow++;
+                }
+            }
+            const currentScore = Math.round((correctUntilNow / 30) * 100);
+            if (currentScore < 90) {
+                document.getElementById('fail-modal').classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function startTimer(duration) {
+            let timer = duration, minutes, seconds;
+            const display = document.getElementById('timer');
+            const interval = setInterval(function () {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+                display.textContent = minutes + ":" + seconds;
+                if (--timer < 0) {
+                    clearInterval(interval);
+                    calculateScore();
+                }
+            }, 1000);
+        }
+
+        function confirmSubmit() {
+            const answered = userAnswers.filter(a => a !== null).length;
+            if (answered < questions.length) {
+                if (!confirm(`Belum semua soal dijawab (${answered}/${questions.length}). Kirim sekarang?`)) return;
+            } else {
+                if (!confirm("Kirim jawaban Anda sekarang?")) return;
+            }
+            calculateScore();
+        }
+
+        function calculateScore() {
+            let correct = 0;
+            questions.forEach((item, index) => {
+                if (userAnswers[index] === item.a) correct++;
+            });
+
+            const score = Math.round((correct / questions.length) * 100);
+            
+            // Mengisi Rekap Sesi
+            document.getElementById('recap-name').innerText = studentName;
+            document.getElementById('recap-nis').innerText = studentNis;
+            document.getElementById('correct-count').innerText = correct;
+            document.getElementById('wrong-count').innerText = questions.length - correct;
+            document.getElementById('final-score').innerText = score;
+
+            document.getElementById('exam-section').classList.add('hidden');
+            document.getElementById('result-section').classList.remove('hidden');
+            document.body.style.overflow = 'auto';
+            window.scrollTo(0, 0);
+        }
+    </script>
+</body>
+</html>
