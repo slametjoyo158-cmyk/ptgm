@@ -1,71 +1,156 @@
-<!-- ... existing code ... -->
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaLab Interaktif XI RPL - Pemrograman Berorientasi Objek</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                            950: '#052e16',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- FontAwesome 6 CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts Inter & Fira Code -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        pre, code, textarea {
+            font-family: 'Fira Code', monospace;
+        }
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #020617;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+        .code-syntax-keyword { color: #f43f5e; font-weight: 600; }
+        .code-syntax-type { color: #38bdf8; font-weight: 600; }
+        .code-syntax-string { color: #a3e635; }
+        .code-syntax-number { color: #fbbf24; }
+        .code-syntax-comment { color: #64748b; font-style: italic; }
+        .code-syntax-function { color: #c084fc; font-weight: 600; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-slate-950">
+
+    <!-- HEADER BAR -->
+    <header class="bg-slate-950 border-b border-slate-800 sticky top-0 z-40 px-4 lg:px-8 py-3 flex items-center justify-between shadow-lg">
+        <div class="flex items-center gap-3">
+            <button id="mobile-menu-btn" onclick="toggleMobileSidebar()" class="md:hidden text-slate-400 hover:text-white text-xl p-2 rounded-lg bg-slate-900 border border-slate-800">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-amber-500 flex items-center justify-center shadow-lg shadow-brand-500/20">
+                <i class="fa-solid fa-mug-hot text-slate-950 text-xl font-black"></i>
+            </div>
             <div>
-                <h1 class="font-bold text-lg leading-tight flex items-center gap-2">
-                    JavaLab <span class="bg-brand-500/20 text-brand-400 text-xs px-2 py-0.5 rounded-full border border-brand-500/30">XI RPL</span>
+                <h1 class="font-bold text-base lg:text-lg leading-tight flex items-center gap-2">
+                    JavaLab <span class="bg-brand-500/20 text-brand-400 text-[10px] lg:text-xs px-2 py-0.5 rounded-full border border-brand-500/30">XI RPL</span>
                 </h1>
-                <p class="text-xs text-slate-400">Media Pembelajaran Interaktif PBO / Java</p>
+                <p class="text-[11px] text-slate-400">Media Pembelajaran Interaktif PBO / Pemrograman Java</p>
             </div>
         </div>
 
         <!-- Right Header Stats & Progress -->
-        <div class="flex items-center gap-4 lg:gap-6">
-            <div class="hidden sm:flex items-center gap-3 bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5">
+        <div class="flex items-center gap-3 lg:gap-6">
+            <div class="hidden sm:flex items-center gap-3 bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5">
                 <i class="fa-solid fa-trophy text-amber-400 text-sm"></i>
                 <div class="text-xs">
-                    <span class="text-slate-400 block">Progres Pembelajaran</span>
+                    <span class="text-slate-400 block text-[10px]">Progres Pembelajaran</span>
                     <span id="header-progress-text" class="font-bold text-slate-200">0% Selesai</span>
                 </div>
-                <div class="w-20 bg-slate-800 h-2 rounded-full overflow-hidden ml-1">
-                    <div id="header-progress-bar" class="bg-brand-500 h-full w-0 transition-all duration-500"></div>
+                <div class="w-24 bg-slate-800 h-2 rounded-full overflow-hidden ml-1">
+                    <div id="header-progress-bar" class="bg-gradient-to-r from-amber-400 to-brand-500 h-full w-0 transition-all duration-500"></div>
                 </div>
             </div>
 
-            <button onclick="resetProgress()" title="Reset Progres Belajar" class="text-slate-400 hover:text-rose-400 text-xs bg-slate-900 hover:bg-slate-800 border border-slate-800 p-2 rounded-lg transition flex items-center gap-1.5">
+            <button onclick="confirmResetProgress()" title="Reset Progres Belajar" class="text-slate-400 hover:text-rose-400 text-xs bg-slate-900 hover:bg-slate-800 border border-slate-800 px-3 py-2 rounded-xl transition flex items-center gap-1.5">
                 <i class="fa-solid fa-rotate-left"></i>
                 <span class="hidden md:inline">Reset Progres</span>
             </button>
         </div>
     </header>
 
-    <!-- MAIN WRAPPER: SIDEBAR + CONTENT -->
-    <div class="flex-1 flex overflow-hidden">
+    <!-- MAIN WRAPPER: SIDEBAR + CONTENT AREA -->
+    <div class="flex-1 flex overflow-hidden relative">
 
         <!-- SIDEBAR NAVIGATION -->
-        <aside class="w-64 bg-slate-950 border-r border-slate-800 hidden md:flex flex-col justify-between shrink-0">
-            <div class="p-4 space-y-6 overflow-y-auto">
-                <!-- Navigation Group 1 -->
+        <aside id="sidebar-nav" class="fixed md:static inset-y-0 left-0 z-30 w-64 bg-slate-950 border-r border-slate-800 flex flex-col justify-between shrink-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
+            <div class="p-4 space-y-6 overflow-y-auto max-h-[calc(100vh-60px)]">
+                <!-- Navigation Group 1: Menu Utama -->
                 <div>
-                    <span class="text-[10px] font-semibold tracking-wider uppercase text-slate-500 px-3">Menu Utama</span>
-                    <nav class="mt-2 space-y-1">
-                        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition text-brand-400 bg-brand-500/10 border border-brand-500/20">
-                            <i class="fa-solid fa-house text-base w-5"></i>
+                    <span class="text-[10px] font-bold tracking-wider uppercase text-slate-500 px-3 block mb-2">Menu Utama</span>
+                    <nav class="space-y-1">
+                        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition text-brand-400 bg-brand-500/10 border border-brand-500/20">
+                            <i class="fa-solid fa-house text-sm w-5"></i>
                             <span>Beranda & Modul</span>
                         </button>
                     </nav>
                 </div>
 
-                <!-- Navigation Group 2: Modul Belajar (With Lock Status) -->
+                <!-- Navigation Group 2: Modul Belajar -->
                 <div>
-                    <span class="text-[10px] font-semibold tracking-wider uppercase text-slate-500 px-3">Materi Pembelajaran</span>
-                    <nav class="mt-2 space-y-1">
+                    <span class="text-[10px] font-bold tracking-wider uppercase text-slate-500 px-3 block mb-2">Modul Pembelajaran</span>
+                    <nav class="space-y-1">
                         <!-- Modul 1 (Unlocked by Default) -->
-                        <button onclick="switchTab('modul-nonvoid')" id="nav-modul-nonvoid" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-900 transition">
-                            <div class="flex items-center gap-3">
-                                <i class="fa-solid fa-arrow-right-to-bracket text-amber-400 text-base w-5"></i>
-                                <div class="text-left leading-tight">
-                                    <div class="truncate">Modul 1: Non-Void</div>
-                                    <span class="text-[10px] text-slate-500">Method Non-Static</span>
+                        <button onclick="switchTab('modul-nonvoid')" id="nav-modul-nonvoid" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-900 transition">
+                            <div class="flex items-center gap-3 truncate">
+                                <i class="fa-solid fa-arrow-right-to-bracket text-amber-400 text-sm w-5 shrink-0"></i>
+                                <div class="text-left leading-tight truncate">
+                                    <div class="truncate font-semibold">Modul 1: Method Non-Void</div>
+                                    <span class="text-[10px] text-slate-500">Non-Static Method</span>
                                 </div>
                             </div>
-                            <span id="nav-badge-mod1" class="text-xs text-emerald-400"><i class="fa-solid fa-unlock"></i></span>
+                            <span id="nav-badge-mod1" class="text-xs text-amber-400"><i class="fa-solid fa-unlock"></i></span>
                         </button>
 
                         <!-- Modul 2 (Locked until Modul 1 Passed) -->
-                        <button onclick="switchTab('modul-enkapsulasi')" id="nav-modul-enkapsulasi" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-900 transition">
-                            <div class="flex items-center gap-3">
-                                <i class="fa-solid fa-user-shield text-blue-400 text-base w-5"></i>
-                                <div class="text-left leading-tight">
-                                    <div class="truncate">Modul 2: Enkapsulasi</div>
+                        <button onclick="switchTab('modul-enkapsulasi')" id="nav-modul-enkapsulasi" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-900 transition">
+                            <div class="flex items-center gap-3 truncate">
+                                <i class="fa-solid fa-user-shield text-blue-400 text-sm w-5 shrink-0"></i>
+                                <div class="text-left leading-tight truncate">
+                                    <div class="truncate font-semibold">Modul 2: Enkapsulasi</div>
                                     <span class="text-[10px] text-slate-500">Private & Getter/Setter</span>
                                 </div>
                             </div>
@@ -73,11 +158,11 @@
                         </button>
 
                         <!-- Modul 3 (Locked until Modul 2 Passed) -->
-                        <button onclick="switchTab('modul-errorhandling')" id="nav-modul-errorhandling" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-900 transition">
-                            <div class="flex items-center gap-3">
-                                <i class="fa-solid fa-triangle-exclamation text-rose-400 text-base w-5"></i>
-                                <div class="text-left leading-tight">
-                                    <div class="truncate">Modul 3: Exceptions</div>
+                        <button onclick="switchTab('modul-errorhandling')" id="nav-modul-errorhandling" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-900 transition">
+                            <div class="flex items-center gap-3 truncate">
+                                <i class="fa-solid fa-triangle-exclamation text-rose-400 text-sm w-5 shrink-0"></i>
+                                <div class="text-left leading-tight truncate">
+                                    <div class="truncate font-semibold">Modul 3: Exceptions</div>
                                     <span class="text-[10px] text-slate-500">Try, Catch & Finally</span>
                                 </div>
                             </div>
@@ -88,150 +173,477 @@
 
                 <!-- Navigation Group 3: Praktikum, Kuis & Proyek Akhir -->
                 <div>
-                    <span class="text-[10px] font-semibold tracking-wider uppercase text-slate-500 px-3">Evaluasi & Proyek</span>
-                    <nav class="mt-2 space-y-1">
-                        <button onclick="switchTab('playground')" id="nav-playground" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-900 transition">
-                            <i class="fa-solid fa-terminal text-emerald-400 text-base w-5"></i>
-                            <span>Code Playground</span>
+                    <span class="text-[10px] font-bold tracking-wider uppercase text-slate-500 px-3 block mb-2">Evaluasi & Praktikum</span>
+                    <nav class="space-y-1">
+                        <button onclick="switchTab('playground')" id="nav-playground" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-900 transition">
+                            <i class="fa-solid fa-terminal text-emerald-400 text-sm w-5"></i>
+                            <span class="font-semibold">Code Playground</span>
                         </button>
 
-                        <button onclick="switchTab('kuis')" id="nav-kuis" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-900 transition">
+                        <button onclick="switchTab('kuis')" id="nav-kuis" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-900 transition">
                             <div class="flex items-center gap-3">
-                                <i class="fa-solid fa-list-check text-purple-400 text-base w-5"></i>
-                                <span>Latihan 15 Soal</span>
+                                <i class="fa-solid fa-list-check text-purple-400 text-sm w-5"></i>
+                                <span class="font-semibold">Latihan 15 Soal</span>
                             </div>
-                            <span class="text-[10px] bg-purple-500/20 text-purple-300 px-1.5 py-0.5 rounded font-bold">45 Soal</span>
+                            <span class="text-[10px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-md font-bold">45 Soal</span>
                         </button>
 
-                        <!-- Proyek Akhir (Locked until Modul 3 Passed) -->
-                        <button onclick="switchTab('proyek-akhir')" id="nav-proyek-akhir" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-900 transition">
+                        <button onclick="switchTab('proyek-akhir')" id="nav-proyek-akhir" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-900 transition">
                             <div class="flex items-center gap-3">
-                                <i class="fa-solid fa-laptop-code text-amber-400 text-base w-5"></i>
-                                <span>Proyek Akhir App</span>
+                                <i class="fa-solid fa-award text-amber-400 text-sm w-5"></i>
+                                <span class="font-semibold">Proyek Akhir App</span>
                             </div>
                             <span id="nav-badge-proyek" class="text-xs text-rose-400"><i class="fa-solid fa-lock"></i></span>
                         </button>
                     </nav>
                 </div>
             </div>
-<!-- ... existing code ... -->
+
+            <!-- Footer Badge -->
+            <div class="p-4 border-t border-slate-900 text-center">
+                <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800 text-[11px] text-slate-400 space-y-1">
+                    <p class="font-semibold text-slate-300">Target Belajar RPL</p>
+                    <p>Praktikum PBO Java XI RPL</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT CONTAINER -->
+        <main class="flex-1 overflow-y-auto p-4 lg:p-8 space-y-6">
+
             <!-- TAB 1: DASHBOARD / OVERVIEW -->
             <section id="tab-dashboard" class="tab-content space-y-6">
                 <!-- Hero Banner -->
-                <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-brand-950 border border-slate-800 p-6 lg:p-8 shadow-2xl">
+                <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-950 via-slate-900 to-brand-950 border border-slate-800 p-6 lg:p-8 shadow-2xl">
                     <div class="relative z-10 max-w-3xl space-y-4">
                         <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-brand-500/10 text-brand-400 border border-brand-500/20">
-                            <span class="w-2 h-2 rounded-full bg-brand-400 animate-pulse"></span> Alur Pembelajaran Bertahap RPL
+                            <span class="w-2 h-2 rounded-full bg-brand-400 animate-pulse"></span> Alur Pembelajaran Bertahap XI RPL
                         </span>
-                        <h2 class="text-2xl lg:text-4xl font-bold tracking-tight text-white">
-                            Media Pembelajaran Interaktif Java & Proyek Akhir Aplikasi
+                        <h2 class="text-2xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight">
+                            Media Pembelajaran Interaktif Java & Proyek Aplikasi
                         </h2>
-                        <p class="text-slate-300 text-sm lg:text-base leading-relaxed">
-                            Selesaikan latihan <span class="text-amber-300 font-bold">15 Soal</span> pada setiap modul untuk membuka modul berikutnya. Setelah menyelesaikan ketiga modul, kamu akan menuntaskan <span class="text-emerald-400 font-bold">Proyek Akhir Aplikasi Bank Interaktif</span>!
+                        <p class="text-slate-300 text-xs lg:text-sm leading-relaxed">
+                            Pelajari <span class="text-amber-300 font-semibold">Method Non-Void Non-Static</span>, kuasai keamanan data dengan <span class="text-blue-300 font-semibold">Enkapsulasi</span>, dan amankan aplikasi dari error dengan <span class="text-rose-300 font-semibold">Try-Catch Exceptions</span>. Kerjakan 15 soal di tiap modul untuk membukanya!
                         </p>
 
                         <div class="flex flex-wrap gap-3 pt-2">
-                            <button onclick="switchTab('modul-nonvoid')" class="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-medium text-sm transition shadow-lg shadow-brand-600/30 flex items-center gap-2">
-                                Buka Modul 1 <i class="fa-solid fa-arrow-right text-xs"></i>
+                            <button onclick="switchTab('modul-nonvoid')" class="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs lg:text-sm transition shadow-lg shadow-brand-600/30 flex items-center gap-2">
+                                Mulai Modul 1 <i class="fa-solid fa-arrow-right text-xs"></i>
                             </button>
-                            <button onclick="switchTab('kuis')" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium text-sm transition flex items-center gap-2">
-                                <i class="fa-solid fa-list-check text-purple-400"></i> Kerjakan Latihan 15 Soal
+                            <button onclick="switchTab('kuis')" class="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 font-semibold text-xs lg:text-sm transition flex items-center gap-2">
+                                <i class="fa-solid fa-list-check text-purple-400"></i> Latihan 15 Soal
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Learning Modules Grid with Locking Status -->
+                <!-- Learning Modules Cards Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <!-- Module Card 1 -->
-                    <div id="card-mod1" class="bg-slate-950 border border-slate-800 rounded-2xl p-6 hover:border-amber-500/40 transition group flex flex-col justify-between">
-                        <div>
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center text-xl">
+                    <div id="card-mod1" class="bg-slate-950 border border-slate-800 rounded-2xl p-6 hover:border-amber-500/40 transition flex flex-col justify-between space-y-4">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center text-xl">
                                     <i class="fa-solid fa-arrow-right-to-bracket"></i>
                                 </div>
                                 <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">15 Soal Latihan</span>
                             </div>
-                            <h3 class="text-lg font-bold text-slate-100">Modul 1: Method Non-Void</h3>
-                            <p class="text-slate-400 text-xs mt-2 leading-relaxed">
-                                Pelajari method non-static tanpa parameter dan dengan parameter, instansiasi objek (`new`), serta nilai kembalian (`return`).
+                            <h3 class="text-base font-bold text-slate-100">Modul 1: Method Non-Void Non-Static</h3>
+                            <p class="text-slate-400 text-xs leading-relaxed">
+                                Memahami method ber-return value tanpa keyword static, instansiasi objek (`new`), serta pengiriman parameter.
                             </p>
                         </div>
-                        <div class="mt-6 pt-4 border-t border-slate-900 flex items-center justify-between">
+                        <div class="pt-4 border-t border-slate-900 flex items-center justify-between">
                             <span id="badge-mod1" class="text-xs text-amber-400 font-semibold"><i class="fa-solid fa-unlock mr-1"></i> Terbuka</span>
-                            <button onclick="switchTab('modul-nonvoid')" class="text-xs font-semibold text-amber-400 hover:underline">Pelajari <i class="fa-solid fa-angle-right"></i></button>
+                            <button onclick="switchTab('modul-nonvoid')" class="text-xs font-semibold text-amber-400 hover:underline flex items-center gap-1">Pelajari <i class="fa-solid fa-angle-right text-[10px]"></i></button>
                         </div>
                     </div>
 
                     <!-- Module Card 2 -->
-                    <div id="card-mod2" class="bg-slate-950 border border-slate-800 rounded-2xl p-6 transition group flex flex-col justify-between opacity-75">
-                        <div>
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center text-xl">
+                    <div id="card-mod2" class="bg-slate-950 border border-slate-800 rounded-2xl p-6 transition flex flex-col justify-between space-y-4 opacity-75">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div class="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center text-xl">
                                     <i class="fa-solid fa-user-shield"></i>
                                 </div>
                                 <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">15 Soal Latihan</span>
                             </div>
-                            <h3 class="text-lg font-bold text-slate-100">Modul 2: Enkapsulasi</h3>
-                            <p class="text-slate-400 text-xs mt-2 leading-relaxed">
-                                Proteksi data variabel dengan modifier `private` serta pengaksesan aman melalui `Getter` & `Setter` tervalidasi.
+                            <h3 class="text-base font-bold text-slate-100">Modul 2: Enkapsulasi Data</h3>
+                            <p class="text-slate-400 text-xs leading-relaxed">
+                                Proteksi atribut dengan modifier `private` serta pengaksesan terstruktur dan aman menggunakan `Getter` & `Setter`.
                             </p>
                         </div>
-                        <div class="mt-6 pt-4 border-t border-slate-900 flex items-center justify-between">
-                            <span id="badge-mod2" class="text-xs text-rose-400 font-semibold"><i class="fa-solid fa-lock mr-1"></i> Terkunci (Lulus Modul 1)</span>
-                            <button onclick="switchTab('modul-enkapsulasi')" class="text-xs font-semibold text-slate-400 hover:text-slate-200">Akses <i class="fa-solid fa-angle-right"></i></button>
+                        <div class="pt-4 border-t border-slate-900 flex items-center justify-between">
+                            <span id="badge-mod2" class="text-xs text-rose-400 font-semibold"><i class="fa-solid fa-lock mr-1"></i> Terkunci</span>
+                            <button onclick="switchTab('modul-enkapsulasi')" class="text-xs font-semibold text-slate-400 hover:text-slate-200 flex items-center gap-1">Akses <i class="fa-solid fa-angle-right text-[10px]"></i></button>
                         </div>
                     </div>
 
                     <!-- Module Card 3 -->
-                    <div id="card-mod3" class="bg-slate-950 border border-slate-800 rounded-2xl p-6 transition group flex flex-col justify-between opacity-75">
-                        <div>
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center text-xl">
+                    <div id="card-mod3" class="bg-slate-950 border border-slate-800 rounded-2xl p-6 transition flex flex-col justify-between space-y-4 opacity-75">
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div class="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center text-xl">
                                     <i class="fa-solid fa-triangle-exclamation"></i>
                                 </div>
                                 <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">15 Soal Latihan</span>
                             </div>
-                            <h3 class="text-lg font-bold text-slate-100">Modul 3: Error Handling</h3>
-                            <p class="text-slate-400 text-xs mt-2 leading-relaxed">
-                                Mengamankan aplikasi dari crash runtime menggunakan blok pertahanan `try`, `catch`, dan `finally`.
+                            <h3 class="text-base font-bold text-slate-100">Modul 3: Error Handling</h3>
+                            <p class="text-slate-400 text-xs leading-relaxed">
+                                Menangani exception runtime seperti pembagian nol dan format angka menggunakan blok `try`, `catch`, dan `finally`.
                             </p>
                         </div>
-                        <div class="mt-6 pt-4 border-t border-slate-900 flex items-center justify-between">
-                            <span id="badge-mod3" class="text-xs text-rose-400 font-semibold"><i class="fa-solid fa-lock mr-1"></i> Terkunci (Lulus Modul 2)</span>
-                            <button onclick="switchTab('modul-errorhandling')" class="text-xs font-semibold text-slate-400 hover:text-slate-200">Akses <i class="fa-solid fa-angle-right"></i></button>
+                        <div class="pt-4 border-t border-slate-900 flex items-center justify-between">
+                            <span id="badge-mod3" class="text-xs text-rose-400 font-semibold"><i class="fa-solid fa-lock mr-1"></i> Terkunci</span>
+                            <button onclick="switchTab('modul-errorhandling')" class="text-xs font-semibold text-slate-400 hover:text-slate-200 flex items-center gap-1">Akses <i class="fa-solid fa-angle-right text-[10px]"></i></button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Final Capstone Banner Card -->
+                <!-- Capstone Project Banner Card -->
                 <div class="bg-gradient-to-r from-amber-950/40 via-slate-950 to-emerald-950/40 border border-amber-500/30 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-6">
                     <div class="space-y-2">
                         <span class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-                            <i class="fa-solid fa-award"></i> Evaluasi Gabungan Akhir
+                            <i class="fa-solid fa-award"></i> Evaluasi Akhir Terintegrasi
                         </span>
-                        <h3 class="text-xl font-bold text-white">Proyek Akhir: Aplikasi Rekening Bank Interaktif</h3>
+                        <h3 class="text-lg lg:text-xl font-bold text-white">Proyek Akhir: Aplikasi Rekening Bank Interaktif</h3>
                         <p class="text-xs text-slate-300 max-w-2xl leading-relaxed">
-                            Buat dan operasikan aplikasi pengelola rekening bank dengan mengombinasikan Method Non-Void, Enkapsulasi data private, dan Error Handling Try-Catch.
+                            Gabungkan Method Non-Void Non-Static, Enkapsulasi Private, dan Exception Handling Try-Catch dalam satu aplikasi bank lengkap.
                         </p>
                     </div>
-                    <button onclick="switchTab('proyek-akhir')" class="px-6 py-3 bg-gradient-to-r from-amber-500 to-emerald-500 hover:from-amber-400 hover:to-emerald-400 text-slate-950 font-bold text-xs rounded-xl shadow-lg shrink-0 flex items-center gap-2">
+                    <button onclick="switchTab('proyek-akhir')" class="px-6 py-3 bg-gradient-to-r from-amber-500 to-emerald-500 hover:from-amber-400 hover:to-emerald-400 text-slate-950 font-extrabold text-xs rounded-xl shadow-lg shrink-0 flex items-center gap-2">
                         <i class="fa-solid fa-laptop-code"></i> Buka Proyek Akhir
                     </button>
                 </div>
             </section>
-<!-- ... existing code ... -->
+
+            <!-- TAB 2: MODUL 1 - METHOD NON-VOID NON-STATIC -->
+            <section id="tab-modul-nonvoid" class="tab-content hidden space-y-6">
+                <!-- Header -->
+                <div class="border-b border-slate-800 pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <span class="text-xs font-semibold text-amber-400 uppercase tracking-wider">Modul 1 • Pemrograman Java XI RPL</span>
+                        <h2 class="text-xl lg:text-2xl font-bold text-white mt-1">Method Non-Void Non-Static (Instance Method)</h2>
+                        <p class="text-xs text-slate-400 mt-1">Belajar membuat method yang mengembalikan nilai (return value) tanpa kata kunci static.</p>
+                    </div>
+                    <!-- Toggle Non-Void Subtopics -->
+                    <div class="flex bg-slate-900 p-1 border border-slate-800 rounded-xl gap-1">
+                        <button onclick="setNonVoidType('tanpa')" id="btn-nonvoid-tanpa" class="px-3 py-1.5 rounded-lg text-xs font-bold transition bg-amber-500 text-slate-950">Tanpa Parameter</button>
+                        <button onclick="setNonVoidType('dengan')" id="btn-nonvoid-dengan" class="px-3 py-1.5 rounded-lg text-xs font-bold transition bg-slate-900 text-slate-400 hover:text-slate-200">Dengan Parameter</button>
+                    </div>
+                </div>
+
+                <!-- Theory & Interactive Simulator Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Theory Explanation Column (6 Cols) -->
+                    <div class="lg:col-span-6 space-y-4">
+                        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-5 space-y-3">
+                            <h3 class="text-sm font-bold text-amber-400 flex items-center gap-2">
+                                <i class="fa-solid fa-book-open"></i> Konsep Utama
+                            </h3>
+                            <div id="nonvoid-theory-box" class="text-xs text-slate-300 space-y-2 leading-relaxed">
+                                <!-- Dynamic content filled by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Code Example Box -->
+                        <div class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden">
+                            <div class="bg-slate-900 px-4 py-2 border-b border-slate-800 text-xs font-mono text-slate-300 flex items-center justify-between">
+                                <span><i class="fa-solid fa-code text-amber-400 mr-2"></i>ContohKode.java</span>
+                                <span class="text-[10px] text-slate-500">Non-Static Instance Method</span>
+                            </div>
+                            <pre id="nonvoid-code-example" class="p-4 text-xs font-mono text-slate-200 overflow-x-auto bg-slate-950 leading-relaxed"></pre>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Method Simulator Column (6 Cols) -->
+                    <div class="lg:col-span-6 bg-slate-950 border border-slate-800 rounded-2xl p-5 space-y-4">
+                        <h3 class="text-sm font-bold text-slate-100 flex items-center justify-between border-b border-slate-800 pb-3">
+                            <span class="flex items-center gap-2"><i class="fa-solid fa-sliders text-brand-400"></i> Simulator Eksekusi Method</span>
+                            <span class="text-[10px] bg-brand-500/20 text-brand-400 px-2 py-0.5 rounded-md font-bold">Interaktif</span>
+                        </h3>
+
+                        <!-- Interactive Inputs -->
+                        <div id="nonvoid-interactive-inputs" class="space-y-3 text-xs">
+                            <!-- Populated dynamically -->
+                        </div>
+
+                        <button onclick="executeNonVoidSimulator()" class="w-full py-2.5 bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-brand-600/30">
+                            <i class="fa-solid fa-play"></i> Jalankan Instansiasi & Panggil Method
+                        </button>
+
+                        <!-- Execution Flow Visualization -->
+                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
+                            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Visualisasi Jalur Nilai (Return Flow)</div>
+                            <div id="nonvoid-flow-diagram" class="space-y-2 text-xs font-mono">
+                                <div class="p-2 bg-slate-950 rounded-lg border border-slate-800 text-slate-400">1. Menunggu pemanggilan method...</div>
+                            </div>
+                        </div>
+
+                        <!-- Console Result -->
+                        <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 text-xs font-mono">
+                            <span class="text-slate-500 block text-[10px] mb-1">Standard Output System.out.println:</span>
+                            <div id="nonvoid-console-output" class="text-amber-300 font-semibold min-h-[24px]">
+                                > Klik tombol di atas untuk melihat hasil
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: MODUL 2 - ENKAPSULASI -->
+            <section id="tab-modul-enkapsulasi" class="tab-content hidden space-y-6">
+                <!-- Header -->
+                <div class="border-b border-slate-800 pb-4">
+                    <span class="text-xs font-semibold text-blue-400 uppercase tracking-wider">Modul 2 • Pemrograman Java XI RPL</span>
+                    <h2 class="text-xl lg:text-2xl font-bold text-white mt-1">Enkapsulasi & Access Modifier Private</h2>
+                    <p class="text-xs text-slate-400 mt-1">Proteksi data variabel dengan `private` serta pengaksesan aman melalui `Getter` dan `Setter` tervalidasi.</p>
+                </div>
+
+                <!-- Enkapsulasi Content Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Theory Column -->
+                    <div class="lg:col-span-6 space-y-4">
+                        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-5 space-y-3 text-xs text-slate-300 leading-relaxed">
+                            <h3 class="text-sm font-bold text-blue-400 flex items-center gap-2">
+                                <i class="fa-solid fa-shield-halved"></i> Apa itu Enkapsulasi?
+                            </h3>
+                            <p>
+                                **Enkapsulasi (Encapsulation)** adalah teknik membungkus atribut variabel agar tidak dapat diubah secara bebas oleh pihak luar. Caranya adalah memberi akses **`private`** pada variabel, lalu menyediakan method **`public Getter`** (membaca) dan **`Setter`** (mengubah dengan validasi).
+                            </p>
+                            <div class="p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl space-y-1">
+                                <span class="font-bold text-blue-300 block">Aturan Utama:</span>
+                                <ul class="list-disc list-inside space-y-1 text-slate-300 text-[11px]">
+                                    <li><code class="text-rose-400">private double saldo;</code> (Akses langsung dari luar class DITOLAK)</li>
+                                    <li><code class="text-amber-400">public double getSaldo()</code> (Membaca nilai saldo)</li>
+                                    <li><code class="text-brand-400">public void setSaldo(double s)</code> (Mengubah saldo dengan syarat > 0)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Code Example -->
+                        <div class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden">
+                            <div class="bg-slate-900 px-4 py-2 border-b border-slate-800 text-xs font-mono text-slate-300">
+                                <i class="fa-solid fa-code text-blue-400 mr-2"></i>RekeningBank.java
+                            </div>
+                            <pre class="p-4 text-xs font-mono text-slate-200 overflow-x-auto bg-slate-950 leading-relaxed">
+<span class="code-syntax-keyword">public class</span> RekeningBank {
+    <span class="code-syntax-comment">// Atribut disembunyikan (Private)</span>
+    <span class="code-syntax-keyword">private double</span> saldo = 500000;
+
+    <span class="code-syntax-comment">// Getter: Membaca nilai saldo</span>
+    <span class="code-syntax-keyword">public double</span> <span class="code-syntax-function">getSaldo</span>() {
+        <span class="code-syntax-keyword">return</span> <span class="code-syntax-keyword">this</span>.saldo;
+    }
+
+    <span class="code-syntax-comment">// Setter: Mengisi saldo dengan Validasi</span>
+    <span class="code-syntax-keyword">public void</span> <span class="code-syntax-function">setSaldo</span>(<span class="code-syntax-keyword">double</span> saldoBaru) {
+        <span class="code-syntax-keyword">if</span> (saldoBaru >= 0) {
+            <span class="code-syntax-keyword">this</span>.saldo = saldoBaru;
+        } <span class="code-syntax-keyword">else</span> {
+            System.out.println(<span class="code-syntax-string">"Error: Saldo tidak boleh negatif!"</span>);
+        }
+    }
+}</pre>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Encapsulation Shield Visualizer -->
+                    <div class="lg:col-span-6 bg-slate-950 border border-slate-800 rounded-2xl p-5 space-y-4">
+                        <h3 class="text-sm font-bold text-slate-100 flex items-center justify-between border-b border-slate-800 pb-3">
+                            <span class="flex items-center gap-2"><i class="fa-solid fa-vault text-blue-400"></i> Simulator Proteksi Data Private</span>
+                        </h3>
+
+                        <!-- Direct Access Attack Simulator -->
+                        <div class="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl space-y-2 text-xs">
+                            <span class="font-bold text-rose-400 flex items-center gap-2"><i class="fa-solid fa-ban"></i> Percobaan 1: Akses Langsung (Private)</span>
+                            <div class="bg-slate-900 p-2 rounded text-[11px] font-mono text-slate-300">
+                                akun.saldo = -1000000; <span class="text-rose-400">// ERROR!</span>
+                            </div>
+                            <button onclick="tryDirectAccess()" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-lg text-[11px] transition">
+                                Jalankan Akses Langsung
+                            </button>
+                            <div id="encap-direct-result" class="text-[11px] font-mono text-rose-400 hidden"></div>
+                        </div>
+
+                        <!-- Safe Access Simulator using Getter/Setter -->
+                        <div class="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl space-y-3 text-xs">
+                            <span class="font-bold text-emerald-400 flex items-center gap-2"><i class="fa-solid fa-lock-open"></i> Percobaan 2: Akses Melalui Setter & Getter</span>
+                            <div class="space-y-2">
+                                <label class="text-[11px] text-slate-300 block">Input Nominal Setter (`setSaldo`):</label>
+                                <div class="flex gap-2">
+                                    <input id="encap-input-saldo" type="number" value="750000" class="flex-1 bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 text-xs focus:outline-none focus:border-brand-500">
+                                    <button onclick="executeSetterTest()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs transition">
+                                        Panggil setSaldo()
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Shield Visual Box -->
+                            <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 text-center space-y-2">
+                                <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Status Memori Variabel Private</div>
+                                <div id="encap-shield-display" class="text-lg font-mono font-bold text-emerald-400">
+                                    private double saldo = Rp 500.000
+                                </div>
+                                <div id="encap-setter-log" class="text-[11px] text-slate-300 italic">
+                                    Nilai terlindungi di dalam objek.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: MODUL 3 - ERROR HANDLING (EXCEPTIONS) -->
+            <section id="tab-modul-errorhandling" class="tab-content hidden space-y-6">
+                <!-- Header -->
+                <div class="border-b border-slate-800 pb-4">
+                    <span class="text-xs font-semibold text-rose-400 uppercase tracking-wider">Modul 3 • Pemrograman Java XI RPL</span>
+                    <h2 class="text-xl lg:text-2xl font-bold text-white mt-1">Error Handling (Try, Catch & Finally)</h2>
+                    <p class="text-xs text-slate-400 mt-1">Mengamankan aplikasi agar tidak crash tiba-tiba saat terjadi Runtime Exception.</p>
+                </div>
+
+                <!-- Error Handling Content Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Theory Column -->
+                    <div class="lg:col-span-6 space-y-4">
+                        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-5 space-y-3 text-xs text-slate-300 leading-relaxed">
+                            <h3 class="text-sm font-bold text-rose-400 flex items-center gap-2">
+                                <i class="fa-solid fa-triangle-exclamation"></i> Blok Pertahanan Try-Catch-Finally
+                            </h3>
+                            <p>
+                                Saat program mengalami kesalahan runtime (seperti pembagian nol atau input teks pada angka), program Java akan **crash**. Blok **`try-catch`** mencegah hal tersebut!
+                            </p>
+                            <div class="space-y-2 font-mono text-[11px]">
+                                <div class="p-2 bg-slate-900 border border-amber-500/30 rounded-lg text-amber-300">
+                                    <span class="font-bold">try { ... }</span> : Berisi kode yang berisiko memicu error.
+                                </div>
+                                <div class="p-2 bg-slate-900 border border-rose-500/30 rounded-lg text-rose-300">
+                                    <span class="font-bold">catch (Exception e) { ... }</span> : Menangkap & menangani error jika terjadi.
+                                </div>
+                                <div class="p-2 bg-slate-900 border border-brand-500/30 rounded-lg text-brand-300">
+                                    <span class="font-bold">finally { ... }</span> : Selalu dieksekusi di akhir (ada error maupun tidak).
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Interactive Exception Type Switcher -->
+                        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-5 space-y-3">
+                            <h4 class="text-xs font-bold text-slate-200 uppercase tracking-wider">Pilih Jenis Exception Runtime:</h4>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button onclick="selectExceptionType('arithmetic')" id="btn-ex-arithmetic" class="p-2 bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-xl text-xs font-bold transition">
+                                    Arithmetic
+                                </button>
+                                <button onclick="selectExceptionType('numberformat')" id="btn-ex-numberformat" class="p-2 bg-slate-900 text-slate-400 border border-slate-800 rounded-xl text-xs font-bold transition">
+                                    NumberFormat
+                                </button>
+                                <button onclick="selectExceptionType('array')" id="btn-ex-array" class="p-2 bg-slate-900 text-slate-400 border border-slate-800 rounded-xl text-xs font-bold transition">
+                                    ArrayIndexOutOfBounds
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Exception Trigger Simulator -->
+                    <div class="lg:col-span-6 bg-slate-950 border border-slate-800 rounded-2xl p-5 space-y-4">
+                        <h3 class="text-sm font-bold text-slate-100 flex items-center justify-between border-b border-slate-800 pb-3">
+                            <span class="flex items-center gap-2"><i class="fa-solid fa-bug text-rose-400"></i> Simulator Crash vs Try-Catch</span>
+                        </h3>
+
+                        <!-- Simulator Controls -->
+                        <div id="exception-inputs-container" class="space-y-3 text-xs">
+                            <!-- Populated dynamically -->
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="runWithoutTryCatch()" class="py-2.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl transition flex items-center justify-center gap-1.5 shadow-lg shadow-rose-600/20">
+                                <i class="fa-solid fa-bomb"></i> Eksekusi TANPA Try-Catch
+                            </button>
+                            <button onclick="runWithTryCatch()" class="py-2.5 bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold rounded-xl transition flex items-center justify-center gap-1.5 shadow-lg shadow-brand-600/20">
+                                <i class="fa-solid fa-shield-cat"></i> Eksekusi DENGAN Try-Catch
+                            </button>
+                        </div>
+
+                        <!-- Output Trace Box -->
+                        <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 font-mono text-xs space-y-2">
+                            <div class="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Hasil Console Execution Trace:</div>
+                            <div id="exception-console-trace" class="min-h-[100px] text-slate-300 space-y-1">
+                                Klik salah satu tombol eksekusi di atas untuk melihat simulasi.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 5: CODE PLAYGROUND -->
+            <section id="tab-playground" class="tab-content hidden space-y-6">
+                <!-- Header -->
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                    <div>
+                        <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Praktikum Mandiri</span>
+                        <h2 class="text-xl lg:text-2xl font-bold text-white mt-1">Interactive Java Code Playground</h2>
+                        <p class="text-xs text-slate-400 mt-1">Uji coba kode Java Anda secara langsung dengan simulasi interpreter terminal.</p>
+                    </div>
+                    <!-- Preset Selector -->
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-slate-400 hidden sm:inline">Preset Kode:</span>
+                        <select id="playground-preset-select" onchange="loadPresetCode()" class="bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-slate-200 text-xs font-semibold focus:outline-none focus:border-brand-500">
+                            <option value="nonvoid">Method Non-Void Non-Static</option>
+                            <option value="enkapsulasi">Enkapsulasi & Getter/Setter</option>
+                            <option value="errorhandling">Try, Catch & Finally</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Code Editor & Output Console Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Textarea Editor (7 Cols) -->
+                    <div class="lg:col-span-7 bg-slate-950 border border-slate-800 rounded-2xl flex flex-col overflow-hidden shadow-xl">
+                        <div class="bg-slate-900 px-4 py-2.5 border-b border-slate-800 flex items-center justify-between">
+                            <span class="text-xs font-mono text-slate-300 flex items-center gap-2"><i class="fa-solid fa-code text-brand-400"></i> MainApplication.java</span>
+                            <button onclick="runPlaygroundCode()" class="px-4 py-1.5 bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold rounded-lg transition flex items-center gap-1.5 shadow-md shadow-brand-600/30">
+                                <i class="fa-solid fa-play text-[10px]"></i> Jalankan Kode
+                            </button>
+                        </div>
+                        <textarea id="playground-code-editor" class="w-full h-96 bg-slate-950 text-slate-200 font-mono text-xs p-4 focus:outline-none resize-none leading-relaxed" spellcheck="false"></textarea>
+                    </div>
+
+                    <!-- Output Console & Memory Stack Visualizer (5 Cols) -->
+                    <div class="lg:col-span-5 space-y-4">
+                        <div class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden flex flex-col h-64">
+                            <div class="bg-slate-900 px-4 py-2 border-b border-slate-800 text-xs font-mono text-slate-300 flex items-center justify-between">
+                                <span class="flex items-center gap-2"><i class="fa-solid fa-terminal text-emerald-400"></i> Terminal Output</span>
+                                <button onclick="clearPlaygroundConsole()" class="text-[10px] text-slate-500 hover:text-slate-300">Clear</button>
+                            </div>
+                            <div id="playground-console-output" class="p-4 bg-slate-950 text-emerald-400 font-mono text-xs overflow-y-auto flex-1 leading-relaxed">
+                                > Klik "Jalankan Kode" untuk mengeksekusi program.
+                            </div>
+                        </div>
+
+                        <!-- Heap/Stack Memory Visualizer -->
+                        <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 space-y-2">
+                            <h4 class="text-xs font-bold text-slate-300 flex items-center gap-2">
+                                <i class="fa-solid fa-microchip text-purple-400"></i> Status Memori Heap Object (JVM)
+                            </h4>
+                            <div id="playground-memory-stack" class="p-3 bg-slate-900 rounded-xl border border-slate-800 font-mono text-[11px] text-slate-400 leading-relaxed">
+                                Objek belum diinstansiasi di dalam Heap.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- TAB 6: KUIS & LATIHAN 15 SOAL PER MODUL -->
             <section id="tab-kuis" class="tab-content hidden space-y-6">
                 <!-- Header -->
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
                     <div>
                         <span class="text-xs font-semibold text-purple-400 uppercase tracking-wider">Evaluasi & Syarat Pembuka Modul</span>
-                        <h2 class="text-2xl font-bold text-white mt-1">Latihan Soal Interaktif (15 Soal per Modul)</h2>
+                        <h2 class="text-xl lg:text-2xl font-bold text-white mt-1">Latihan Soal Interaktif (15 Soal per Modul)</h2>
                         <p class="text-xs text-slate-400 mt-1">Selesaikan 15 soal latihan dengan skor minimal 70% untuk meluluskan modul dan membuka modul berikutnya.</p>
                     </div>
                     <!-- Module Selector Tabs -->
-                    <div class="flex bg-slate-950 p-1 border border-slate-800 rounded-xl gap-1">
+                    <div class="flex bg-slate-900 p-1 border border-slate-800 rounded-xl gap-1">
                         <button onclick="selectQuizModule(1)" id="quiz-tab-1" class="px-3 py-1.5 rounded-lg text-xs font-bold transition bg-amber-500 text-slate-950">Modul 1 (15 Soal)</button>
                         <button onclick="selectQuizModule(2)" id="quiz-tab-2" class="px-3 py-1.5 rounded-lg text-xs font-bold transition bg-slate-900 text-slate-400 hover:text-slate-200">Modul 2 (15 Soal)</button>
                         <button onclick="selectQuizModule(3)" id="quiz-tab-3" class="px-3 py-1.5 rounded-lg text-xs font-bold transition bg-slate-900 text-slate-400 hover:text-slate-200">Modul 3 (15 Soal)</button>
@@ -239,11 +651,11 @@
                 </div>
 
                 <!-- Quiz Container -->
-                <div class="bg-slate-950 border border-slate-800 rounded-2xl p-6 max-w-4xl mx-auto space-y-6">
+                <div class="bg-slate-950 border border-slate-800 rounded-2xl p-6 max-w-4xl mx-auto space-y-6 shadow-xl">
                     <!-- Progress Bar inside Quiz -->
                     <div class="flex items-center justify-between text-xs text-slate-400">
                         <span>Soal <span id="quiz-current-num" class="text-amber-400 font-bold">1</span> dari <span id="quiz-total-num">15</span></span>
-                        <span id="quiz-category-tag" class="px-2.5 py-0.5 bg-slate-900 border border-slate-800 text-slate-300 rounded-full font-semibold">Modul 1: Method Non-Void</span>
+                        <span id="quiz-category-tag" class="px-2.5 py-0.5 bg-slate-900 border border-slate-800 text-slate-300 rounded-full font-semibold text-[11px]">Modul 1: Method Non-Void</span>
                     </div>
 
                     <!-- Question Box -->
@@ -251,10 +663,6 @@
                         <h3 id="quiz-question-text" class="text-base lg:text-lg font-bold text-slate-100 leading-snug">
                             Loading pertanyaan...
                         </h3>
-
-                        <!-- Code Snippet inside Question (Optional) -->
-                        <div id="quiz-code-box" class="hidden bg-slate-900 p-4 rounded-xl border border-slate-800 font-mono text-xs text-slate-300 overflow-x-auto">
-                        </div>
 
                         <!-- Answer Options -->
                         <div id="quiz-options-container" class="space-y-2.5">
@@ -268,10 +676,10 @@
 
                     <!-- Controls -->
                     <div class="flex justify-between items-center pt-4 border-t border-slate-900">
-                        <button onclick="restartCurrentQuizModule()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-semibold rounded-lg border border-slate-800 transition flex items-center gap-1.5">
+                        <button onclick="restartCurrentQuizModule()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-semibold rounded-xl border border-slate-800 transition flex items-center gap-1.5">
                             <i class="fa-solid fa-rotate"></i> Ulangi Latihan Modul Ini
                         </button>
-                        <button onclick="nextQuestion()" id="btn-next-quiz" class="px-6 py-2 bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold rounded-lg transition flex items-center gap-2 shadow-md">
+                        <button onclick="nextQuestion()" id="btn-next-quiz" class="px-6 py-2 bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold rounded-xl transition flex items-center gap-2 shadow-md">
                             Pertanyaan Selanjutnya <i class="fa-solid fa-arrow-right"></i>
                         </button>
                     </div>
@@ -283,12 +691,12 @@
                 <!-- Header -->
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
                     <div>
-                        <span class="text-xs font-semibold text-amber-400 uppercase tracking-wider"><i class="fa-solid fa-award"></i> Capstone Project</span>
-                        <h2 class="text-2xl font-bold text-white mt-1">Proyek Akhir: Aplikasi Rekening Bank Interaktif</h2>
+                        <span class="text-xs font-semibold text-amber-400 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-award"></i> Capstone Project Final</span>
+                        <h2 class="text-xl lg:text-2xl font-bold text-white mt-1">Proyek Akhir: Aplikasi Rekening Bank Interaktif</h2>
                         <p class="text-xs text-slate-400 mt-1">Gabungkan konsep Method Non-Void, Enkapsulasi Data Private, dan Exception Handling Try-Catch dalam satu aplikasi lengkap.</p>
                     </div>
-                    <div id="capstone-status-badge" class="px-4 py-2 bg-slate-800 text-slate-300 border border-slate-700 rounded-xl font-bold text-xs flex items-center gap-2">
-                        <i class="fa-solid fa-circle-notch animate-spin text-amber-400"></i> Status Proyek: Belum Diverifikasi
+                    <div id="capstone-status-badge" class="px-4 py-2 bg-slate-900 text-slate-300 border border-slate-800 rounded-xl font-bold text-xs flex items-center gap-2">
+                        <i class="fa-solid fa-unlock text-amber-400"></i> Status: Siap Dikerjakan
                     </div>
                 </div>
 
@@ -303,10 +711,10 @@
                         <div class="space-y-3 text-xs">
                             <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 space-y-1">
                                 <div class="flex items-center justify-between">
-                                    <span class="font-bold text-amber-300">1. Method Non-Void</span>
+                                    <span class="font-bold text-amber-300">1. Method Non-Void Non-Static</span>
                                     <i id="check-cap-1" class="fa-solid fa-circle-xmark text-rose-400"></i>
                                 </div>
-                                <p class="text-[11px] text-slate-400">Memiliki method non-static `hitungSetoran()`, `tarikSisa()`, atau `getInformasi()`. Wajib kata kunci `return`.</p>
+                                <p class="text-[11px] text-slate-400">Memiliki method non-static `getSaldo()` atau `hitungSetoran()` dengan keyword `return`.</p>
                             </div>
 
                             <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 space-y-1">
@@ -314,7 +722,7 @@
                                     <span class="font-bold text-blue-300">2. Enkapsulasi Private</span>
                                     <i id="check-cap-2" class="fa-solid fa-circle-xmark text-rose-400"></i>
                                 </div>
-                                <p class="text-[11px] text-slate-400">Variabel `private double saldo;` dan `private String pin;` diakses via Getter & Setter tervalidasi.</p>
+                                <p class="text-[11px] text-slate-400">Atribut `private double saldo;` diakses terstruktur via Getter & Setter tervalidasi.</p>
                             </div>
 
                             <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 space-y-1">
@@ -322,16 +730,16 @@
                                     <span class="font-bold text-rose-300">3. Error Handling</span>
                                     <i id="check-cap-3" class="fa-solid fa-circle-xmark text-rose-400"></i>
                                 </div>
-                                <p class="text-[11px] text-slate-400">Program dibungkus blok `try-catch` untuk menangkap input non-angka atau penarikan melebihi saldo.</p>
+                                <p class="text-[11px] text-slate-400">Instruksi dibungkus blok `try-catch` untuk menangkap exception runtime.</p>
                             </div>
                         </div>
 
-                        <button onclick="verifyCapstoneProject()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-emerald-500 hover:from-amber-400 hover:to-emerald-400 text-slate-950 font-bold text-xs rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+                        <button onclick="verifyCapstoneProject()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-emerald-500 hover:from-amber-400 hover:to-emerald-400 text-slate-950 font-extrabold text-xs rounded-xl shadow-lg transition flex items-center justify-center gap-2">
                             <i class="fa-solid fa-shield-check"></i> Uji & Verifikasi Kode Proyek
                         </button>
                     </div>
 
-                    <!-- Interactive Capstone Code Editor & Simulator (8 Cols) -->
+                    <!-- Code Editor & Output (8 Cols) -->
                     <div class="lg:col-span-8 bg-slate-950 border border-slate-800 rounded-2xl flex flex-col overflow-hidden">
                         <div class="bg-slate-900 px-4 py-2.5 border-b border-slate-800 flex items-center justify-between">
                             <span class="text-xs font-mono text-slate-300"><i class="fa-solid fa-code text-amber-400 mr-2"></i>AplikasiBankUtama.java</span>
@@ -387,7 +795,7 @@ public class RekeningBank {
                         <!-- Live Console Simulator Output -->
                         <div class="bg-slate-900 p-4 border-t border-slate-800 font-mono text-xs space-y-1">
                             <div class="text-slate-400 font-bold mb-1"><i class="fa-solid fa-terminal text-emerald-400 mr-2"></i>Hasil Output Simulasi System Console:</div>
-                            <div id="capstone-console-output" class="text-emerald-400 bg-slate-950 p-3 rounded-lg border border-slate-800 min-h-[80px]">
+                            <div id="capstone-console-output" class="text-emerald-400 bg-slate-950 p-3 rounded-lg border border-slate-800 min-h-[80px] leading-relaxed">
                                 Klik "Simulasi Transaksi Bank" atau "Uji & Verifikasi Kode Proyek" untuk menguji kelulusan proyek akhir.
                             </div>
                         </div>
@@ -398,9 +806,31 @@ public class RekeningBank {
         </main>
     </div>
 
-    <!-- SCRIPT SECTION: DATA 45 SOAL & PROGRESS LOCK LOGIC -->
+    <!-- CUSTOM TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm pointer-events-none"></div>
+
+    <!-- CUSTOM CONFIRMATION MODAL -->
+    <div id="custom-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
+            <div class="flex items-center gap-3 text-amber-400">
+                <i id="modal-icon" class="fa-solid fa-triangle-exclamation text-2xl"></i>
+                <h3 id="modal-title" class="text-base font-bold text-white">Konfirmasi</h3>
+            </div>
+            <p id="modal-message" class="text-xs text-slate-300 leading-relaxed">
+                Apakah Anda yakin?
+            </p>
+            <div class="flex justify-end gap-2 pt-2">
+                <button id="modal-btn-cancel" onclick="closeModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition">
+                    Batal
+                </button>
+                <button id="modal-btn-confirm" class="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold rounded-xl transition">
+                    Ya, Lanjutkan
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // EXPANDED PROGRESS TRACKING STATE
         let userProgress = {
             mod1Passed: false,
             mod2Passed: false,
@@ -424,35 +854,37 @@ public class RekeningBank {
             updateProgressUI();
         }
 
-        function resetProgress() {
-            if (confirm("Apakah Anda yakin ingin mereset seluruh progres modul, nilai kuis, dan kelulusan proyek akhir?")) {
-                userProgress = {
-                    mod1Passed: false,
-                    mod2Passed: false,
-                    mod3Passed: false,
-                    quizScores: { 1: 0, 2: 0, 3: 0 },
-                    capstonePassed: false
-                };
-                saveProgress();
-                alert("Seluruh progres berhasil direset!");
-            }
+        function confirmResetProgress() {
+            showConfirmModal(
+                "Reset Progres Belajar",
+                "Apakah Anda yakin ingin mereset seluruh progres modul, nilai latihan 15 soal, dan kelulusan proyek akhir?",
+                function() {
+                    userProgress = {
+                        mod1Passed: false,
+                        mod2Passed: false,
+                        mod3Passed: false,
+                        quizScores: { 1: 0, 2: 0, 3: 0 },
+                        capstonePassed: false
+                    };
+                    saveProgress();
+                    showToast("Progres Direset", "Seluruh progres belajar telah berhasil direset.", "info");
+                }
+            );
         }
 
         function updateProgressUI() {
-            // Calculate overall percentage
             let passedCount = 0;
             if (userProgress.mod1Passed) passedCount++;
             if (userProgress.mod2Passed) passedCount++;
             if (userProgress.mod3Passed) passedCount++;
             if (userProgress.capstonePassed) passedCount++;
 
-            const totalSteps = 4; // 3 Modul + 1 Proyek Akhir
+            const totalSteps = 4;
             const percent = Math.round((passedCount / totalSteps) * 100);
 
             document.getElementById('header-progress-text').innerText = `${percent}% Selesai`;
             document.getElementById('header-progress-bar').style.width = `${percent}%`;
 
-            // Update Badges & Locks in Sidebar & Dashboard
             // Modul 1
             const badge1Nav = document.getElementById('nav-badge-mod1');
             const badge1Dash = document.getElementById('badge-mod1');
@@ -521,340 +953,486 @@ public class RekeningBank {
             }
         }
 
-        // TAB SWITCHING WITH PROGRESS LOCK CHECK
+        function showToast(title, message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let bgBorder = 'bg-slate-900 border-slate-800 text-slate-200';
+            let icon = 'fa-circle-info text-blue-400';
+            
+            if (type === 'success') {
+                bgBorder = 'bg-slate-900 border-emerald-500/40 text-emerald-200';
+                icon = 'fa-circle-check text-emerald-400';
+            } else if (type === 'error' || type === 'warning') {
+                bgBorder = 'bg-slate-900 border-rose-500/40 text-rose-200';
+                icon = 'fa-triangle-exclamation text-rose-400';
+            }
+
+            toast.className = `p-4 rounded-xl border ${bgBorder} shadow-2xl flex items-start gap-3 pointer-events-auto transition duration-300 transform translate-y-2 opacity-0`;
+            toast.innerHTML = `
+                <i class="fa-solid ${icon} text-lg shrink-0 mt-0.5"></i>
+                <div class="space-y-0.5 text-xs">
+                    <div class="font-bold text-white">${title}</div>
+                    <div class="leading-relaxed opacity-90">${message}</div>
+                </div>
+            `;
+
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        function showConfirmModal(title, message, onConfirm) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-message').innerText = message;
+            
+            const modal = document.getElementById('custom-modal');
+            const confirmBtn = document.getElementById('modal-btn-confirm');
+            
+            confirmBtn.onclick = function() {
+                closeModal();
+                if(onConfirm) onConfirm();
+            };
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('custom-modal').classList.add('hidden');
+        }
+
         function switchTab(tabId) {
-            // Lock enforcement check
+            // Lock guards
             if (tabId === 'modul-enkapsulasi' && !userProgress.mod1Passed) {
-                alert("🔒 MODUL TERKUNCI!\n\nAnda harus menyelesaikan Latihan 15 Soal pada Modul 1 (Method Non-Void) dengan nilai minimal 70% terlebih dahulu.");
+                showToast("Modul Terkunci 🔒", "Anda harus menyelesaikan Latihan 15 Soal pada Modul 1 (Method Non-Void) dengan nilai minimal 70% terlebih dahulu.", "warning");
                 return;
             }
             if (tabId === 'modul-errorhandling' && !userProgress.mod2Passed) {
-                alert("🔒 MODUL TERKUNCI!\n\nAnda harus menyelesaikan Latihan 15 Soal pada Modul 2 (Enkapsulasi) dengan nilai minimal 70% terlebih dahulu.");
+                showToast("Modul Terkunci 🔒", "Anda harus menyelesaikan Latihan 15 Soal pada Modul 2 (Enkapsulasi) dengan nilai minimal 70% terlebih dahulu.", "warning");
                 return;
             }
             if (tabId === 'proyek-akhir' && !userProgress.mod3Passed) {
-                alert("🔒 PROYEK AKHIR TERKUNCI!\n\nSelesaikan Latihan 15 Soal pada Modul 3 (Error Handling) dengan nilai minimal 70% terlebih dahulu untuk membuka Proyek Akhir.");
+                showToast("Proyek Akhir Terkunci 🔒", "Selesaikan Latihan 15 Soal pada Modul 3 (Error Handling) dengan nilai minimal 70% terlebih dahulu.", "warning");
                 return;
             }
 
-            // Hide all tabs
+            // Close mobile menu if open
+            const sidebar = document.getElementById('sidebar-nav');
+            if (!sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.add('-translate-x-full');
+            }
+
+            // Hide tabs
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
 
-            // Show target
+            // Show target tab
             const target = document.getElementById(`tab-${tabId}`);
             if (target) target.classList.remove('hidden');
 
-            // Reset navigation active styles
+            // Reset navigation styles
             document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.className = "nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-900 transition";
+                btn.className = "nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-900 transition";
             });
 
             const activeNav = document.getElementById(`nav-${tabId}`);
             if (activeNav) {
-                activeNav.className = "nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition text-brand-400 bg-brand-500/10 border border-brand-500/20";
+                activeNav.className = "nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition text-brand-400 bg-brand-500/10 border border-brand-500/20";
             }
 
-            // Component initializations
+            // Tab specific setup
             if (tabId === 'modul-nonvoid') setNonVoidType('tanpa');
             if (tabId === 'modul-errorhandling') selectExceptionType('arithmetic');
             if (tabId === 'playground') loadPresetCode();
             if (tabId === 'kuis') selectQuizModule(1);
         }
 
-        // 45 DATABASE OF QUESTIONS (15 QUESTIONS PER MODULE)
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar-nav');
+            sidebar.classList.toggle('-translate-x-full');
+        }
+
+        let currentNonVoidType = 'tanpa';
+
+        function setNonVoidType(type) {
+            currentNonVoidType = type;
+            const btnTanpa = document.getElementById('btn-nonvoid-tanpa');
+            const btnDengan = document.getElementById('btn-nonvoid-dengan');
+            const theoryBox = document.getElementById('nonvoid-theory-box');
+            const codeEx = document.getElementById('nonvoid-code-example');
+            const inputs = document.getElementById('nonvoid-interactive-inputs');
+
+            if (type === 'tanpa') {
+                btnTanpa.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition bg-amber-500 text-slate-950";
+                btnDengan.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition bg-slate-900 text-slate-400 hover:text-slate-200";
+
+                theoryBox.innerHTML = `
+                    <p>Method Non-Void Non-Static <strong>Tanpa Parameter</strong> mengolah nilai variabel internal dan mengembalikan hasilnya via keyword <code>return</code>.</p>
+                    <p class="text-amber-300 font-semibold">Syarat Utama:</p>
+                    <ul class="list-disc list-inside space-y-1 text-[11px] text-slate-400">
+                        <li>Tanpa keyword <code>static</code> di deklarasi header method.</li>
+                        <li>Wajib instansiasi objek dengan keyword <code>new</code> di main().</li>
+                        <li>Wajib mempunyai statement <code>return</code> dengan tipe data sejenis.</li>
+                    </ul>
+                `;
+
+                codeEx.innerHTML = `
+<span class="code-syntax-keyword">public class</span> HitungLuas {
+    <span class="code-syntax-comment">// Method non-static tanpa parameter</span>
+    <span class="code-syntax-keyword">public int</span> <span class="code-syntax-function">hitungLuasPersegi</span>() {
+        <span class="code-syntax-keyword">int</span> sisi = <span class="code-syntax-number">8</span>;
+        <span class="code-syntax-keyword">return</span> sisi * sisi; <span class="code-syntax-comment">// Return nilai int</span>
+    }
+
+    <span class="code-syntax-keyword">public static void</span> <span class="code-syntax-function">main</span>(String[] args) {
+        <span class="code-syntax-comment">// 1. Instansiasi Objek</span>
+        HitungLuas obj = <span class="code-syntax-keyword">new</span> HitungLuas();
+        <span class="code-syntax-comment">// 2. Panggil Method</span>
+        <span class="code-syntax-keyword">int</span> hasil = obj.<span class="code-syntax-function">hitungLuasPersegi</span>();
+        System.out.println(<span class="code-syntax-string">"Luas: "</span> + hasil);
+    }
+}`;
+
+                inputs.innerHTML = `
+                    <div class="space-y-1">
+                        <label class="text-[11px] text-slate-400">Panjang Sisi Persegi (Variabel Internal):</label>
+                        <input id="nv-input-sisi" type="number" value="8" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 focus:outline-none focus:border-amber-500">
+                    </div>
+                `;
+            } else {
+                btnDengan.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition bg-amber-500 text-slate-950";
+                btnTanpa.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition bg-slate-900 text-slate-400 hover:text-slate-200";
+
+                theoryBox.innerHTML = `
+                    <p>Method Non-Void Non-Static <strong>Dengan Parameter</strong> menerima masukan variabel dari luar saat method tersebut dipanggil oleh objek.</p>
+                    <p class="text-amber-300 font-semibold">Syarat Utama:</p>
+                    <ul class="list-disc list-inside space-y-1 text-[11px] text-slate-400">
+                        <li>Mempunyai variabel penampung di dalam tanda kurung header method.</li>
+                        <li>Pemanggil wajib mengirimkan argumen yang tipe datanya cocok.</li>
+                    </ul>
+                `;
+
+                codeEx.innerHTML = `
+<span class="code-syntax-keyword">public class</span> KalkulatorAplikasi {
+    <span class="code-syntax-comment">// Method non-static DENGAN parameter</span>
+    <span class="code-syntax-keyword">public double</span> <span class="code-syntax-function">hitungDiskon</span>(<span class="code-syntax-keyword">double</span> harga, <span class="code-syntax-keyword">int</span> persen) {
+        <span class="code-syntax-keyword">return</span> harga * (persen / <span class="code-syntax-number">100.0</span>);
+    }
+
+    <span class="code-syntax-keyword">public static void</span> <span class="code-syntax-function">main</span>(String[] args) {
+        KalkulatorAplikasi k = <span class="code-syntax-keyword">new</span> KalkulatorAplikasi();
+        <span class="code-syntax-keyword">double</span> potongan = k.<span class="code-syntax-function">hitungDiskon</span>(<span class="code-syntax-number">200000</span>, <span class="code-syntax-number">15</span>);
+        System.out.println(<span class="code-syntax-string">"Diskon: Rp "</span> + potongan);
+    }
+}`;
+
+                inputs.innerHTML = `
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="space-y-1">
+                            <label class="text-[11px] text-slate-400">Harga Barang (double):</label>
+                            <input id="nv-input-harga" type="number" value="200000" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 focus:outline-none focus:border-amber-500">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[11px] text-slate-400">Persen Diskon (int):</label>
+                            <input id="nv-input-persen" type="number" value="15" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200 focus:outline-none focus:border-amber-500">
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function executeNonVoidSimulator() {
+            const flow = document.getElementById('nonvoid-flow-diagram');
+            const consoleOut = document.getElementById('nonvoid-console-output');
+
+            if (currentNonVoidType === 'tanpa') {
+                const sisi = parseInt(document.getElementById('nv-input-sisi').value) || 0;
+                const luas = sisi * sisi;
+
+                flow.innerHTML = `
+                    <div class="p-2 bg-slate-950 rounded border border-amber-500/30 text-amber-300">1. Instansiasi: <code>HitungLuas obj = new HitungLuas();</code></div>
+                    <div class="p-2 bg-slate-950 rounded border border-blue-500/30 text-blue-300">2. Panggil: <code>obj.hitungLuasPersegi()</code></div>
+                    <div class="p-2 bg-slate-950 rounded border border-emerald-500/30 text-emerald-300">3. Return: <code>return ${sisi} * ${sisi} = ${luas}</code></div>
+                `;
+                consoleOut.innerText = `> Luas Persegi: ${luas} cm2`;
+            } else {
+                const harga = parseFloat(document.getElementById('nv-input-harga').value) || 0;
+                const persen = parseInt(document.getElementById('nv-input-persen').value) || 0;
+                const potongan = harga * (persen / 100.0);
+
+                flow.innerHTML = `
+                    <div class="p-2 bg-slate-950 rounded border border-amber-500/30 text-amber-300">1. Instansiasi: <code>KalkulatorAplikasi k = new KalkulatorAplikasi();</code></div>
+                    <div class="p-2 bg-slate-950 rounded border border-blue-500/30 text-blue-300">2. Kirim Argumen: <code>hitungDiskon(${harga}, ${persen})</code></div>
+                    <div class="p-2 bg-slate-950 rounded border border-emerald-500/30 text-emerald-300">3. Return: <code>return ${potongan}</code></div>
+                `;
+                consoleOut.innerText = `> Nilai Diskon: Rp ${potongan.toLocaleString('id-ID')}`;
+            }
+        }
+
+        function tryDirectAccess() {
+            const resultBox = document.getElementById('encap-direct-result');
+            resultBox.classList.remove('hidden');
+            resultBox.innerText = "Kompilasi Error: saldo has private access in RekeningBank!";
+        }
+
+        function executeSetterTest() {
+            const inputVal = parseFloat(document.getElementById('encap-input-saldo').value) || 0;
+            const display = document.getElementById('encap-shield-display');
+            const log = document.getElementById('encap-setter-log');
+
+            if (inputVal >= 0) {
+                display.className = "text-lg font-mono font-bold text-emerald-400";
+                display.innerText = `private double saldo = Rp ${inputVal.toLocaleString('id-ID')}`;
+                log.className = "text-[11px] text-emerald-400 italic";
+                log.innerText = "Setter Berhasil! Validasi Lulus (saldo >= 0).";
+            } else {
+                display.className = "text-lg font-mono font-bold text-rose-400";
+                log.className = "text-[11px] text-rose-400 italic";
+                log.innerText = "Setter Ditolak! Validasi Gagal (saldo tidak boleh negatif).";
+            }
+        }
+
+        let activeExceptionType = 'arithmetic';
+
+        function selectExceptionType(type) {
+            activeExceptionType = type;
+            const inputs = document.getElementById('exception-inputs-container');
+            const btnArith = document.getElementById('btn-ex-arithmetic');
+            const btnNum = document.getElementById('btn-ex-numberformat');
+            const btnArr = document.getElementById('btn-ex-array');
+
+            btnArith.className = "p-2 bg-slate-900 text-slate-400 border border-slate-800 rounded-xl text-xs font-bold transition";
+            btnNum.className = "p-2 bg-slate-900 text-slate-400 border border-slate-800 rounded-xl text-xs font-bold transition";
+            btnArr.className = "p-2 bg-slate-900 text-slate-400 border border-slate-800 rounded-xl text-xs font-bold transition";
+
+            if (type === 'arithmetic') {
+                btnArith.className = "p-2 bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-xl text-xs font-bold transition";
+                inputs.innerHTML = `
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-[11px] text-slate-400 block mb-1">Pembilang:</label>
+                            <input id="ex-val-1" type="number" value="10" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200">
+                        </div>
+                        <div>
+                            <label class="text-[11px] text-slate-400 block mb-1">Penyebut (Uji angka 0):</label>
+                            <input id="ex-val-2" type="number" value="0" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200">
+                        </div>
+                    </div>
+                `;
+            } else if (type === 'numberformat') {
+                btnNum.className = "p-2 bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-xl text-xs font-bold transition";
+                inputs.innerHTML = `
+                    <div>
+                        <label class="text-[11px] text-slate-400 block mb-1">Input Teks ke Integer (Uji teks "abc"):</label>
+                        <input id="ex-val-text" type="text" value="abc" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200">
+                    </div>
+                `;
+            } else {
+                btnArr.className = "p-2 bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-xl text-xs font-bold transition";
+                inputs.innerHTML = `
+                    <div>
+                        <label class="text-[11px] text-slate-400 block mb-1">Akses Indeks Array Ukuran [3] (Uji indeks 5):</label>
+                        <input id="ex-val-idx" type="number" value="5" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-slate-200">
+                    </div>
+                `;
+            }
+        }
+
+        function runWithoutTryCatch() {
+            const trace = document.getElementById('exception-console-trace');
+            if (activeExceptionType === 'arithmetic') {
+                const v2 = parseInt(document.getElementById('ex-val-2').value);
+                if (v2 === 0) {
+                    trace.innerHTML = `<span class="text-rose-400 font-bold">FATAL RUNTIME CRASH!</span><br>Exception in thread "main" java.lang.ArithmeticException: / by zero<br>at App.main(App.java:12)<br><span class="text-rose-500 font-bold">[Program Terhenti Tiba-tiba]</span>`;
+                    return;
+                }
+            } else if (activeExceptionType === 'numberformat') {
+                const txt = document.getElementById('ex-val-text').value;
+                if (isNaN(txt)) {
+                    trace.innerHTML = `<span class="text-rose-400 font-bold">FATAL RUNTIME CRASH!</span><br>java.lang.NumberFormatException: For input string: "${txt}"<br><span class="text-rose-500 font-bold">[Program Terhenti Tiba-tiba]</span>`;
+                    return;
+                }
+            } else {
+                const idx = parseInt(document.getElementById('ex-val-idx').value);
+                if (idx >= 3) {
+                    trace.innerHTML = `<span class="text-rose-400 font-bold">FATAL RUNTIME CRASH!</span><br>java.lang.ArrayIndexOutOfBoundsException: Index ${idx} out of bounds for length 3<br><span class="text-rose-500 font-bold">[Program Terhenti Tiba-tiba]</span>`;
+                    return;
+                }
+            }
+            trace.innerHTML = `<span class="text-emerald-400">Eksekusi normal tanpa crash.</span>`;
+        }
+
+        function runWithTryCatch() {
+            const trace = document.getElementById('exception-console-trace');
+            trace.innerHTML = `
+                <span class="text-amber-300">1. Masuk blok try...</span><br>
+                <span class="text-rose-300">2. Exception Terdeteksi -> Ditangkap oleh blok catch!</span><br>
+                <span class="text-brand-300">3. Pesan Error Safe: "Terjadi kesalahan input/proses"</span><br>
+                <span class="text-emerald-300 font-bold">4. Blok finally dieksekusi -> Program Tetap Berjalan Aman!</span>
+            `;
+        }
+
+        const playgroundPresets = {
+            nonvoid: `public class Main {
+    // Method Non-Void Non-Static
+    public int hitungTotalHarga(int harga, int jumlah) {
+        return harga * jumlah;
+    }
+
+    public static void main(String[] args) {
+        Main app = new Main();
+        int total = app.hitungTotalHarga(15000, 3);
+        System.out.println("Total Pembayaran: Rp " + total);
+    }
+}`,
+            enkapsulasi: `public class Siswa {
+    private String nama = "Budi";
+    private int nilai = 85;
+
+    public String getNama() {
+        return this.nama;
+    }
+
+    public void setNilai(int nilaiBaru) {
+        if (nilaiBaru >= 0 && nilaiBaru <= 100) {
+            this.nilai = nilaiBaru;
+        }
+    }
+
+    public int getNilai() {
+        return this.nilai;
+    }
+
+    public static void main(String[] args) {
+        Siswa s = new Siswa();
+        System.out.println("Siswa: " + s.getNama());
+        s.setNilai(92);
+        System.out.println("Nilai Baru: " + s.getNilai());
+    }
+}`,
+            errorhandling: `public class TestingTryCatch {
+    public static void main(String[] args) {
+        try {
+            int angka = Integer.parseInt("100A");
+            System.out.println("Angka: " + angka);
+        } catch (NumberFormatException e) {
+            System.out.println("Catch: Format angka tidak valid!");
+        } finally {
+            System.out.println("Finally: Selesai diuji.");
+        }
+    }
+}`
+        };
+
+        function loadPresetCode() {
+            const select = document.getElementById('playground-preset-select').value;
+            document.getElementById('playground-code-editor').value = playgroundPresets[select];
+        }
+
+        function runPlaygroundCode() {
+            const code = document.getElementById('playground-code-editor').value;
+            const consoleOut = document.getElementById('playground-console-output');
+            const memoryStack = document.getElementById('playground-memory-stack');
+
+            consoleOut.innerText = "Compiling and Executing Java Code...\n---------------------------------\n";
+
+            setTimeout(() => {
+                let logs = [];
+                if (code.includes('hitungTotalHarga')) logs.push("Total Pembayaran: Rp 45000");
+                if (code.includes('getNama()')) logs.push("Siswa: Budi");
+                if (code.includes('setNilai')) logs.push("Nilai Baru: 92");
+                if (code.includes('Catch:')) logs.push("Catch: Format angka tidak valid!");
+                if (code.includes('Finally:')) logs.push("Finally: Selesai diuji.");
+
+                if (logs.length > 0) {
+                    consoleOut.innerText = logs.join('\n');
+                } else {
+                    consoleOut.innerText = "> Program executed successfully with 0 errors.";
+                }
+
+                memoryStack.innerHTML = `
+                    <span class="text-brand-400 font-bold">HEAP ALLOCATION:</span><br>
+                    Object Instance: Created in Memory Heap.<br>
+                    Stack Trace: Main thread finished.
+                `;
+            }, 300);
+        }
+
+        function clearPlaygroundConsole() {
+            document.getElementById('playground-console-output').innerText = "> Console cleared.";
+        }
+
         const quizDatabase = {
             1: [
-                {
-                    category: "Modul 1: Method Non-Void",
-                    question: "1. Manakah ciri utama dari method non-void pada Java?",
-                    options: ["Wajib kata kunci void", "Wajib kata kunci return", "Tidak bisa dipanggil di main", "Selalu bertipe static"],
-                    answer: 1, explanation: "Method non-void mengembalikan nilai sehingga wajib memiliki statement return."
-                },
-                {
-                    category: "Modul 1: Method Non-Void",
-                    question: "2. Bagaimana cara memanggil method non-static di dalam method main()?",
-                    options: ["Langsung tulis nama method", "Harus membuat objek terlebih dahulu (new)", "Menggunakan kata kunci super", "Mengimpor package java.util"],
-                    answer: 1, explanation: "Method non-static melekat pada objek, sehingga wajib diinstansiasi terlebih dahulu."
-                },
-                {
-                    category: "Modul 1: Method Non-Void",
-                    question: "3. Perhatikan kode: public int hitung() { return 10.5; }. Mengapa kode ini error?",
-                    options: ["Nama method salah", "Nilai return (double) tidak sesuai tipe deklarasi (int)", "Tidak memiliki parameter", "Harus bertipe void"],
-                    answer: 1, explanation: "Tipe data kembalian (10.5 adalah double) harus cocok dengan header method (int)."
-                },
-                {
-                    category: "Modul 1: Method Non-Void",
-                    question: "4. Apakah yang dimaksud dengan parameter pada method?",
-                    options: ["Nilai hasil kembalian", "Variabel masukan yang diterima method saat dipanggil", "Kata kunci untuk membuat objek", "Tipe data khusus String"],
-                    answer: 1, explanation: "Parameter adalah variabel penampung nilai masukan dari pemanggil method."
-                },
-                {
-                    category: "Modul 1: Method Non-Void",
-                    question: "5. Manakah deklarasi header method non-void non-static dengan parameter yang benar?",
-                    options: ["public static void hitung(int a)", "public int hitungLuas(int p, int l)", "public void hitung()", "static int hitung()"],
-                    answer: 1, explanation: "public int hitungLuas(int p, int l) adalah method non-static, non-void, dan memiliki 2 parameter."
-                },
-                {
-                    category: "Modul 1: Method Non-Void",
-                    question: "6. Baris kode manakah yang melakukan instansiasi objek dari kelas Mobil?",
-                    options: ["Mobil m = new Mobil();", "Mobil m = Mobil();", "new Mobil m;", "Mobil = new Mobil();"],
-                    answer: 0, explanation: "Format instansiasi objek yang tepat adalah NamaClass namaObjek = new NamaClass();"
-                },
-                {
-                    category: "Modul 1: Method Non-Void",
-                    question: "7. Apa hasil kembalian dari method: public boolean isLunas() { return true; }?",
-                    options: ["Teks 'true'", "Nilai boolean true", "Angka 1", "Error kompilasi"],
-                    answer: 1, explanation: "Method tersebut mengembalikan tipe data boolean literal `true`."
-                },
-                {
-                    category: "Modul 1: Method Non-Void",
-                    question: "8. Jika sebuah method bertipe String, manakah nilai return yang valid?",
-                    options: ["return 100;", "return 'A';", "return \"SMK RPL\";", "return true;"],
-                    answer: 2, explanation: "Tipe String ditandai dengan petik ganda (\"...\")."
-                },
-                {
-                    category: "Modul 1: Method Non-Void",
-                    question: "9. Apa kesalahan pada method: public int getAngka() { int a = 5; }?",
-                    options: ["Tidak ada kata kunci static", "Missing return statement", "Nama variabel a salah", "Tipe int tidak valid"],
-                    answer: 1, explanation: "Method non-void wajib mengembalikan nilai dengan statement `return`."
-                },
-                {
-                    category: "Modul 1: Method Non-Void",
-                    question: "10. Apakah method non-static dapat mengakses variabel instansi di dalam kelasnya?",
-                    options: ["Bisa langsung", "Tidak bisa sama sekali", "Harus lewat file terpisah", "Hanya jika bertipe public"],
-                    answer: 0, explanation: "Method non-static dapat mengakses variabel anggota kelasnya secara langsung."
-                },
-                {
-                    category: "Modul 1: Method Non-Void",
-                    question: "11. Apa beda method non-void TANPA parameter dan DENGAN parameter?",
-                    options: ["Nilai return", "Sumber data masukannya", "Keyword static", "Modifier akses"],
-                    answer: 1, explanation: "Tanpa parameter mengolah data internal; dengan parameter menerima data dari luar."
-                },
-                {
-                    category: "Modul 1: Method Non-Void",
-                    question: "12. Manakah cara menyimpan hasil pengembalian method obj.getNilai() yang benar?",
-                    options: ["int x = obj.getNilai();", "void x = obj.getNilai();", "obj.getNilai() = int x;", "getNilai(int x);"],
-                    answer: 0, explanation: "Nilai return disimpang dalam variabel dengan tipe data yang sejenis."
-                },
-                {
-                    category: "Modul 1: Method Non-Void",
-                    question: "13. Apa yang terjadi jika dipanggil method non-static dari static main tanpa objek?",
-                    options: ["Program berjalan lancar", "Kompilasi error: non-static method cannot be referenced from static context", "Runtime exception division by zero", "Output bernilai null"],
-                    answer: 1, explanation: "Java melarang pemanggilan langsung method non-static dari konteks static tanpa objek."
-                },
-                {
-                    category: "Modul 1: Method Non-Void",
-                    question: "14. Berapa nilai yang dikembalikan oleh: public int tambah(int a, int b) { return a + b; } jika dipanggil tambah(4, 6)?",
-                    options: ["4", "6", "10", "46"],
-                    answer: 2, explanation: "Parameter a=4, b=6, return 4+6 = 10."
-                },
-                {
-                    category: "Modul 1: Method Non-Void",
-                    question: "15. Manakah di bawah ini yang BUKAN merupakan tipe data kembalian valid untuk method non-void?",
-                    options: ["double", "String", "void", "char"],
-                    answer: 2, explanation: "`void` menunjukkan method TIDAK mengembalikan nilai (bukan non-void)."
-                }
+                { category: "Modul 1: Method Non-Void", question: "1. Manakah ciri utama dari method non-void pada Java?", options: ["Wajib kata kunci void", "Wajib kata kunci return", "Tidak bisa dipanggil di main", "Selalu bertipe static"], answer: 1, explanation: "Method non-void mengembalikan nilai sehingga wajib memiliki statement return." },
+                { category: "Modul 1: Method Non-Void", question: "2. Bagaimana cara memanggil method non-static di dalam method main()?", options: ["Langsung tulis nama method", "Harus membuat objek terlebih dahulu (new)", "Menggunakan kata kunci super", "Mengimpor package java.util"], answer: 1, explanation: "Method non-static melekat pada objek, sehingga wajib diinstansiasi terlebih dahulu." },
+                { category: "Modul 1: Method Non-Void", question: "3. Perhatikan kode: public int hitung() { return 10.5; }. Mengapa kode ini error?", options: ["Nama method salah", "Nilai return (double) tidak sesuai tipe deklarasi (int)", "Tidak memiliki parameter", "Harus bertipe void"], answer: 1, explanation: "Tipe data kembalian (10.5 adalah double) harus cocok dengan header method (int)." },
+                { category: "Modul 1: Method Non-Void", question: "4. Apakah yang dimaksud dengan parameter pada method?", options: ["Nilai hasil kembalian", "Variabel masukan yang diterima method saat dipanggil", "Kata kunci untuk membuat objek", "Tipe data khusus String"], answer: 1, explanation: "Parameter adalah variabel penampung nilai masukan dari pemanggil method." },
+                { category: "Modul 1: Method Non-Void", question: "5. Manakah deklarasi header method non-void non-static dengan parameter yang benar?", options: ["public static void hitung(int a)", "public int hitungLuas(int p, int l)", "public void hitung()", "static int hitung()"], answer: 1, explanation: "public int hitungLuas(int p, int l) adalah method non-static, non-void, dan memiliki 2 parameter." },
+                { category: "Modul 1: Method Non-Void", question: "6. Baris kode manakah yang melakukan instansiasi objek dari kelas Mobil?", options: ["Mobil m = new Mobil();", "Mobil m = Mobil();", "new Mobil m;", "Mobil = new Mobil();"], answer: 0, explanation: "Format instansiasi objek yang tepat adalah NamaClass namaObjek = new NamaClass();" },
+                { category: "Modul 1: Method Non-Void", question: "7. Apa hasil kembalian dari method: public boolean isLunas() { return true; }?", options: ["Teks 'true'", "Nilai boolean true", "Angka 1", "Error kompilasi"], answer: 1, explanation: "Method tersebut mengembalikan tipe data boolean literal true." },
+                { category: "Modul 1: Method Non-Void", question: "8. Jika sebuah method bertipe String, manakah nilai return yang valid?", options: ["return 100;", "return 'A';", "return \"SMK RPL\";", "return true;"], answer: 2, explanation: "Tipe String ditandai dengan petik ganda (\"...\")." },
+                { category: "Modul 1: Method Non-Void", question: "9. Apa kesalahan pada method: public int getAngka() { int a = 5; }?", options: ["Tidak ada kata kunci static", "Missing return statement", "Nama variabel a salah", "Tipe int tidak valid"], answer: 1, explanation: "Method non-void wajib mengembalikan nilai dengan statement return." },
+                { category: "Modul 1: Method Non-Void", question: "10. Apakah method non-static dapat mengakses variabel instansi di dalam kelasnya?", options: ["Bisa langsung", "Tidak bisa sama sekali", "Harus lewat file terpisah", "Hanya jika bertipe public"], answer: 0, explanation: "Method non-static dapat mengakses variabel anggota kelasnya secara langsung." },
+                { category: "Modul 1: Method Non-Void", question: "11. Apa beda method non-void TANPA parameter dan DENGAN parameter?", options: ["Nilai return", "Sumber data masukannya", "Keyword static", "Modifier akses"], answer: 1, explanation: "Tanpa parameter mengolah data internal; dengan parameter menerima data dari luar." },
+                { category: "Modul 1: Method Non-Void", question: "12. Manakah cara menyimpan hasil pengembalian method obj.getNilai() yang benar?", options: ["int x = obj.getNilai();", "void x = obj.getNilai();", "obj.getNilai() = int x;", "getNilai(int x);"], answer: 0, explanation: "Nilai return disimpan dalam variabel dengan tipe data yang sejenis." },
+                { category: "Modul 1: Method Non-Void", question: "13. Apa yang terjadi jika dipanggil method non-static dari static main tanpa objek?", options: ["Program berjalan lancar", "Kompilasi error: non-static method cannot be referenced from static context", "Runtime exception division by zero", "Output bernilai null"], answer: 1, explanation: "Java melarang pemanggilan langsung method non-static dari konteks static tanpa objek." },
+                { category: "Modul 1: Method Non-Void", question: "14. Berapa nilai yang dikembalikan oleh: public int tambah(int a, int b) { return a + b; } jika dipanggil tambah(4, 6)?", options: ["4", "6", "10", "46"], answer: 2, explanation: "Parameter a=4, b=6, return 4+6 = 10." },
+                { category: "Modul 1: Method Non-Void", question: "15. Manakah di bawah ini yang BUKAN merupakan tipe data kembalian valid untuk method non-void?", options: ["double", "String", "void", "char"], answer: 2, explanation: "void menunjukkan method TIDAK mengembalikan nilai." }
             ],
             2: [
-                {
-                    category: "Modul 2: Enkapsulasi",
-                    question: "1. Apa tujuan utama dari prinsip Enkapsulasi (Encapsulation)?",
-                    options: ["Mempercepat eksekusi program", "Penyembunyian data (Data Hiding) dan keamanan objek", "Membuat kode menjadi otomatis bertipe static", "Menghemat penggunaan RAM"],
-                    answer: 1, explanation: "Enkapsulasi melindungi data sensitif objek agar tidak diubah sembarangan dari luar."
-                },
-                {
-                    category: "Modul 2: Enkapsulasi",
-                    question: "2. Modifier akses manakah yang digunakan agar variabel HANYA dapat diakses di dalam kelasnya sendiri?",
-                    options: ["public", "protected", "private", "default"],
-                    answer: 2, explanation: "`private` membatasi akses variabel hanya untuk internal kelas itu sendiri."
-                },
-                {
-                    category: "Modul 2: Enkapsulasi",
-                    question: "3. Method apakah yang berfungsi membaca (read) nilai dari variabel private?",
-                    options: ["Setter Method", "Getter Method", "Main Method", "Constructor"],
-                    answer: 1, explanation: "Getter method mengembalikan nilai dari variabel private."
-                },
-                {
-                    category: "Modul 2: Enkapsulasi",
-                    question: "4. Method apakah yang berfungsi mengubah/mengisi (write) nilai variabel private?",
-                    options: ["Getter Method", "Setter Method", "Static Method", "Finalizer"],
-                    answer: 1, explanation: "Setter method menerima nilai baru untuk memperbarui variabel private."
-                },
-                {
-                    category: "Modul 2: Enkapsulasi",
-                    question: "5. Manakah konvensi penamaan Getter yang benar untuk variabel `saldo`?",
-                    options: ["fetchSaldo()", "getSaldo()", "readSaldo()", "saldoGet()"],
-                    answer: 1, explanation: "Konvensi standar Java Naming menggunakan awalan `get` dilanjutkan nama variabel berhuruf kapital awal."
-                },
-                {
-                    category: "Modul 2: Enkapsulasi",
-                    question: "6. Mengapa Setter sangat penting dibanding membiarkan variabel public?",
-                    options: ["Agar kode lebih panjang", "Dapat menyisipkan validasi/filter data sebelum disimpan", "Mencegah pembuatan objek", "Membuat variabel jadi konstan"],
-                    answer: 1, explanation: "Setter memungkinkan kita menolak data ilegal (misal: saldo negatif) sebelum disimpan."
-                },
-                {
-                    category: "Modul 2: Enkapsulasi",
-                    question: "7. Apa yang terjadi jika kita mengeksekusi `obj.pin = \"1234\";` padahal `pin` bertipe private?",
-                    options: ["Pin berhasil diubah", "Error kompilasi: pin has private access", "Warning tapi tetap berjalan", "Pin bernilai null"],
-                    answer: 1, explanation: "Akses langsung ke anggota private dari luar kelas akan ditolak oleh kompilator Java."
-                },
-                {
-                    category: "Modul 2: Enkapsulasi",
-                    question: "8. Manakah contoh deklarasi variabel private yang benar?",
-                    options: ["private double saldo = 5000;", "double private saldo;", "saldo private double;", "private : double saldo;"],
-                    answer: 0, explanation: "Format yang benar adalah [modifier] [tipeData] [namaVariabel];"
-                },
-                {
-                    category: "Modul 2: Enkapsulasi",
-                    question: "9. Di dalam Setter method `public void setUmur(int umur)`, kata kunci apakah yang merujuk pada variabel instansi kelas?",
-                    options: ["super", "this", "parent", "class"],
-                    answer: 1, explanation: "Kata kunci `this` merujuk pada atribut kelas saat ini untuk membedakannya dari nama parameter."
-                },
-                {
-                    category: "Modul 2: Enkapsulasi",
-                    question: "10. Apakah Getter method harus memiliki nilai kembalian (non-void)?",
-                    options: ["Ya, wajib", "Tidak, harus void", "Boleh void boleh non-void", "Tergantung nama method"],
-                    answer: 0, explanation: "Getter bertugas mengembalikan nilai, sehingga Wajib non-void."
-                },
-                {
-                    category: "Modul 2: Enkapsulasi",
-                    question: "11. Tipe data kembalian apakah yang umum dipakai pada Setter yang menyertakan laporan sukses/gagal validasi?",
-                    options: ["void", "boolean", "int", "String"],
-                    answer: 1, explanation: "Tipe `boolean` (true/false) sering dipakai agar pemanggil tahu apakah perubahan disetujui."
-                },
-                {
-                    category: "Modul 2: Enkapsulasi",
-                    question: "12. Perhatikan kode: `if (nilai < 0) return;`. Apa dampak baris ini di dalam Setter `void`?",
-                    options: ["Menghentikan method jika nilai negatif", "Menghapus nilai", "Membuat error", "Merestart program"],
-                    answer: 0, explanation: "`return;` pada method void menghentikan eksekusi method lebih awal jika validasi tidak terpenuhi."
-                },
-                {
-                    category: "Modul 2: Enkapsulasi",
-                    question: "13. Manakah istilah lain dari Enkapsulasi dalam PBO?",
-                    options: ["Inheritance", "Data Hiding", "Polymorphism", "Abstraction"],
-                    answer: 1, explanation: "Enkapsulasi sangat identik dengan istilah Data Hiding (menyembunyikan rincian internal data)."
-                },
-                {
-                    category: "Modul 2: Enkapsulasi",
-                    question: "14. Jika sebuah kelas HANYA memiliki Getter tanpa Setter untuk suatu atribut, atribut tersebut bersifat...",
-                    options: ["Write-Only", "Read-Only (Hanya dapat dibaca)", "Unaccessible", "Public"],
-                    answer: 1, explanation: "Tanpa Setter, pihak luar hanya bisa membaca (Read-Only) dan tidak bisa mengubah variabel tersebut."
-                },
-                {
-                    category: "Modul 2: Enkapsulasi",
-                    question: "15. Manakah kombinasi pembentukan kelas enkapsulasi yang paling lengkap?",
-                    options: ["Private Atribut + Public Getter + Public Setter", "Public Atribut + Private Getter", "Private Atribut tanpa Getter/Setter", "Static Atribut + Private Setter"],
-                    answer: 0, explanation: "Atribut disembunyikan (private) dan dibuka secara terkontrol via Public Getter & Setter."
-                }
+                { category: "Modul 2: Enkapsulasi", question: "1. Apa tujuan utama dari prinsip Enkapsulasi (Encapsulation)?", options: ["Mempercepat eksekusi program", "Penyembunyian data (Data Hiding) dan keamanan objek", "Membuat kode menjadi otomatis bertipe static", "Menghemat penggunaan RAM"], answer: 1, explanation: "Enkapsulasi melindungi data sensitif objek agar tidak diubah sembarangan." },
+                { category: "Modul 2: Enkapsulasi", question: "2. Modifier akses manakah yang digunakan agar variabel HANYA dapat diakses di dalam kelasnya sendiri?", options: ["public", "protected", "private", "default"], answer: 2, explanation: "private membatasi akses variabel hanya untuk internal kelas itu sendiri." },
+                { category: "Modul 2: Enkapsulasi", question: "3. Method apakah yang berfungsi membaca (read) nilai dari variabel private?", options: ["Setter Method", "Getter Method", "Main Method", "Constructor"], answer: 1, explanation: "Getter method mengembalikan nilai dari variabel private." },
+                { category: "Modul 2: Enkapsulasi", question: "4. Method apakah yang berfungsi mengubah/mengisi (write) nilai variabel private?", options: ["Getter Method", "Setter Method", "Static Method", "Finalizer"], answer: 1, explanation: "Setter method menerima nilai baru untuk memperbarui variabel private." },
+                { category: "Modul 2: Enkapsulasi", question: "5. Manakah konvensi penamaan Getter yang benar untuk variabel `saldo`?", options: ["fetchSaldo()", "getSaldo()", "readSaldo()", "saldoGet()"], answer: 1, explanation: "Konvensi standar Java Naming menggunakan awalan get." },
+                { category: "Modul 2: Enkapsulasi", question: "6. Mengapa Setter sangat penting dibanding membiarkan variabel public?", options: ["Agar kode lebih panjang", "Dapat menyisipkan validasi/filter data sebelum disimpan", "Mencegah pembuatan objek", "Membuat variabel jadi konstan"], answer: 1, explanation: "Setter memungkinkan kita menolak data ilegal sebelum disimpan." },
+                { category: "Modul 2: Enkapsulasi", question: "7. Apa yang terjadi jika kita mengeksekusi `obj.pin = \"1234\";` padahal `pin` bertipe private?", options: ["Pin berhasil diubah", "Error kompilasi: pin has private access", "Warning tapi tetap berjalan", "Pin bernilai null"], answer: 1, explanation: "Akses langsung ke anggota private dari luar kelas akan ditolak oleh kompilator." },
+                { category: "Modul 2: Enkapsulasi", question: "8. Manakah contoh deklarasi variabel private yang benar?", options: ["private double saldo = 5000;", "double private saldo;", "saldo private double;", "private : double saldo;"], answer: 0, explanation: "Format yang benar adalah [modifier] [tipeData] [namaVariabel];" },
+                { category: "Modul 2: Enkapsulasi", question: "9. Di dalam Setter method `public void setUmur(int umur)`, kata kunci apakah yang merujuk pada variabel instansi kelas?", options: ["super", "this", "parent", "class"], answer: 1, explanation: "Kata kunci this merujuk pada atribut kelas saat ini." },
+                { category: "Modul 2: Enkapsulasi", question: "10. Apakah Getter method harus memiliki nilai kembalian (non-void)?", options: ["Ya, wajib", "Tidak, harus void", "Boleh void boleh non-void", "Tergantung nama method"], answer: 0, explanation: "Getter bertugas mengembalikan nilai, sehingga Wajib non-void." },
+                { category: "Modul 2: Enkapsulasi", question: "11. Tipe data kembalian apakah yang umum dipakai pada Setter yang menyertakan laporan sukses/gagal validasi?", options: ["void", "boolean", "int", "String"], answer: 1, explanation: "Tipe boolean (true/false) sering dipakai agar pemanggil tahu hasil validasi." },
+                { category: "Modul 2: Enkapsulasi", question: "12. Perhatikan kode: `if (nilai < 0) return;`. Apa dampak baris ini di dalam Setter `void`?", options: ["Menghentikan method jika nilai negatif", "Menghapus nilai", "Membuat error", "Merestart program"], answer: 0, explanation: "return; pada method void menghentikan eksekusi method lebih awal jika validasi gagal." },
+                { category: "Modul 2: Enkapsulasi", question: "13. Manakah istilah lain dari Enkapsulasi dalam PBO?", options: ["Inheritance", "Data Hiding", "Polymorphism", "Abstraction"], answer: 1, explanation: "Enkapsulasi identik dengan Data Hiding." },
+                { category: "Modul 2: Enkapsulasi", question: "14. Jika sebuah kelas HANYA memiliki Getter tanpa Setter untuk suatu atribut, atribut tersebut bersifat...", options: ["Write-Only", "Read-Only (Hanya dapat dibaca)", "Unaccessible", "Public"], answer: 1, explanation: "Tanpa Setter, pihak luar hanya bisa membaca (Read-Only)." },
+                { category: "Modul 2: Enkapsulasi", question: "15. Manakah kombinasi pembentukan kelas enkapsulasi yang paling lengkap?", options: ["Private Atribut + Public Getter + Public Setter", "Public Atribut + Private Getter", "Private Atribut tanpa Getter/Setter", "Static Atribut + Private Setter"], answer: 0, explanation: "Atribut disembunyikan (private) dan dibuka via Public Getter & Setter." }
             ],
             3: [
-                {
-                    category: "Modul 3: Error Handling",
-                    question: "1. Apa fungsi utama dari Error Handling (Try-Catch) pada Java?",
-                    options: ["Mencegah program crash tiba-tiba saat runtime exception", "Membuat program berjalan lebih cepat", "Menghapus bug secara otomatis", "Menyimpan data ke harddisk"],
-                    answer: 0, explanation: "Try-catch menangkap exception saat runtime agar aplikasi tetap berjalan stabil tanpa crash."
-                },
-                {
-                    category: "Modul 3: Error Handling",
-                    question: "2. Blok kode manakah yang digunakan untuk menempatkan kode yang BERPOTENSI mengalami error?",
-                    options: ["Blok catch", "Blok try", "Blok finally", "Blok throw"],
-                    answer: 1, explanation: "Blok `try` menampung instruksi yang berisiko memicu exception."
-                },
-                {
-                    category: "Modul 3: Error Handling",
-                    question: "3. Blok kode manakah yang HANYA dieksekusi jika terjadi exception di blok try?",
-                    options: ["Blok try", "Blok catch", "Blok finally", "Blok main"],
-                    answer: 1, explanation: "Blok `catch` aktif khusus untuk menangani dan memproses error yang terjadi."
-                },
-                {
-                    category: "Modul 3: Error Handling",
-                    question: "4. Kapan blok `finally` akan dieksekusi?",
-                    options: ["Hanya jika ada error", "Hanya jika tidak ada error", "Selalu dieksekusi, ada error maupun tidak", "Tergantung pilihan user"],
-                    answer: 2, explanation: "Blok `finally` dijamin SELALU dieksekusi di akhir proses try-catch."
-                },
-                {
-                    category: "Modul 3: Error Handling",
-                    question: "5. Exception apakah yang muncul jika kita membagi bilangan bulat dengan angka NOL (0)?",
-                    options: ["NullPointerException", "ArrayIndexOutOfBoundsException", "ArithmeticException", "NumberFormatException"],
-                    answer: 2, explanation: "Pembagian dengan nol pada integer memicu `java.lang.ArithmeticException`."
-                },
-                {
-                    category: "Modul 3: Error Handling",
-                    question: "6. Exception apakah yang muncul saat mengakses index array ke-5 pada array berukuran 3 element?",
-                    options: ["ArrayIndexOutOfBoundsException", "ClassNotFoundException", "ArithmeticException", "IOException"],
-                    answer: 0, explanation: "Akses di luar jangkauan batas indeks array memicu `ArrayIndexOutOfBoundsException`."
-                },
-                {
-                    category: "Modul 3: Error Handling",
-                    question: "7. Method apakah pada objek Exception yang digunakan untuk mencetak pesan ringkas error?",
-                    options: ["e.getReason()", "e.getMessage()", "e.printError()", "e.toStringMessage()"],
-                    answer: 1, explanation: "`e.getMessage()` mengembalikan deskripsi pesan error dalam bentuk String."
-                },
-                {
-                    category: "Modul 3: Error Handling",
-                    question: "8. Manakah urutan struktur Try-Catch-Finally yang benar?",
-                    options: ["catch -> try -> finally", "try -> catch -> finally", "finally -> try -> catch", "try -> finally -> catch"],
-                    answer: 1, explanation: "Urutan resmi Java adalah `try` dulu, diikuti `catch`, lalu penutup `finally`."
-                },
-                {
-                    category: "Modul 3: Error Handling",
-                    question: "9. Dapatkah satu blok `try` memiliki LEBIH DARI SATU blok `catch`?",
-                    options: ["Tidak bisa", "Bisa (Multiple Catch)", "Maksimal 2 catch saja", "Hanya jika menggunakan static"],
-                    answer: 1, explanation: "Satu blok try dapat memiliki multiple catch untuk menangani berbagai tipe exception spesifik."
-                },
-                {
-                    category: "Modul 3: Error Handling",
-                    question: "10. Class induk tertinggi bagi seluruh exception di Java adalah...",
-                    options: ["java.lang.Error", "java.lang.Exception", "java.lang.Throwable", "java.lang.Object"],
-                    answer: 2, explanation: "`Throwable` adalah superclass utama dari `Exception` dan `Error`."
-                },
-                {
-                    category: "Modul 3: Error Handling",
-                    question: "11. Apa yang terjadi pada kode di dalam `try` SETELAH baris yang mengalami error?",
-                    options: ["Tetap dijalankan", "Dilewati langsung lompat ke blok catch", "Diulang dari awal", "Menyebabkan komputer restart"],
-                    answer: 1, explanation: "Begitu terjadi error, eksekusi dalam try langsung terhenti dan loncat ke blok catch."
-                },
-                {
-                    category: "Modul 3: Error Handling",
-                    question: "12. Exception apakah yang terjadi jika kita mencoba mengonversi String \"abc\" menjadi Integer?",
-                    options: ["NumberFormatException", "NullPointerException", "ArithmeticException", "StringIndexOutOfBoundsException"],
-                    answer: 0, explanation: "`Integer.parseInt(\"abc\")` memicu `NumberFormatException` karena bukan format angka."
-                },
-                {
-                    category: "Modul 3: Error Handling",
-                    question: "13. Kata kunci apakah yang digunakan untuk melempar exception buatan secara manual?",
-                    options: ["throws", "throw", "catch", "try"],
-                    answer: 1, explanation: "Kata kunci `throw` digunakan untuk melemparkan objek exception secara eksplisit."
-                },
-                {
-                    category: "Modul 3: Error Handling",
-                    question: "14. Apakah penggunaan `finally` bersifat wajib pada struktur try-catch?",
-                    options: ["Wajib", "Opsional (tidak harus ada)", "Wajib jika ada catch", "Hanya untuk file I/O"],
-                    answer: 1, explanation: "Blok `finally` bersifat opsional. Kita boleh hanya menggunakan try-catch."
-                },
-                {
-                    category: "Modul 3: Error Handling",
-                    question: "15. Manakah keuntungan utama menangkap spesifik exception dibanding catch(Exception e)?",
-                    options: ["Program lebih lambat", "Penanganan pesan error lebih tepat sesuai jenis masalahnya", "Menghapus kode try", "Otomatis memperbaiki data"],
-                    answer: 1, explanation: "Spesifik catch memberikan pesan dan solusi tindakan pemulihan yang tepat sasaran."
-                }
+                { category: "Modul 3: Error Handling", question: "1. Apa fungsi utama dari Error Handling (Try-Catch) pada Java?", options: ["Mencegah program crash tiba-tiba saat runtime exception", "Membuat program berjalan lebih cepat", "Menghapus bug secara otomatis", "Menyimpan data ke harddisk"], answer: 0, explanation: "Try-catch menangkap exception saat runtime agar aplikasi tetap berjalan stabil." },
+                { category: "Modul 3: Error Handling", question: "2. Blok kode manakah yang digunakan untuk menempatkan kode yang BERPOTENSI mengalami error?", options: ["Blok catch", "Blok try", "Blok finally", "Blok throw"], answer: 1, explanation: "Blok try menampung instruksi yang berisiko memicu exception." },
+                { category: "Modul 3: Error Handling", question: "3. Blok kode manakah yang HANYA dieksekusi jika terjadi exception di blok try?", options: ["Blok try", "Blok catch", "Blok finally", "Blok main"], answer: 1, explanation: "Blok catch aktif khusus untuk menangani error yang terjadi." },
+                { category: "Modul 3: Error Handling", question: "4. Kapan blok `finally` akan dieksekusi?", options: ["Hanya jika ada error", "Hanya jika tidak ada error", "Selalu dieksekusi, ada error maupun tidak", "Tergantung pilihan user"], answer: 2, explanation: "Blok finally dijamin SELALU dieksekusi di akhir proses try-catch." },
+                { category: "Modul 3: Error Handling", question: "5. Exception apakah yang muncul jika kita membagi bilangan bulat dengan angka NOL (0)?", options: ["NullPointerException", "ArrayIndexOutOfBoundsException", "ArithmeticException", "NumberFormatException"], answer: 2, explanation: "Pembagian dengan nol pada integer memicu ArithmeticException." },
+                { category: "Modul 3: Error Handling", question: "6. Exception apakah yang muncul saat mengakses index array ke-5 pada array berukuran 3 element?", options: ["ArrayIndexOutOfBoundsException", "ClassNotFoundException", "ArithmeticException", "IOException"], answer: 0, explanation: "Akses di luar jangkauan batas indeks array memicu ArrayIndexOutOfBoundsException." },
+                { category: "Modul 3: Error Handling", question: "7. Method apakah pada objek Exception yang digunakan untuk mencetak pesan ringkas error?", options: ["e.getReason()", "e.getMessage()", "e.printError()", "e.toStringMessage()"], answer: 1, explanation: "e.getMessage() mengembalikan deskripsi pesan error." },
+                { category: "Modul 3: Error Handling", question: "8. Manakah urutan struktur Try-Catch-Finally yang benar?", options: ["catch -> try -> finally", "try -> catch -> finally", "finally -> try -> catch", "try -> finally -> catch"], answer: 1, explanation: "Urutan resmi Java adalah try dulu, diikuti catch, lalu penutup finally." },
+                { category: "Modul 3: Error Handling", question: "9. Dapatkah satu blok `try` memiliki LEBIH DARI SATU blok `catch`?", options: ["Tidak bisa", "Bisa (Multiple Catch)", "Maksimal 2 catch saja", "Hanya jika menggunakan static"], answer: 1, explanation: "Satu blok try dapat memiliki multiple catch." },
+                { category: "Modul 3: Error Handling", question: "10. Class induk tertinggi bagi seluruh exception di Java adalah...", options: ["java.lang.Error", "java.lang.Exception", "java.lang.Throwable", "java.lang.Object"], answer: 2, explanation: "Throwable adalah superclass utama dari Exception dan Error." },
+                { category: "Modul 3: Error Handling", question: "11. Apa yang terjadi pada kode di dalam `try` SETELAH baris yang mengalami error?", options: ["Tetap dijalankan", "Dilewati langsung lompat ke blok catch", "Diulang dari awal", "Menyebabkan komputer restart"], answer: 1, explanation: "Begitu terjadi error, eksekusi dalam try langsung terhenti dan loncat ke blok catch." },
+                { category: "Modul 3: Error Handling", question: "12. Exception apakah yang terjadi jika kita mencoba mengonversi String \"abc\" menjadi Integer?", options: ["NumberFormatException", "NullPointerException", "ArithmeticException", "StringIndexOutOfBoundsException"], answer: 0, explanation: "Integer.parseInt(\"abc\") memicu NumberFormatException." },
+                { category: "Modul 3: Error Handling", question: "13. Kata kunci apakah yang digunakan untuk melempar exception buatan secara manual?", options: ["throws", "throw", "catch", "try"], answer: 1, explanation: "Kata kunci throw digunakan untuk melemparkan objek exception." },
+                { category: "Modul 3: Error Handling", question: "14. Apakah penggunaan `finally` bersifat wajib pada struktur try-catch?", options: ["Wajib", "Opsional (tidak harus ada)", "Wajib jika ada catch", "Hanya untuk file I/O"], answer: 1, explanation: "Blok finally bersifat opsional." },
+                { category: "Modul 3: Error Handling", question: "15. Manakah keuntungan utama menangkap spesifik exception dibanding catch(Exception e)?", options: ["Program lebih lambat", "Penanganan pesan error lebih tepat sesuai jenis masalahnya", "Menghapus kode try", "Otomatis memperbaiki data"], answer: 1, explanation: "Spesifik catch memberikan pesan dan tindakan pemulihan yang tepat sasaran." }
             ]
         };
 
-        // QUIZ ENGINE VARIABLES
         let activeQuizModule = 1;
         let currentQuizQuestionIdx = 0;
         let activeQuizScore = 0;
         let quizSelectedAnswerIdx = null;
 
         function selectQuizModule(modId) {
-            // Check lock
             if (modId === 2 && !userProgress.mod1Passed) {
-                alert("🔒 MODUL 2 TERKUNCI!\n\nLuluskan Latihan Modul 1 terlebih dahulu dengan nilai minimal 70%.");
+                showToast("Modul 2 Terkunci 🔒", "Luluskan Latihan Modul 1 terlebih dahulu dengan nilai minimal 70%.", "warning");
                 return;
             }
             if (modId === 3 && !userProgress.mod2Passed) {
-                alert("🔒 MODUL 3 TERKUNCI!\n\nLuluskan Latihan Modul 2 terlebih dahulu dengan nilai minimal 70%.");
+                showToast("Modul 3 Terkunci 🔒", "Luluskan Latihan Modul 2 terlebih dahulu dengan nilai minimal 70%.", "warning");
                 return;
             }
 
@@ -862,7 +1440,6 @@ public class RekeningBank {
             currentQuizQuestionIdx = 0;
             activeQuizScore = 0;
 
-            // Update sub-tab buttons
             [1, 2, 3].forEach(id => {
                 const btn = document.getElementById(`quiz-tab-${id}`);
                 if (btn) {
@@ -887,7 +1464,6 @@ public class RekeningBank {
             document.getElementById('quiz-category-tag').innerText = q.category;
             document.getElementById('quiz-question-text').innerText = q.question;
 
-            // Options
             const container = document.getElementById('quiz-options-container');
             container.innerHTML = '';
 
@@ -898,7 +1474,7 @@ public class RekeningBank {
                 btn.id = `quiz-opt-${idx}`;
                 btn.innerHTML = `
                     <div class="flex items-center gap-3">
-                        <span class="w-6 h-6 rounded-lg bg-slate-800 group-hover:bg-amber-500/20 group-hover:text-amber-400 text-slate-400 text-[11px] font-bold flex items-center justify-center">${String.fromCharCode(65 + idx)}</span>
+                        <span class="w-6 h-6 rounded-lg bg-slate-800 group-hover:bg-amber-500/20 group-hover:text-amber-400 text-slate-400 text-[11px] font-bold flex items-center justify-center shrink-0">${String.fromCharCode(65 + idx)}</span>
                         <span>${opt}</span>
                     </div>
                     <i class="fa-regular fa-circle text-slate-600 group-hover:text-amber-400"></i>
@@ -906,7 +1482,6 @@ public class RekeningBank {
                 container.appendChild(btn);
             });
 
-            // Hide feedback
             document.getElementById('quiz-feedback-box').className = "hidden p-4 rounded-xl border text-xs leading-relaxed transition";
         }
 
@@ -937,7 +1512,7 @@ public class RekeningBank {
 
         function nextQuestion() {
             if (quizSelectedAnswerIdx === null) {
-                alert("Pilihlah salah satu jawaban terlebih dahulu!");
+                showToast("Pilih Jawaban", "Pilihlah salah satu opsi jawaban terlebih dahulu!", "warning");
                 return;
             }
 
@@ -946,7 +1521,6 @@ public class RekeningBank {
                 currentQuizQuestionIdx++;
                 renderQuizQuestion();
             } else {
-                // Quiz completed for this module
                 const finalScore = Math.round(activeQuizScore);
                 userProgress.quizScores[activeQuizModule] = finalScore;
 
@@ -956,10 +1530,10 @@ public class RekeningBank {
                     if (activeQuizModule === 3) userProgress.mod3Passed = true;
 
                     saveProgress();
-                    alert(`🎉 SELAMAT! Anda LULUS Latihan Modul ${activeQuizModule}!\n\nSkor Anda: ${finalScore}% (Minimal 70%)\nModul berikutnya telah DIBUKA!`);
+                    showToast(`Latihan Modul ${activeQuizModule} LULUS! 🎉`, `Skor Anda: ${finalScore}% (Minimal 70%). Modul berikutnya DIBUKA!`, "success");
                 } else {
                     saveProgress();
-                    alert(`⚠️ SKOR BELUM CUKUP.\n\nSkor Anda: ${finalScore}% (Minimal Lulus 70%).\nSilakan ulangi latihan untuk membuka modul berikutnya.`);
+                    showToast("Skor Belum Cukup ⚠️", `Skor Anda: ${finalScore}% (Syarat lulus 70%). Silakan ulangi latihan ini.`, "warning");
                 }
             }
         }
@@ -968,7 +1542,6 @@ public class RekeningBank {
             selectQuizModule(activeQuizModule);
         }
 
-        // CAPSTONE FINAL PROJECT VALIDATION SIMULATOR
         function runCapstoneInteractiveSimulator() {
             const code = document.getElementById('capstone-editor').value;
             const consoleOut = document.getElementById('capstone-console-output');
@@ -1001,35 +1574,21 @@ public class RekeningBank {
             let pass2 = code.includes('private') && (code.includes('get') || code.includes('set'));
             let pass3 = code.includes('try') && code.includes('catch');
 
-            if (pass1) {
-                check1.className = "fa-solid fa-circle-check text-emerald-400";
-            } else {
-                check1.className = "fa-solid fa-circle-xmark text-rose-400";
-            }
-
-            if (pass2) {
-                check2.className = "fa-solid fa-circle-check text-emerald-400";
-            } else {
-                check2.className = "fa-solid fa-circle-xmark text-rose-400";
-            }
-
-            if (pass3) {
-                check3.className = "fa-solid fa-circle-check text-emerald-400";
-            } else {
-                check3.className = "fa-solid fa-circle-xmark text-rose-400";
-            }
+            check1.className = pass1 ? "fa-solid fa-circle-check text-emerald-400" : "fa-solid fa-circle-xmark text-rose-400";
+            check2.className = pass2 ? "fa-solid fa-circle-check text-emerald-400" : "fa-solid fa-circle-xmark text-rose-400";
+            check3.className = pass3 ? "fa-solid fa-circle-check text-emerald-400" : "fa-solid fa-circle-xmark text-rose-400";
 
             if (pass1 && pass2 && pass3) {
                 userProgress.capstonePassed = true;
                 saveProgress();
                 consoleOut.innerHTML = `<span class="text-amber-300 font-bold">🏆 VERIFIKASI PROYEK AKHIR SUKSES!</span>\nSelamat! Kode Anda memenuhi ketiga pilar utama (Method Non-Void, Enkapsulasi, dan Error Handling). Proyek Akhir dinyatakan LULUS!`;
-                alert("🏆 SELAMAT!\n\nProyek Akhir Aplikasi Rekening Bank berhasil diverifikasi dan dinyatakan LULUS!");
+                showToast("Proyek Akhir LULUS! 🏆", "Selamat! Kode Aplikasi Rekening Bank berhasil diverifikasi dan dinyatakan LULUS!", "success");
             } else {
                 consoleOut.innerHTML = `<span class="text-rose-400 font-bold">⚠️ VERIFIKASI BELUM LENGKAP:</span>\nPastikan kode Anda menyertakan method non-void dengan return, variabel private dengan getter/setter, serta blok try-catch.`;
+                showToast("Verifikasi Belum Lengkap ⚠️", "Periksa kembali checklist kriteria proyek akhir Anda.", "warning");
             }
         }
 
-        // Initialize App
         window.onload = function() {
             loadProgress();
             switchTab('dashboard');
