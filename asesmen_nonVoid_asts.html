@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asesmen Pemrograman Berbasis Objek - SMK Bhakti Persada</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace']
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Styling for Code Snippets */
+        pre code {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white">
+
+    <!-- App Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-brand-600 text-white flex items-center justify-center font-bold text-xl shadow-md shadow-brand-200">
+                    <i class="fa-solid me-0.5 fa-laptop-code"></i>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-bold text-slate-900 leading-tight">SMK Bhakti Persada Patebon</h1>
+                    <p class="text-xs text-slate-500 font-medium">CBT System &bull; Pemrograman Terstruktur / PBO Kelas 11</p>
+                </div>
+            </div>
+
+            <!-- User Info & Timer (Shown during Exam) -->
+            <div id="header-user-info" class="hidden items-center space-x-4">
+                <div class="text-right hidden sm:block">
+                    <div id="student-name-display" class="text-sm font-semibold text-slate-800">Siswa</div>
+                    <div id="student-nis-display" class="text-xs text-slate-500">NIS: -</div>
+                </div>
+                <div id="timer-box" class="flex items-center space-x-2 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-lg text-amber-700 font-mono font-bold text-sm sm:text-base">
+                    <i class="fa-regular fa-clock text-amber-600"></i>
+                    <span id="timer-text">45:00</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow flex items-center justify-center p-4 sm:p-6">
+        
+        <!-- ================= SECTION 1: LOGIN ================= -->
+        <div id="section-login" class="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden transition-all duration-300">
+            <div class="bg-gradient-to-r from-brand-600 to-brand-800 p-6 text-white text-center">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/10 mb-3 backdrop-blur-sm">
+                    <i class="fa-solid fa-graduation-cap text-3xl"></i>
+                </div>
+                <h2 class="text-xl font-bold">Asesmen Pembelajaran</h2>
+                <p class="text-xs text-brand-100 mt-1">Tahun Pelajaran 2026/2027 Semester Ganjil</p>
+            </div>
+
+            <form id="login-form" class="p-6 space-y-4">
+                <div id="login-error" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium flex items-center space-x-2">
+                    <i class="fa-solid fa-triangle-exclamation text-rose-500 text-sm"></i>
+                    <span id="login-error-msg">NIS atau Password salah!</span>
+                </div>
+
+                <div>
+                    <label for="student-name" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Nama Lengkap Siswa</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-regular fa-user"></i>
+                        </span>
+                        <input type="text" id="student-name" required placeholder="Masukkan Nama Lengkap" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm outline-none transition">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="student-nis" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">NIS (Nomor Induk Siswa)</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-solid fa-id-card"></i>
+                        </span>
+                        <input type="text" id="student-nis" required placeholder="Contoh: 24030" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm outline-none transition">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="student-password" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Password</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-solid fa-key"></i>
+                        </span>
+                        <input type="password" id="student-password" required placeholder="Contoh: 030BP" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm outline-none transition">
+                    </div>
+                    <p class="text-[11px] text-slate-500 mt-1 flex items-center space-x-1">
+                        <i class="fa-solid fa-circle-info text-brand-500"></i>
+                        <span>Ketentuan Password: 3 digit terakhir NIS + <strong>BP</strong></span>
+                    </p>
+                </div>
+
+                <div class="pt-2">
+                    <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-3 px-4 rounded-xl shadow-lg shadow-brand-200 transition duration-200 flex items-center justify-center space-x-2">
+                        <span>Mulai Asesmen</span>
+                        <i class="fa-solid fa-arrow-right text-sm"></i>
+                    </button>
+                </div>
+
+                <!-- Quick Demo Fill -->
+                <div class="pt-3 border-t border-slate-100 text-center">
+                    <button type="button" onclick="fillDemoCredentials()" class="text-xs text-brand-600 hover:text-brand-800 font-medium underline underline-offset-2">
+                        <i class="fa-solid fa-bolt mr-1"></i>Gunakan Akun Demo (NIS: 24030 / Pass: 030BP)
+                    </button>
+                </div>
+            </form>
+        </div>
+
+
+        <!-- ================= SECTION 2: EXAM SCREEN ================= -->
+        <div id="section-exam" class="hidden w-full max-w-7xl my-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                
+                <!-- Main Question Box (Cols 3) -->
+                <div class="lg:col-span-3 space-y-4">
+                    <div class="bg-white rounded-2xl shadow-md border border-slate-200 p-5 sm:p-6">
+                        
+                        <!-- Question Header -->
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
+                            <div class="flex items-center space-x-3">
+                                <span id="q-number-badge" class="bg-brand-600 text-white text-sm font-bold px-3 py-1 rounded-lg">Soal #1</span>
+                                <span id="q-type-badge" class="bg-slate-100 text-slate-700 text-xs font-semibold px-2.5 py-1 rounded-md border border-slate-200">
+                                    Pilihan Ganda
+                                </span>
+                            </div>
+                            <button id="btn-bookmark" onclick="toggleBookmark()" class="flex items-center space-x-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-amber-50 hover:border-amber-300 hover:text-amber-700 transition">
+                                <i class="fa-regular fa-bookmark" id="bookmark-icon"></i>
+                                <span id="bookmark-text">Ragu-Ragu</span>
+                            </button>
+                        </div>
+
+                        <!-- Question Text & Code Snippet -->
+                        <div id="question-text" class="text-sm sm:text-base font-medium text-slate-800 leading-relaxed mb-4">
+                            <!-- Injected by JS -->
+                        </div>
+
+                        <div id="question-code-snippet" class="hidden mb-6 bg-slate-900 text-slate-100 rounded-xl p-4 overflow-x-auto border border-slate-800">
+                            <!-- Injected by JS -->
+                        </div>
+
+                        <!-- Options Container -->
+                        <div id="options-container" class="space-y-3 pt-2">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Navigation Footer Controls -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 flex items-center justify-between">
+                        <button id="btn-prev" onclick="prevQuestion()" class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center space-x-2">
+                            <i class="fa-solid fa-arrow-left"></i>
+                            <span class="hidden sm:inline">Sebelumnya</span>
+                        </button>
+
+                        <div class="text-xs text-slate-500 font-medium">
+                            Terjawab: <strong id="answered-count-text" class="text-brand-600">0</strong> / 20
+                        </div>
+
+                        <button id="btn-next" onclick="nextQuestion()" class="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold shadow-md shadow-brand-100 transition flex items-center space-x-2">
+                            <span id="btn-next-text" class="hidden sm:inline">Berikutnya</span>
+                            <i class="fa-solid fa-arrow-right" id="btn-next-icon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sidebar Question Grid Navigation (Col 1) -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-2xl shadow-md border border-slate-200 p-5 sticky top-20">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center justify-between">
+                            <span>Navigasi Soal</span>
+                            <i class="fa-solid fa-grid-2 text-slate-400"></i>
+                        </h3>
+
+                        <!-- Grid 1 - 20 -->
+                        <div id="question-grid" class="grid grid-cols-5 gap-2 mb-6">
+                            <!-- Generated by JS -->
+                        </div>
+
+                        <!-- Legend -->
+                        <div class="space-y-2 pt-4 border-t border-slate-100 text-xs">
+                            <div class="flex items-center space-x-2 text-slate-600">
+                                <span class="w-3.5 h-3.5 rounded bg-brand-600"></span>
+                                <span>Sudah Dijawab</span>
+                            </div>
+                            <div class="flex items-center space-x-2 text-slate-600">
+                                <span class="w-3.5 h-3.5 rounded bg-amber-400"></span>
+                                <span>Ragu-Ragu</span>
+                            </div>
+                            <div class="flex items-center space-x-2 text-slate-600">
+                                <span class="w-3.5 h-3.5 rounded bg-slate-200 border border-slate-300"></span>
+                                <span>Belum Dijawab</span>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="mt-6">
+                            <button onclick="promptSubmitExam()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-emerald-100 transition duration-200 flex items-center justify-center space-x-2 text-sm">
+                                <i class="fa-solid fa-paper-plane"></i>
+                                <span>Selesaikan Asesmen</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- ================= SECTION 3: RESULT SCREEN ================= -->
+        <div id="section-result" class="hidden w-full max-w-4xl bg-white rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-8 my-6">
+            <div class="text-center pb-6 border-b border-slate-100">
+                <div id="result-status-badge" class="inline-flex items-center justify-center p-4 rounded-full mb-3 shadow-lg">
+                    <!-- Icon Injected by JS -->
+                </div>
+                <h2 id="result-title" class="text-2xl sm:text-3xl font-extrabold text-slate-900">Hasil Asesmen Anda</h2>
+                <p id="result-subtitle" class="text-sm text-slate-500 mt-1">Pemrograman Terstruktur / PBO Kelas 11</p>
+            </div>
+
+            <!-- Score Summary Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 my-6">
+                <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 text-center">
+                    <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Skor Akhir</div>
+                    <div id="result-score" class="text-4xl font-extrabold text-brand-600">0</div>
+                    <div class="text-[11px] text-slate-400 mt-1">Maksimal: 100</div>
+                </div>
+
+                <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 text-center">
+                    <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Status Kelulusan</div>
+                    <div id="result-status-text" class="text-xl font-bold">LULUS / TUNTAS</div>
+                    <div class="text-[11px] text-slate-400 mt-1">Batas Tuntas (KKM): 85</div>
+                </div>
+
+                <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 text-center">
+                    <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Jawaban Benar</div>
+                    <div id="result-correct-count" class="text-3xl font-bold text-emerald-600">0 / 20</div>
+                    <div class="text-[11px] text-slate-400 mt-1">Total Soal Asesmen</div>
+                </div>
+            </div>
+
+            <!-- Identity Info -->
+            <div class="bg-brand-50 rounded-2xl p-4 border border-brand-100 flex flex-wrap justify-between items-center text-sm mb-8 text-brand-900">
+                <div>
+                    <span class="text-brand-600 font-medium">Nama Siswa:</span>
+                    <strong id="result-student-name" class="ml-1 font-bold">Nama</strong>
+                </div>
+                <div>
+                    <span class="text-brand-600 font-medium">NIS:</span>
+                    <strong id="result-student-nis" class="ml-1 font-bold">24030</strong>
+                </div>
+                <div>
+                    <span class="text-brand-600 font-medium">Waktu Selesai:</span>
+                    <strong id="result-time-taken" class="ml-1 font-bold">00:00</strong>
+                </div>
+            </div>
+
+            <!-- Detailed Review Section -->
+            <div>
+                <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center justify-between">
+                    <span>Pembahasan & Review Jawaban</span>
+                    <span class="text-xs font-normal text-slate-500">20 Soal Evaluasi</span>
+                </h3>
+
+                <div id="review-container" class="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                    <!-- Injected by JS -->
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="mt-8 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <button onclick="window.print()" class="w-full sm:w-auto px-6 py-3 rounded-xl border border-slate-300 text-slate-700 font-semibold hover:bg-slate-50 transition flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-print"></i>
+                    <span>Cetak Hasil</span>
+                </button>
+                <button onclick="restartExam()" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold shadow-lg shadow-brand-200 transition flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    <span>Ulangi Ujian</span>
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Confirmation Modal -->
+    <div id="modal-confirm" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 animate-in fade-in zoom-in duration-150">
+            <div class="w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mx-auto mb-4 text-xl">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 text-center">Konfirmasi Mengumpulkan</h3>
+            <p id="modal-confirm-msg" class="text-sm text-slate-600 text-center mt-2">
+                Apakah Anda yakin ingin mengakhiri dan mengumpulkan hasil asesmen sekarang?
+            </p>
+            <div id="unanswered-warning" class="hidden mt-3 p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 text-center font-medium">
+                Masih ada <strong id="unanswered-count">0</strong> soal yang belum Anda jawab/ragu-ragu!
+            </div>
+            <div class="grid grid-cols-2 gap-3 mt-6">
+                <button onclick="closeConfirmModal()" class="py-2.5 px-4 rounded-xl border border-slate-300 text-slate-700 font-semibold text-sm hover:bg-slate-50 transition">
+                    Batal
+                </button>
+                <button onclick="submitExam()" class="py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm shadow-md shadow-emerald-200 transition">
+                    Ya, Kumpulkan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-3 text-center text-xs text-slate-500">
+        &copy; 2026 SMK Bhakti Persada Patebon Kendal &bull; Assessment Platform
+    </footer>
+
+    <script>
+        // QUESTION DATASET (20 QUESTIONS)
+        // Types: 'pg' (Single Choice), 'pgk' (Complex Multiple Choice > 1 answer), 'bs' (Benar/Salah)
+        const questions = [
+            // --- BAGIAN I: PILIHAN GANDA (1 - 8) ---
+            {
+                id: 1,
+                type: 'pg',
+                typeLabel: 'Pilihan Ganda',
+                question: 'Perhatikan kode program Java berikut:',
+                code: `class Lingkaran {
+    double hitungLuas() {
+        double r = 7.0;
+        return 3.14 * r * r;
+    }
+}`,
+                prompt: 'Pernyataan yang paling tepat mengenai method hitungLuas() pada kode di atas adalah ....',
+                options: [
+                    { id: 'A', text: 'Method void karena tidak mengembalikan nilai' },
+                    { id: 'B', text: 'Method static karena menggunakan rumus perhitungan' },
+                    { id: 'C', text: 'Method non-void non-static tanpa parameter karena mengembalikan nilai bertipe double' },
+                    { id: 'D', text: 'Method constructor karena mengembalikan nilai float' },
+                    { id: 'E', text: 'Method static void karena berada di dalam class Lingkaran' }
+                ],
+                correct: 'C',
+                explanation: 'Method hitungLuas() memiliki tipe kembalian double dan kata kunci return, sehingga merupakan method non-void. Tidak ada kata kunci static dan tidak ada variabel di dalam (), sehingga dinamakan method non-void non-static tanpa parameter.'
+            },
+            {
+                id: 2,
+                type: 'pg',
+                typeLabel: 'Pilihan Ganda',
+                question: 'Perhatikan program berikut:',
+                code: `class Segitiga {
+    double hitungLuas() {
+        double alas = 6;
+        double tinggi = 8;
+        return 0.5 * alas * tinggi;
+    }
+}
+public class Main {
+    public static void main(String[] args) {
+        Segitiga s = new Segitiga();
+        System.out.println(__________);
+    }
+}`,
+                prompt: 'Kode yang tepat untuk mengisi bagian yang kosong agar method hitungLuas() dapat dipanggil adalah ....',
+                options: [
+                    { id: 'A', text: 'Segitiga.hitungLuas()' },
+                    { id: 'B', text: 'hitungLuas()' },
+                    { id: 'C', text: 's.hitungLuas()' },
+                    { id: 'D', text: 'new.hitungLuas()' },
+                    { id: 'E', text: 'Segitiga->hitungLuas()' }
+                ],
+                correct: 'C',
+                explanation: 'Karena hitungLuas() merupakan method non-static, pemanggilan harus melalui variabel objek yang telah diinstansiasi yaitu "s.hitungLuas()".'
+            },
+            {
+                id: 3,
+                type: 'pg',
+                typeLabel: 'Pilihan Ganda',
+                question: 'Perhatikan kode program berikut:',
+                code: `class Kubus {
+    int hitungVolume() {
+        int s = 4;
+        return s * s * s;
+    }
+}
+public class Main {
+    public static void main(String[] args) {
+        Kubus k = new Kubus();
+        int volume = k.hitungVolume();
+        System.out.println(volume);
+    }
+}`,
+                prompt: 'Output yang dihasilkan saat program di atas dijalankan adalah ....',
+                options: [
+                    { id: 'A', text: '12' },
+                    { id: 'B', text: '16' },
+                    { id: 'C', text: '64' },
+                    { id: 'D', text: '4' },
+                    { id: 'E', text: '0' }
+                ],
+                correct: 'C',
+                explanation: 'Perhitungan volume kubus adalah s * s * s = 4 * 4 * 4 = 64.'
+            },
+            {
+                id: 4,
+                type: 'pg',
+                typeLabel: 'Pilihan Ganda',
+                question: 'Perhatikan program berikut:',
+                code: `class Balok {
+    int hitungVolume() {
+        int p = 5, l = 3, t = 2;
+        return p * l * t;
+    }
+}
+public class Main {
+    public static void main(String[] args) {
+        System.out.println(Balok.hitungVolume());
+    }
+}`,
+                prompt: 'Program tersebut mengalami error kompilasi. Penyebab yang paling tepat adalah ....',
+                options: [
+                    { id: 'A', text: 'Method hitungVolume() harus menggunakan void' },
+                    { id: 'B', text: 'Method hitungVolume() bersifat non-static sehingga harus dipanggil melalui objek' },
+                    { id: 'C', text: 'Variabel p, l, dan t harus dibuat static' },
+                    { id: 'D', text: 'Method hitungVolume() tidak boleh menggunakan return' },
+                    { id: 'E', text: 'Class Balok tidak boleh mempunyai method' }
+                ],
+                correct: 'B',
+                explanation: 'Method hitungVolume() dideklarasikan tanpa kata kunci static, sehingga tidak bisa dipanggil secara langsung menggunakan nama class (Balok.hitungVolume()). Harus dibuat objeknya terlebih dahulu.'
+            },
+            {
+                id: 5,
+                type: 'pg',
+                typeLabel: 'Pilihan Ganda',
+                question: 'Seorang siswa ingin membuat program Java untuk menghitung keliling persegi panjang. Ia ingin menggunakan method non-void non-static tanpa parameter dengan ketentuan panjang = 10 dan lebar = 4.',
+                code: null,
+                prompt: 'Manakah implementasi deklarasi method yang paling tepat?',
+                options: [
+                    { id: 'A', text: 'int hitungKeliling() { return 2 * (10 + 4); }' },
+                    { id: 'B', text: 'static int hitungKeliling() { return 2 * (10 + 4); }' },
+                    { id: 'C', text: 'void hitungKeliling() { System.out.println(2 * (10 + 4)); }' },
+                    { id: 'D', text: 'int hitungKeliling(int p, int l) { return 2 * (p + l); }' },
+                    { id: 'E', text: 'static void hitungKeliling() { return 2 * (10 + 4); }' },
+                ],
+                correct: 'A',
+                explanation: 'Opsi A mengembalikan int (non-void), tidak ada static (non-static), dan tidak ada parameter di dalam kurung () (tanpa parameter).'
+            },
+            {
+                id: 6,
+                type: 'pg',
+                typeLabel: 'Pilihan Ganda',
+                question: 'Kata kunci dalam bahasa pemograman Java yang berfungsi untuk mengembalikan suatu nilai dari dalam method ke pemanggil method tersebut adalah ....',
+                code: null,
+                prompt: 'Pilihlah jawaban yang paling tepat:',
+                options: [
+                    { id: 'A', text: 'void' },
+                    { id: 'B', text: 'static' },
+                    { id: 'C', text: 'return' },
+                    { id: 'D', text: 'import' },
+                    { id: 'E', text: 'new' }
+                ],
+                correct: 'C',
+                explanation: 'Kata kunci "return" digunakan untuk mengembalikan nilai keluaran dari sebuah method non-void.'
+            },
+            {
+                id: 7,
+                type: 'pg',
+                typeLabel: 'Pilihan Ganda',
+                question: 'Perhatikan deklarasi method berikut:',
+                code: `class Tabung {
+    double hitungVolume() {
+        double r = 7;
+        double t = 10;
+        return 3.14 * r * r * t;
+    }
+}`,
+                prompt: 'Tipe data dari nilai kembalian (return value) pada method hitungVolume() adalah ....',
+                options: [
+                    { id: 'A', text: 'int' },
+                    { id: 'B', text: 'void' },
+                    { id: 'C', text: 'double' },
+                    { id: 'D', text: 'String' },
+                    { id: 'E', text: 'boolean' }
+                ],
+                correct: 'C',
+                explanation: 'Tipe data yang dideklarasikan sebelum nama method "hitungVolume" adalah double.'
+            },
+            {
+                id: 8,
+                type: 'pg',
+                typeLabel: 'Pilihan Ganda',
+                question: 'Perhatikan perintah instansiasi objek berikut:',
+                code: `Kalkulator k = new Kalkulator();`,
+                prompt: 'Fungsi dari perintah `new Kalkulator()` pada instruksi di atas adalah ....',
+                options: [
+                    { id: 'A', text: 'Mendeklarasikan nama variabel referensi k' },
+                    { id: 'B', text: 'Membuat atau mengalokasikan instance objek baru dari class Kalkulator di memori' },
+                    { id: 'C', text: 'Memanggil method hitung secara otomatis' },
+                    { id: 'D', text: 'Menghapus class Kalkulator dari memori' },
+                    { id: 'E', text: 'Mengubah method non-static menjadi static' }
+                ],
+                correct: 'B',
+                explanation: 'Kata kunci `new` dikombinasikan dengan constructor `Kalkulator()` berfungsi mengalokasikan memori untuk objek baru.'
+            },
+
+            // --- BAGIAN II: PILIHAN GANDA KOMPLEKS (9 - 14) [JAWABAN BENAR > 1] ---
+            {
+                id: 9,
+                type: 'pgk',
+                typeLabel: 'Pilihan Ganda Kompleks (Jawaban > 1)',
+                question: 'Perhatikan kode program Java berikut:',
+                code: `class BangunDatar {
+    int hitungLuasPersegi() {
+        int s = 6;
+        return s * s;
+    }
+    double hitungKelilingLingkaran() {
+        double r = 14;
+        return 2 * 3.14 * r;
+    }
+    void cetakPesan() {
+        System.out.println("Perhitungan Selesai");
+    }
+}`,
+                prompt: 'Pilihlah SEMUA pernyataan yang BENAR berdasarkan kode di atas (Jawaban benar lebih dari satu):',
+                options: [
+                    { id: 'A', text: 'hitungLuasPersegi() merupakan method non-void' },
+                    { id: 'B', text: 'hitungKelilingLingkaran() mengembalikan nilai bertipe double' },
+                    { id: 'C', text: 'hitungLuasPersegi() dan hitungKelilingLingkaran() keduanya merupakan method non-static' },
+                    { id: 'D', text: 'cetakPesan() merupakan method non-void karena mencetak string' },
+                    { id: 'E', text: 'cetakPesan() merupakan method void yang tidak mengembalikan nilai' }
+                ],
+                correct: ['A', 'B', 'C', 'E'],
+                explanation: 'Pernyataan A, B, C, dan E benar. cetakPesan() mengembalikan void (method void), sedangkan dua method lainnya non-void dan non-static.'
+            },
+            {
+                id: 10,
+                type: 'pgk',
+                typeLabel: 'Pilihan Ganda Kompleks (Jawaban > 1)',
+                question: 'Perhatikan kode program berikut:',
+                code: `class OperasiStatistik {
+    int hitungTotal() {
+        int a = 20, b = 30, c = 50;
+        return a + b + c;
+    }
+    double hitungRataRata() {
+        return hitungTotal() / 3.0;
+    }
+}`,
+                prompt: 'Pilihlah SEMUA cara atau kode yang BENAR untuk memanggil dan memanfaatkan method tersebut dari method main:',
+                options: [
+                    { id: 'A', text: 'OperasiStatistik op = new OperasiStatistik();' },
+                    { id: 'B', text: 'int total = op.hitungTotal();' },
+                    { id: 'C', text: 'double rata = op.hitungRataRata();' },
+                    { id: 'D', text: 'OperasiStatistik.hitungTotal();' },
+                    { id: 'E', text: 'System.out.println(op.hitungTotal());' }
+                ],
+                correct: ['A', 'B', 'C', 'E'],
+                explanation: 'Karena method bersifat non-static, pemanggilan harus melalui objek (Opsi A). Opsi B, C, dan E adalah sintaks pemanggilan yang valid via objek. Opsi D salah karena memanggil method non-static secara static.'
+            },
+            {
+                id: 11,
+                type: 'pgk',
+                typeLabel: 'Pilihan Ganda Kompleks (Jawaban > 1)',
+                question: 'Sebuah method dirancang dengan ketentuan wajib sebagai berikut:\n- Method bersifat non-static\n- Method bersifat non-void (mengembalikan nilai int)\n- Method tidak menerima parameter',
+                code: null,
+                prompt: 'Manakah opsi deklarasi method yang MEMENUHI KETENTUAN tersebut? (Pilih semua yang benar)',
+                options: [
+                    { id: 'A', text: 'int hitungSisa() { int total = 100, terpakai = 35; return total - terpakai; }' },
+                    { id: 'B', text: 'static int hitungSisa() { return 100 - 35; }' },
+                    { id: 'C', text: 'int hitungSisa() { return 100 - 35; }' },
+                    { id: 'D', text: 'void hitungSisa() { System.out.println(100 - 35); }' },
+                    { id: 'E', text: 'int hitungSisa(int a, int b) { return a - b; }' }
+                ],
+                correct: ['A', 'C'],
+                explanation: 'Opsi A dan C memenuhi ketiga syarat (non-static, mengembalikan int, tanpa parameter di tanda ()). B mengandung static, D bertipe void, dan E menggunakan parameter.'
+            },
+            {
+                id: 12,
+                type: 'pgk',
+                typeLabel: 'Pilihan Ganda Kompleks (Jawaban > 1)',
+                question: 'Perhatikan deklarasi method berikut:',
+                code: `class NilaiSiswa {
+    int hitungTotal() {
+        int tugas = 80, uts = 75, uas = 85;
+        return tugas + uts + uas;
+    }
+    double hitungRataRata() {
+        return hitungTotal() / 3.0;
+    }
+}`,
+                prompt: 'Manakah pernyataan yang BENAR mengenai method pada class NilaiSiswa di atas?',
+                options: [
+                    { id: 'A', text: 'hitungTotal() mengembalikan nilai bertipe int' },
+                    { id: 'B', text: 'hitungRataRata() mengembalikan nilai bertipe double' },
+                    { id: 'C', text: 'Kedua method merupakan method non-static' },
+                    { id: 'D', text: 'Kedua method dipanggil langsung tanpa membuat objek' },
+                    { id: 'E', text: 'Hasil dari hitungTotal() adalah 240' }
+                ],
+                correct: ['A', 'B', 'C', 'E'],
+                explanation: 'A, B, C, dan E benar. total = 80 + 75 + 85 = 240. Kedua method bersifat non-static sehingga butuh objek untuk dipanggil.'
+            },
+            {
+                id: 13,
+                type: 'pgk',
+                typeLabel: 'Pilihan Ganda Kompleks (Jawaban > 1)',
+                question: 'Dalam konsep dasar Pemrograman Berbasis Objek (OOP) Java, manakah ciri-ciri khas dari Method Non-Void?',
+                code: null,
+                prompt: 'Pilihlah SEMUA pernyataan yang tepat:',
+                options: [
+                    { id: 'A', text: 'Memiliki tipe data kembalian (seperti int, double, String) di deklarasi method' },
+                    { id: 'B', text: 'Menggunakan kata kunci `return` di dalam body method' },
+                    { id: 'C', text: 'Selalu diawali kata kunci `void` pada header method' },
+                    { id: 'D', text: 'Nilai kembaliannya dapat disimpan ke dalam suatu variabel' },
+                    { id: 'E', text: 'Dapat dicetak langsung di dalam System.out.println()' }
+                ],
+                correct: ['A', 'B', 'D', 'E'],
+                explanation: 'A, B, D, dan E adalah ciri utama method non-void. C adalah ciri method void.'
+            },
+            {
+                id: 14,
+                type: 'pgk',
+                typeLabel: 'Pilihan Ganda Kompleks (Jawaban > 1)',
+                question: 'Perhatikan kode program berikut:',
+                code: `class Siswa {
+    int hitungUmur() {
+        int thnLahir = 2008;
+        int thnSekarang = 2026;
+        return thnSekarang - thnLahir;
+    }
+}`,
+                prompt: 'Manakah pernyataan yang BENAR mengenai program di atas?',
+                options: [
+                    { id: 'A', text: 'hitungUmur() mengembalikan nilai integer' },
+                    { id: 'B', text: 'Hasil keluaran dari method hitungUmur() adalah 18' },
+                    { id: 'C', text: 'Untuk memanggil hitungUmur(), harus diinstansiasi objek Siswa' },
+                    { id: 'D', text: 'Method hitungUmur() menggunakan parameter thnLahir dan thnSekarang' },
+                    { id: 'E', text: 'hitungUmur() termasuk method tanpa parameter' }
+                ],
+                correct: ['A', 'B', 'C', 'E'],
+                explanation: 'A, B, C, dan E benar. 2026 - 2008 = 18. Variabel thnLahir & thnSekarang adalah variabel lokal di dalam method, bukan parameter method.'
+            },
+
+            // --- BAGIAN III: PERNYATAAN BENAR / SALAH (15 - 20) ---
+            {
+                id: 15,
+                type: 'bs',
+                typeLabel: 'Pernyataan Benar / Salah',
+                question: 'Perhatikan kode berikut:',
+                code: `class Persegi {
+    int hitungLuas() {
+        int sisi = 8;
+        return sisi * sisi;
+    }
+}`,
+                prompt: 'PERNYATAAN: Method hitungLuas() merupakan method non-void karena memiliki tipe return int dan mengembalikan nilai menggunakan kata kunci return.',
+                options: [
+                    { id: 'BENAR', text: 'BENAR' },
+                    { id: 'SALAH', text: 'SALAH' }
+                ],
+                correct: 'BENAR',
+                explanation: 'Pernyataan BENAR. Adanya tipe data int dan perintah return membuktikan method tersebut bersifat non-void.'
+            },
+            {
+                id: 16,
+                type: 'bs',
+                typeLabel: 'Pernyataan Benar / Salah',
+                question: 'Perhatikan kode berikut:',
+                code: `class Kalkulator {
+    int hitungTambah() {
+        int a = 10, b = 20;
+        return a + b;
+    }
+}`,
+                prompt: 'PERNYATAAN: Method hitungTambah() dapat dipanggil langsung dengan instruksi `Kalkulator.hitungTambah()` meskipun method tidak menggunakan kata kunci static.',
+                options: [
+                    { id: 'BENAR', text: 'BENAR' },
+                    { id: 'SALAH', text: 'SALAH' }
+                ],
+                correct: 'SALAH',
+                explanation: 'Pernyataan SALAH. Method tanpa static (non-static) TIDAK DAPAT dipanggil langsung melalui nama class. Harus dibuat objeknya terlebih dahulu.'
+            },
+            {
+                id: 17,
+                type: 'bs',
+                typeLabel: 'Pernyataan Benar / Salah',
+                question: 'Perhatikan program berikut:',
+                code: `class Nilai {
+    int hitungTotal() {
+        int tugas = 80, uts = 75, uas = 85;
+        return tugas + uts + uas;
+    }
+}
+public class Main {
+    public static void main(String[] args) {
+        Nilai n = new Nilai();
+        int hasil = n.hitungTotal();
+    }
+}`,
+                prompt: 'PERNYATAAN: Nilai yang disimpan di dalam variabel `hasil` setelah program dieksekusi adalah 240.',
+                options: [
+                    { id: 'BENAR', text: 'BENAR' },
+                    { id: 'SALAH', text: 'SALAH' }
+                ],
+                correct: 'BENAR',
+                explanation: 'Pernyataan BENAR. 80 + 75 + 85 = 240.'
+            },
+            {
+                id: 18,
+                type: 'bs',
+                typeLabel: 'Pernyataan Benar / Salah',
+                question: 'Perhatikan kode berikut:',
+                code: `class PersegiPanjang {
+    int hitungLuas() {
+        int panjang = 12, lebar = 5;
+        return panjang * lebar;
+    }
+}`,
+                prompt: 'PERNYATAAN: Method hitungLuas() termasuk method tanpa parameter karena tidak terdapat variabel di dalam tanda kurung () pada deklarasi nama method.',
+                options: [
+                    { id: 'BENAR', text: 'BENAR' },
+                    { id: 'SALAH', text: 'SALAH' }
+                ],
+                correct: 'BENAR',
+                explanation: 'Pernyataan BENAR. Tanda kurung () kosong menandakan method tidak menerima masukan parameter dari luar.'
+            },
+            {
+                id: 19,
+                type: 'bs',
+                typeLabel: 'Pernyataan Benar / Salah',
+                question: 'Perhatikan kode berikut:',
+                code: `class Lingkaran {
+    double hitungLuas() {
+        double r = 7;
+        return 3.14 * r * r;
+    }
+}`,
+                prompt: 'PERNYATAAN: Kode method hitungLuas() di atas salah dan menyebabkan error kompilasi karena method yang mengembalikan nilai double diwajibkan memakai kata kunci void.',
+                options: [
+                    { id: 'BENAR', text: 'BENAR' },
+                    { id: 'SALAH', text: 'SALAH' }
+                ],
+                correct: 'SALAH',
+                explanation: 'Pernyataan SALAH. Method yang mengembalikan nilai bertipe double JUSTRUS TIDAK BOLEH memakai void. Penulisan kode di atas sudah tepat.'
+            },
+            {
+                id: 20,
+                type: 'bs',
+                typeLabel: 'Pernyataan Benar / Salah',
+                question: 'Perhatikan kode berikut:',
+                code: `class Diskon {
+    double hitungHarga() {
+        double harga = 100000;
+        double diskon = 0.15;
+        return harga - (harga * diskon);
+    }
+}`,
+                prompt: 'PERNYATAAN: Nilai yang dikembalikan oleh method hitungHarga() di atas adalah 85000.0.',
+                options: [
+                    { id: 'BENAR', text: 'BENAR' },
+                    { id: 'SALAH', text: 'SALAH' }
+                ],
+                correct: 'BENAR',
+                explanation: 'Pernyataan BENAR. Diskon 15% dari 100.000 adalah 15.000, sehingga harga akhirnya adalah 85.000,0.'
+            }
+        ];
+
+        // STATE VARIABLES
+        let currentStudent = { name: '', nis: '' };
+        let userAnswers = {}; // { qId: 'A' or ['A', 'B'] or 'BENAR' }
+        let bookmarks = {};   // { qId: true/false }
+        let currentQuestionIndex = 0;
+        let timerSeconds = 45 * 60; // 45 Minutes
+        let timerInterval = null;
+        const KKM = 85;
+
+        // DEMO CREDENTIALS FILLER
+        function fillDemoCredentials() {
+            document.getElementById('student-name').value = 'Ahmad Tri Raharjo';
+            document.getElementById('student-nis').value = '24030';
+            document.getElementById('student-password').value = '030BP';
+        }
+
+        // LOGIN FORM SUBMISSION
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('student-name').value.trim();
+            const nis = document.getElementById('student-nis').value.trim();
+            const pass = document.getElementById('student-password').value.trim();
+
+            const errBox = document.getElementById('login-error');
+            const errMsg = document.getElementById('login-error-msg');
+
+            if (nis.length < 3) {
+                errMsg.innerText = 'NIS minimal harus terdiri dari 3 digit!';
+                errBox.classList.remove('hidden');
+                return;
+            }
+
+            // Expected Password Logic: Last 3 digits of NIS + "BP"
+            const last3 = nis.slice(-3);
+            const expectedPass = last3 + "BP";
+
+            if (pass.toUpperCase() !== expectedPass.toUpperCase()) {
+                errMsg.innerText = `Password salah! Password harus berupa 3 digit terakhir NIS + BP (Contoh: ${last3}BP)`;
+                errBox.classList.remove('hidden');
+                return;
+            }
+
+            // Successful Login
+            errBox.classList.add('hidden');
+            currentStudent.name = name;
+            currentStudent.nis = nis;
+
+            document.getElementById('student-name-display').innerText = name;
+            document.getElementById('student-nis-display').innerText = `NIS: ${nis}`;
+            document.getElementById('header-user-info').classList.remove('hidden');
+            document.getElementById('header-user-info').classList.add('flex');
+
+            // Switch Screen
+            document.getElementById('section-login').classList.add('hidden');
+            document.getElementById('section-exam').classList.remove('hidden');
+
+            // Initialize Grid & Question
+            initQuestionGrid();
+            renderQuestion(0);
+            startTimer();
+        });
+
+        // TIMER FUNCTION
+        function startTimer() {
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                timerSeconds--;
+                updateTimerDisplay();
+                if (timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    alert("Waktu pengerjaan asesmen telah habis!");
+                    submitExam();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(timerSeconds / 60);
+            const secs = timerSeconds % 60;
+            const formatted = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            document.getElementById('timer-text').innerText = formatted;
+        }
+
+        // QUESTION GRID BUILDER
+        function initQuestionGrid() {
+            const gridContainer = document.getElementById('question-grid');
+            gridContainer.innerHTML = '';
+
+            questions.forEach((q, idx) => {
+                const btn = document.createElement('button');
+                btn.id = `grid-btn-${idx}`;
+                btn.className = getGridBtnClass(idx);
+                btn.innerText = idx + 1;
+                btn.onclick = () => renderQuestion(idx);
+                gridContainer.appendChild(btn);
+            });
+        }
+
+        function getGridBtnClass(idx) {
+            const qId = questions[idx].id;
+            const isAnswered = isQuestionAnswered(qId);
+            const isBookmarked = !!bookmarks[qId];
+            const isCurrent = currentQuestionIndex === idx;
+
+            let base = "w-full aspect-square rounded-xl font-bold text-xs flex items-center justify-center transition border ";
+
+            if (isCurrent) {
+                base += "ring-2 ring-brand-500 ring-offset-1 ";
+            }
+
+            if (isBookmarked) {
+                return base + "bg-amber-400 text-amber-950 border-amber-500 shadow-sm";
+            } else if (isAnswered) {
+                return base + "bg-brand-600 text-white border-brand-700 shadow-sm";
+            } else {
+                return base + "bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200";
+            }
+        }
+
+        function isQuestionAnswered(qId) {
+            const ans = userAnswers[qId];
+            if (!ans) return false;
+            if (Array.isArray(ans)) return ans.length > 0;
+            return true;
+        }
+
+        function updateAnsweredCount() {
+            let count = 0;
+            questions.forEach(q => {
+                if (isQuestionAnswered(q.id)) count++;
+            });
+            document.getElementById('answered-count-text').innerText = count;
+        }
+
+        // RENDER QUESTION
+        function renderQuestion(index) {
+            currentQuestionIndex = index;
+            const q = questions[index];
+
+            // Badge & Header
+            document.getElementById('q-number-badge').innerText = `Soal #${index + 1}`;
+            document.getElementById('q-type-badge').innerText = q.typeLabel;
+
+            // Question Text & Code
+            document.getElementById('question-text').innerHTML = `
+                <p class="font-semibold text-slate-800">${q.question}</p>
+                <p class="mt-2 text-slate-700">${q.prompt}</p>
+            `;
+
+            const codeBox = document.getElementById('question-code-snippet');
+            if (q.code) {
+                codeBox.innerHTML = `<pre><code>${escapeHtml(q.code)}</code></pre>`;
+                codeBox.classList.remove('hidden');
+            } else {
+                codeBox.classList.add('hidden');
+            }
+
+            // Bookmark State
+            const isBookmarked = !!bookmarks[q.id];
+            const bmIcon = document.getElementById('bookmark-icon');
+            const bmBtn = document.getElementById('btn-bookmark');
+
+            if (isBookmarked) {
+                bmIcon.className = "fa-solid fa-bookmark text-amber-600";
+                bmBtn.className = "flex items-center space-x-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-amber-300 bg-amber-50 text-amber-700 shadow-sm transition";
+            } else {
+                bmIcon.className = "fa-regular fa-bookmark text-slate-400";
+                bmBtn.className = "flex items-center space-x-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-amber-50 hover:border-amber-300 hover:text-amber-700 transition";
+            }
+
+            // Options Rendering
+            const optionsBox = document.getElementById('options-container');
+            optionsBox.innerHTML = '';
+
+            const currentAns = userAnswers[q.id];
+
+            q.options.forEach(opt => {
+                const optWrapper = document.createElement('label');
+                let isChecked = false;
+
+                if (q.type === 'pgk') {
+                    isChecked = Array.isArray(currentAns) && currentAns.includes(opt.id);
+                } else {
+                    isChecked = currentAns === opt.id;
+                }
+
+                optWrapper.className = `flex items-start p-3.5 sm:p-4 rounded-xl border-2 cursor-pointer transition ${
+                    isChecked 
+                        ? 'border-brand-600 bg-brand-50/60 text-brand-950 font-medium shadow-sm' 
+                        : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700'
+                }`;
+
+                const inputType = q.type === 'pgk' ? 'checkbox' : 'radio';
+                const inputName = `q_option_${q.id}`;
+
+                optWrapper.innerHTML = `
+                    <div class="flex items-center h-5 mt-0.5">
+                        <input type="${inputType}" name="${inputName}" value="${opt.id}" ${isChecked ? 'checked' : ''} 
+                            onchange="handleAnswerSelect(${q.id}, '${opt.id}', '${q.type}')" 
+                            class="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
+                    </div>
+                    <div class="ml-3 text-sm leading-snug">
+                        <span class="font-bold mr-1.5">${opt.id}.</span>
+                        <span>${escapeHtml(opt.text)}</span>
+                    </div>
+                `;
+
+                optionsBox.appendChild(optWrapper);
+            });
+
+            // Update Navigation Button States
+            document.getElementById('btn-prev').disabled = index === 0;
+
+            const nextBtnText = document.getElementById('btn-next-text');
+            const nextBtnIcon = document.getElementById('btn-next-icon');
+
+            if (index === questions.length - 1) {
+                nextBtnText.innerText = "Selesai";
+                nextBtnIcon.className = "fa-solid fa-check";
+            } else {
+                nextBtnText.innerText = "Berikutnya";
+                nextBtnIcon.className = "fa-solid fa-arrow-right";
+            }
+
+            // Refresh Grid Visuals
+            initQuestionGrid();
+            updateAnsweredCount();
+        }
+
+        // ANSWER SELECTION HANDLER
+        function handleAnswerSelect(qId, optId, type) {
+            if (type === 'pgk') {
+                if (!Array.isArray(userAnswers[qId])) {
+                    userAnswers[qId] = [];
+                }
+                const idx = userAnswers[qId].indexOf(optId);
+                if (idx > -1) {
+                    userAnswers[qId].splice(idx, 1);
+                } else {
+                    userAnswers[qId].push(optId);
+                }
+            } else {
+                userAnswers[qId] = optId;
+            }
+
+            renderQuestion(currentQuestionIndex);
+        }
+
+        // BOOKMARK TOGGLE
+        function toggleBookmark() {
+            const qId = questions[currentQuestionIndex].id;
+            bookmarks[qId] = !bookmarks[qId];
+            renderQuestion(currentQuestionIndex);
+        }
+
+        // NEXT / PREV
+        function nextQuestion() {
+            if (currentQuestionIndex < questions.length - 1) {
+                renderQuestion(currentQuestionIndex + 1);
+            } else {
+                promptSubmitExam();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                renderQuestion(currentQuestionIndex - 1);
+            }
+        }
+
+        // PROMPT SUBMIT MODAL
+        function promptSubmitExam() {
+            let unanswered = 0;
+            questions.forEach(q => {
+                if (!isQuestionAnswered(q.id)) unanswered++;
+            });
+
+            const warningBox = document.getElementById('unanswered-warning');
+            if (unanswered > 0) {
+                document.getElementById('unanswered-count').innerText = unanswered;
+                warningBox.classList.remove('hidden');
+            } else {
+                warningBox.classList.add('hidden');
+            }
+
+            document.getElementById('modal-confirm').classList.remove('hidden');
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('modal-confirm').classList.add('hidden');
+        }
+
+        // SUBMIT EXAM & CALCULATE SCORE
+        function submitExam() {
+            clearInterval(timerInterval);
+            closeConfirmModal();
+
+            // Calculate Score
+            let totalScore = 0;
+            let correctCount = 0;
+            const pointsPerQuestion = 5; // 20 Questions * 5 = 100 Max Score
+
+            questions.forEach(q => {
+                const userAns = userAnswers[q.id];
+
+                if (q.type === 'pg' || q.type === 'bs') {
+                    if (userAns === q.correct) {
+                        totalScore += pointsPerQuestion;
+                        correctCount++;
+                    }
+                } else if (q.type === 'pgk') {
+                    // Array Comparison for PGK
+                    if (Array.isArray(userAns)) {
+                        const correctArray = q.correct.sort();
+                        const userArray = [...userAns].sort();
+
+                        const isExactMatch = correctArray.length === userArray.length && 
+                            correctArray.every((val, idx) => val === userArray[idx]);
+
+                        if (isExactMatch) {
+                            totalScore += pointsPerQuestion;
+                            correctCount++;
+                        } else {
+                            // Partial Scoring: calculate proportion if no wrong options selected
+                            const wrongSelected = userArray.filter(item => !correctArray.includes(item));
+                            if (wrongSelected.length === 0 && userArray.length > 0) {
+                                const partialRatio = userArray.length / correctArray.length;
+                                totalScore += pointsPerQuestion * partialRatio;
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Round final score
+            totalScore = Math.round(totalScore);
+
+            // Hide Exam & Show Result
+            document.getElementById('section-exam').classList.add('hidden');
+            document.getElementById('section-result').classList.remove('hidden');
+
+            // Render Results Data
+            document.getElementById('result-score').innerText = totalScore;
+            document.getElementById('result-correct-count').innerText = `${correctCount} / 20 Soal`;
+            document.getElementById('result-student-name').innerText = currentStudent.name;
+            document.getElementById('result-student-nis').innerText = currentStudent.nis;
+
+            const timeTakenSecs = (45 * 60) - timerSeconds;
+            const mins = Math.floor(timeTakenSecs / 60);
+            const secs = timeTakenSecs % 60;
+            document.getElementById('result-time-taken').innerText = `${mins}m ${secs}s`;
+
+            // Status Badge & Text
+            const badge = document.getElementById('result-status-badge');
+            const statusText = document.getElementById('result-status-text');
+
+            if (totalScore >= KKM) {
+                badge.className = "inline-flex items-center justify-center p-4 rounded-full mb-3 shadow-lg bg-emerald-100 text-emerald-600";
+                badge.innerHTML = `<i class="fa-solid fa-trophy text-4xl"></i>`;
+                statusText.innerText = "LULUS / TUNTAS";
+                statusText.className = "text-xl font-extrabold text-emerald-600";
+            } else {
+                badge.className = "inline-flex items-center justify-center p-4 rounded-full mb-3 shadow-lg bg-rose-100 text-rose-600";
+                badge.innerHTML = `<i class="fa-solid fa-circle-xmark text-4xl"></i>`;
+                statusText.innerText = "BELUM TUNTAS";
+                statusText.className = "text-xl font-extrabold text-rose-600";
+            }
+
+            // Render Detailed Review
+            renderReviewList();
+        }
+
+        // RENDER REVIEW DETAILS
+        function renderReviewList() {
+            const container = document.getElementById('review-container');
+            container.innerHTML = '';
+
+            questions.forEach((q, idx) => {
+                const userAns = userAnswers[q.id];
+                let isCorrect = false;
+
+                if (q.type === 'pg' || q.type === 'bs') {
+                    isCorrect = (userAns === q.correct);
+                } else if (q.type === 'pgk') {
+                    if (Array.isArray(userAns)) {
+                        const correctArray = q.correct.sort();
+                        const userArray = [...userAns].sort();
+                        isCorrect = correctArray.length === userArray.length && 
+                            correctArray.every((val, i) => val === userArray[i]);
+                    }
+                }
+
+                const item = document.createElement('div');
+                item.className = `p-4 rounded-2xl border ${
+                    isCorrect ? 'bg-emerald-50/50 border-emerald-200' : 'bg-rose-50/50 border-rose-200'
+                }`;
+
+                let formattedUserAns = '-';
+                if (userAns) {
+                    formattedUserAns = Array.isArray(userAns) ? userAns.join(', ') : userAns;
+                }
+
+                let formattedCorrectAns = Array.isArray(q.correct) ? q.correct.join(', ') : q.correct;
+
+                item.innerHTML = `
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs font-bold px-2.5 py-1 rounded-md ${
+                                isCorrect ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'
+                            }">Soal #${idx + 1}</span>
+                            <span class="text-xs font-semibold text-slate-500">${q.typeLabel}</span>
+                        </div>
+                        <span class="text-xs font-bold ${isCorrect ? 'text-emerald-700' : 'text-rose-700'}">
+                            ${isCorrect ? '<i class="fa-solid fa-check mr-1"></i> Benar' : '<i class="fa-solid fa-xmark mr-1"></i> Salah'}
+                        </span>
+                    </div>
+
+                    <p class="text-sm font-semibold text-slate-800 mt-2">${q.question}</p>
+                    <p class="text-xs text-slate-600 mt-1">${q.prompt}</p>
+
+                    ${q.code ? `<pre class="my-2 p-2.5 bg-slate-900 text-slate-100 text-xs rounded-lg overflow-x-auto"><code>${escapeHtml(q.code)}</code></pre>` : ''}
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 pt-3 border-t border-slate-200/60 text-xs">
+                        <div>
+                            <span class="text-slate-500">Jawaban Anda:</span>
+                            <strong class="${isCorrect ? 'text-emerald-700' : 'text-rose-700'} ml-1">${formattedUserAns}</strong>
+                        </div>
+                        <div>
+                            <span class="text-slate-500">Kunci Jawaban:</span>
+                            <strong class="text-emerald-700 ml-1">${formattedCorrectAns}</strong>
+                        </div>
+                    </div>
+
+                    <div class="mt-2.5 pt-2 border-t border-slate-200/40 text-xs text-slate-600 bg-white/70 p-2.5 rounded-lg border">
+                        <strong class="text-slate-800 block mb-0.5"><i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i>Pembahasan:</strong>
+                        ${q.explanation}
+                    </div>
+                `;
+
+                container.appendChild(item);
+            });
+        }
+
+        // RESTART EXAM
+        function restartExam() {
+            userAnswers = {};
+            bookmarks = {};
+            currentQuestionIndex = 0;
+            timerSeconds = 45 * 60;
+
+            document.getElementById('section-result').classList.add('hidden');
+            document.getElementById('section-exam').classList.remove('hidden');
+
+            initQuestionGrid();
+            renderQuestion(0);
+            startTimer();
+        }
+
+        // UTILITY: ESCAPE HTML
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
