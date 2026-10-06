@@ -741,7 +741,7 @@
     <footer class="bg-slate-900 border-t border-slate-800 py-6 mt-12 text-center text-xs text-slate-500">
         <div class="max-w-7xl mx-auto px-4">
             <p>© 2026 Modul Pembelajaran RPL SMK Kelas XI - Enkapsulasi Java.</p>
-            <p class="mt-1">Dirancang khusus untuk siswa SMK Kurikulum Merdeka / Industri Teknologi Informasi.</p>
+            <p class="mt-1">Dirancang khusus untuk siswa SMK Kurikulum Merdeka / RPL.</p>
         </div>
     </footer>
 
@@ -831,7 +831,7 @@
         const gateQuizzes = {
             1: [
                 {
-                    q: "1. [Analisis C4] Seorang pengembang aplikasi perbankan menetapkan 'public double saldo;' pada class Rekening. Akibat sistemik terbesar apa yang terjadi pada aplikasi saat dijalankan?",
+                    q: "1. Seorang pengembang aplikasi perbankan menetapkan 'public double saldo;' pada class Rekening. Akibat sistemik terbesar apa yang terjadi pada aplikasi saat dijalankan?",
                     options: [
                         "A. Komputer server bank akan langsung crash saat kompilasi",
                         "B. Saldo akun dapat diubah secara langsung dari mana saja tanpa melalui pemeriksaan aturan bisnis (seperti saldo negatif)",
@@ -841,7 +841,7 @@
                     answer: 1
                 },
                 {
-                    q: "2. [Analisis C4] Perhatikan potongan kode berikut:\nclass Rekening { private double saldo; }\nJika class MainBank mencoba mengeksekusi 'akun.saldo = 50000;', apa reaksi spesifik compiler Java?",
+                    q: "2. Perhatikan potongan kode berikut:\nclass Rekening { private double saldo; }\nJika class MainBank mencoba mengeksekusi 'akun.saldo = 50000;', apa reaksi spesifik compiler Java?",
                     options: [
                         "A. Program tetap berjalan lancar tetapi saldo tidak berubah",
                         "B. Terjadi 'Compile-time Error': saldo has private access in Rekening",
@@ -851,7 +851,7 @@
                     answer: 1
                 },
                 {
-                    q: "3. [Analisis C4] Mengapa penggunaan Access Modifier 'protected' KURANG TEPAT untuk variabel 'saldo' jika tujuannya mencegah manipulasi dari class dalam package yang sama?",
+                    q: "3. Mengapa penggunaan Access Modifier 'protected' KURANG TEPAT untuk variabel 'saldo' jika tujuannya mencegah manipulasi dari class dalam package yang sama?",
                     options: [
                         "A. Karena protected memblokir akses untuk semua class turunan",
                         "B. Karena protected masih memberikan hak akses ke class lain di dalam package yang sama",
@@ -863,7 +863,7 @@
             ],
             2: [
                 {
-                    q: "1. [Analisis C4] Diberikan kode Setter berikut:\npublic void setJudul(String judul) {\n    judul = judul;\n}\nAnalisis mengapa kode di atas gagal memperbarui variabel instance 'private String judul;'?",
+                    q: "1. Diberikan kode Setter berikut:\npublic void setJudul(String judul) {\n    judul = judul;\n}\nAnalisis mengapa kode di atas gagal memperbarui variabel instance 'private String judul;'?",
                     options: [
                         "A. Karena tidak ada kata kunci 'this', sehingga terjadi variable shadowing di mana parameter mengisi dirinya sendiri",
                         "B. Karena tipe data String tidak dapat digunakan dalam method void",
@@ -873,7 +873,7 @@
                     answer: 0
                 },
                 {
-                    q: "2. [Analisis C4] Jika method Getter ditulis seperti ini:\npublic void getSaldo() { return this.saldo; }\nAnalisis penyebab terjadinya error kompilasi pada method tersebut!",
+                    q: "2. Jika method Getter ditulis seperti ini:\npublic void getSaldo() { return this.saldo; }\nAnalisis penyebab terjadinya error kompilasi pada method tersebut!",
                     options: [
                         "A. Kata kunci 'this' tidak boleh digunakan di dalam getter",
                         "B. Return type 'void' bertentangan dengan instruksi 'return this.saldo' yang mengembalikan nilai numerik double",
@@ -883,7 +883,7 @@
                     answer: 1
                 },
                 {
-                    q: "3. [Analisis C4] Apa perbedaan mendasar antara mengeksekusi 'akun.saldo = akun.saldo + 10000;' (Direct) dengan 'akun.setorTunai(10000);' (Enkapsulasi)?",
+                    q: "3. Apa perbedaan mendasar antara mengeksekusi 'akun.saldo = akun.saldo + 10000;' (Direct) dengan 'akun.setorTunai(10000);' (Enkapsulasi)?",
                     options: [
                         "A. Akses direct lebih aman karena diproses langsung oleh RAM",
                         "B. Method setorTunai() dapat menyisipkan logika validasi (misal: jumlah > 0) dan pencatatan log transaksi",
@@ -895,7 +895,7 @@
             ],
             3: [
                 {
-                    q: "1. [Analisis C4] Pada sistem E-Kedisiplinan Siswa SMK, jika variabel 'poinKarakter' dibuat dengan default access (tanpa modifier) di package 'id.smk.disiplin', analisis celah keamanannya!",
+                    q: "1.  Pada sistem E-Kedisiplinan Siswa SMK, jika variabel 'poinKarakter' dibuat dengan default access (tanpa modifier) di package 'id.smk.disiplin', analisis celah keamanannya!",
                     options: [
                         "A. Tidak ada celah keamanan sama sekali",
                         "B. Class lain yang berada di dalam package 'id.smk.disiplin' masih dapat merubah poinKarakter siswa secara ilegal",
@@ -905,7 +905,7 @@
                     answer: 1
                 },
                 {
-                    q: "2. [Analisis C4] Dalam method 'catatPelanggaran(int poinPengurangan, String jenis)', jika programmer lupa memasukkan batas 'if (this.poinKarakter < 0) this.poinKarakter = 0;', apa konsekuensi analisisnya?",
+                    q: "2. Dalam method 'catatPelanggaran(int poinPengurangan, String jenis)', jika programmer lupa memasukkan batas 'if (this.poinKarakter < 0) this.poinKarakter = 0;', apa konsekuensi analisisnya?",
                     options: [
                         "A. Poin karakter siswa bisa bernilai negatif (misal -25) yang merusak konsistensi data poin sekolah (0 - 100)",
                         "B. Poin karakter siswa otomatis menjadi 100 kembali",
@@ -915,7 +915,7 @@
                     answer: 0
                 },
                 {
-                    q: "3. [Analisis C4] Mengapa method 'catatPrestasi(int bonus, String deskripsi)' membatasi poin maksimal di angka 100?",
+                    q: "3.Mengapa method 'catatPrestasi(int bonus, String deskripsi)' membatasi poin maksimal di angka 100?",
                     options: [
                         "A. Agar memori database SMK tidak penuh",
                         "B. Untuk menjaga kriteria integritas skala penilaian kedisiplinan sekolah yang disepakati (skala 0 - 100)",
