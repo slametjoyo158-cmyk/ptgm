@@ -1,0 +1,1609 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modul Interaktif Enkapsulasi Java - Class XI RPL SMK</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#2563eb',
+                            600: '#1d4ed8',
+                            700: '#1e40af',
+                            900: '#1e3a8a',
+                        },
+                        darkbg: '#0f172a',
+                        cardbg: '#1e293b'
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        code: ['Fira Code', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .code-font { font-family: 'Fira Code', monospace; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #1e293b; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        .locked-tab { opacity: 0.5; cursor: not-allowed !important; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col custom-scrollbar">
+
+    <!-- Header Navbar -->
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-blue-600 text-white p-2.5 rounded-xl shadow-lg shadow-blue-500/30">
+                        <i class="fa-solid fa-shield-halved text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold tracking-widest text-blue-400 uppercase block">Modul RPL SMK XI</span>
+                        <h1 class="text-lg font-extrabold text-white leading-tight">Enkapsulasi Java Interaktif</h1>
+                    </div>
+                </div>
+                
+                <!-- Desktop Navigation Tabs -->
+                <nav class="hidden md:flex space-x-1 bg-slate-800/80 p-1 rounded-xl border border-slate-700/50">
+                    <button onclick="switchTab('materi')" id="nav-materi" class="tab-btn px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 text-white bg-blue-600 flex items-center">
+                        <i class="fa-solid fa-book-open mr-2"></i>1. Materi & Konsep
+                    </button>
+                    
+                    <button onclick="trySwitchTab('komparasi')" id="nav-komparasi" class="tab-btn locked-tab px-4 py-2 text-sm font-semibold rounded-lg text-slate-400 hover:text-white transition-all duration-200 flex items-center">
+                        <i id="lock-icon-komparasi" class="fa-solid fa-lock mr-2 text-amber-400"></i>2. Kode Program
+                    </button>
+                    
+                    <button onclick="trySwitchTab('studikasus')" id="nav-studikasus" class="tab-btn locked-tab px-4 py-2 text-sm font-semibold rounded-lg text-slate-400 hover:text-white transition-all duration-200 flex items-center">
+                        <i id="lock-icon-studikasus" class="fa-solid fa-lock mr-2 text-amber-400"></i>3. Kasus SMK
+                    </button>
+
+                    <button onclick="trySwitchTab('quiz')" id="nav-quiz" class="tab-btn locked-tab px-4 py-2 text-sm font-semibold rounded-lg text-slate-400 hover:text-white transition-all duration-200 flex items-center">
+                        <i id="lock-icon-quiz" class="fa-solid fa-lock mr-2 text-amber-400"></i>4. Evaluasi (30 Soal)
+                    </button>
+                </nav>
+
+                <div class="text-right hidden lg:block">
+                    <span class="text-xs text-slate-400 block">Status Pembelajaran</span>
+                    <span id="overall-progress-badge" class="text-xs font-semibold text-amber-400">
+                        <i class="fa-solid fa-bars-progress mr-1"></i>Modul 1 / 4
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Bar -->
+        <div class="md:hidden flex justify-around bg-slate-800 border-t border-slate-700 p-2 text-xs">
+            <button onclick="switchTab('materi')" id="mobile-materi" class="mobile-tab text-blue-400 flex flex-col items-center py-1">
+                <i class="fa-solid fa-book-open text-base mb-1"></i>Materi
+            </button>
+            <button onclick="trySwitchTab('komparasi')" id="mobile-komparasi" class="mobile-tab text-slate-500 flex flex-col items-center py-1">
+                <i id="mobile-lock-komparasi" class="fa-solid fa-lock text-base mb-1 text-amber-400"></i>Kode
+            </button>
+            <button onclick="trySwitchTab('studikasus')" id="mobile-studikasus" class="mobile-tab text-slate-500 flex flex-col items-center py-1">
+                <i id="mobile-lock-studikasus" class="fa-solid fa-lock text-base mb-1 text-amber-400"></i>Kasus
+            </button>
+            <button onclick="trySwitchTab('quiz')" id="mobile-quiz" class="mobile-tab text-slate-500 flex flex-col items-center py-1">
+                <i id="mobile-lock-quiz" class="fa-solid fa-lock text-base mb-1 text-amber-400"></i>Quiz 30
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- TAB 1: MATERI & KONSEP -->
+        <section id="tab-materi" class="tab-content space-y-8">
+            <!-- Hero Banner -->
+            <div class="relative bg-gradient-to-r from-blue-900/60 via-slate-800 to-indigo-900/60 rounded-2xl p-6 sm:p-8 border border-blue-500/30 overflow-hidden shadow-2xl">
+                <div class="relative z-10 max-w-3xl">
+                    <span class="px-3 py-1 bg-blue-500/20 text-blue-300 border border-blue-400/30 rounded-full text-xs font-bold uppercase tracking-wider mb-4 inline-block">
+                        Konsep Utama PBO / OOP
+                    </span>
+                    <h2 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight mb-3">
+                        Apa itu Enkapsulasi? (Encapsulation)
+                    </h2>
+                    <p class="text-slate-300 text-sm sm:text-base leading-relaxed mb-6">
+                        <strong>Enkapsulasi</strong> adalah mekanisme membungkus data (<span class="text-amber-300 font-mono">variable</span>) dan metode (<span class="text-amber-300 font-mono">method</span>) yang bekerja pada data tersebut menjadi satu kesatuan unit (<span class="text-emerald-300 font-mono">class</span>), serta <strong>menyembunyikan rincian implementasi</strong> dari akses luar.
+                    </p>
+                    <div class="flex flex-wrap gap-3">
+                        <div class="flex items-center space-x-2 bg-slate-900/80 px-4 py-2 rounded-lg border border-slate-700">
+                            <i class="fa-solid fa-lock text-emerald-400"></i>
+                            <span class="text-xs text-slate-200">Keamanan Data</span>
+                        </div>
+                        <div class="flex items-center space-x-2 bg-slate-900/80 px-4 py-2 rounded-lg border border-slate-700">
+                            <i class="fa-solid fa-sliders text-blue-400"></i>
+                            <span class="text-xs text-slate-200">Validasi Terkontrol</span>
+                        </div>
+                        <div class="flex items-center space-x-2 bg-slate-900/80 px-4 py-2 rounded-lg border border-slate-700">
+                            <i class="fa-solid fa-arrows-rotate text-purple-400"></i>
+                            <span class="text-xs text-slate-200">Fleksibilitas Refactoring</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contextual Card: Alasan Saldo Harus Private -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Analogi Dunia Nyata -->
+                <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-6 hover:border-blue-500/50 transition duration-300 shadow-xl flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center space-x-3 mb-4">
+                            <div class="p-3 bg-amber-500/10 text-amber-400 rounded-xl border border-amber-500/20">
+                                <i class="fa-solid fa-vault text-2xl"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-white">Analogi Kasus: Brankas vs Dompet Terbuka</h3>
+                        </div>
+                        <p class="text-slate-300 text-sm leading-relaxed mb-4">
+                            Bayangkan saldo bank seperti uang tunai di tabungan Anda:
+                        </p>
+                        <ul class="space-y-3 text-sm text-slate-300">
+                            <li class="flex items-start space-x-3">
+                                <i class="fa-solid fa-circle-xmark text-rose-400 mt-1"></i>
+                                <span><strong>Tanpa Enkapsulasi (Public):</strong> Seperti meletakkan dompet terbuka di meja kantin. Siapapun bisa mengambil uang, mengubah jumlahnya, atau memasukkan uang mainan tanpa izin.</span>
+                            </li>
+                            <li class="flex items-start space-x-3">
+                                <i class="fa-solid fa-circle-check text-emerald-400 mt-1"></i>
+                                <span><strong>Dengan Enkapsulasi (Private + Getter/Setter):</strong> Seperti mesin ATM. Anda tidak bisa menyentuh lembaran uang langsung di dalam mesin. Harus lewat antarmuka kartu & PIN (Validation), lalu tarik/setor sesuai aturan.</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="mt-6 p-4 bg-slate-900/60 rounded-xl border border-slate-700/50 text-xs text-slate-400">
+                        <span class="font-semibold text-amber-400"><i class="fa-solid fa-lightbulb mr-1"></i> Kesimpulan Guru:</span> Data penting harus dikunci (<code class="text-rose-300">private</code>) dan hanya bisa diakses via pintu resmi (<code class="text-emerald-300">Getter/Setter</code>).
+                    </div>
+                </div>
+
+                <!-- Kenapa Saldo Tidak Boleh Diubah Langsung -->
+                <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-6 hover:border-blue-500/50 transition duration-300 shadow-xl flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center space-x-3 mb-4">
+                            <div class="p-3 bg-rose-500/10 text-rose-400 rounded-xl border border-rose-500/20">
+                                <i class="fa-solid fa-triangle-exclamation text-2xl"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-white">Bahaya Mengapa 'saldo' Tidak Boleh Public</h3>
+                        </div>
+                        <p class="text-slate-300 text-sm leading-relaxed mb-3">
+                            Jika atribut <code class="text-rose-300 font-mono">saldo</code> bersifat <code class="text-rose-300 font-mono">public</code>, hal-hal berbahaya ini bisa terjadi secara tidak sengaja maupun disengaja:
+                        </p>
+                        <div class="space-y-2 text-xs font-mono bg-slate-950 p-4 rounded-xl border border-slate-800 text-slate-300">
+                            <div class="text-rose-400">// DANGEROUS CODE EXAMPLES:</div>
+                            <div class="flex items-center justify-between bg-rose-950/40 p-2 rounded border border-rose-800/50">
+                                <span>akun.saldo = -5000000;</span>
+                                <span class="text-rose-400 font-sans text-[11px]">❌ Saldo bernilai negatif!</span>
+                            </div>
+                            <div class="flex items-center justify-between bg-rose-950/40 p-2 rounded border border-rose-800/50">
+                                <span>akun.saldo = 999999999;</span>
+                                <span class="text-rose-400 font-sans text-[11px]">❌ Cheat / Manipulasi Data</span>
+                            </div>
+                            <div class="flex items-center justify-between bg-rose-950/40 p-2 rounded border border-rose-800/50">
+                                <span>akun.saldo = akun.saldo - 10000;</span>
+                                <span class="text-rose-400 font-sans text-[11px]">❌ Tanpa cetak struk/log!</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-3 bg-blue-950/50 border border-blue-800/50 rounded-xl text-xs text-blue-200">
+                        <i class="fa-solid fa-shield text-blue-400 mr-1"></i> <strong>Solusi Enkapsulasi:</strong> Perubahan saldo wajib melalui aturan logika bisnis seperti <code class="text-emerald-300">setor(double jumlah)</code> atau <code class="text-emerald-300">tarik(double jumlah)</code> dengan syarat validasi.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Access Modifiers Table -->
+            <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-6 shadow-xl">
+                <h3 class="text-lg font-bold text-white mb-4 flex items-center">
+                    <i class="fa-solid fa-key text-blue-400 mr-2"></i>
+                    4 Modifier Akses di Java (Access Modifiers)
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs sm:text-sm text-slate-300">
+                        <thead class="bg-slate-900/80 text-slate-200 uppercase text-[11px] font-bold tracking-wider">
+                            <tr>
+                                <th class="p-3 rounded-l-lg">Modifier</th>
+                                <th class="p-3">Class Sama</th>
+                                <th class="p-3">Package Sama</th>
+                                <th class="p-3">Subclass (Turunan)</th>
+                                <th class="p-3 rounded-r-lg">Luar Package</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-700/50">
+                            <tr class="hover:bg-slate-700/30 transition">
+                                <td class="p-3 font-mono font-bold text-emerald-400">private</td>
+                                <td class="p-3 text-emerald-400 font-bold">✅ YA</td>
+                                <td class="p-3 text-rose-400">❌ TIDAK</td>
+                                <td class="p-3 text-rose-400">❌ TIDAK</td>
+                                <td class="p-3 text-rose-400">❌ TIDAK</td>
+                            </tr>
+                            <tr class="hover:bg-slate-700/30 transition">
+                                <td class="p-3 font-mono font-bold text-amber-400">default (no mod)</td>
+                                <td class="p-3 text-emerald-400 font-bold">✅ YA</td>
+                                <td class="p-3 text-emerald-400 font-bold">✅ YA</td>
+                                <td class="p-3 text-rose-400">❌ TIDAK</td>
+                                <td class="p-3 text-rose-400">❌ TIDAK</td>
+                            </tr>
+                            <tr class="hover:bg-slate-700/30 transition">
+                                <td class="p-3 font-mono font-bold text-blue-400">protected</td>
+                                <td class="p-3 text-emerald-400 font-bold">✅ YA</td>
+                                <td class="p-3 text-emerald-400 font-bold">✅ YA</td>
+                                <td class="p-3 text-emerald-400 font-bold">✅ YA</td>
+                                <td class="p-3 text-rose-400">❌ TIDAK</td>
+                            </tr>
+                            <tr class="hover:bg-slate-700/30 transition">
+                                <td class="p-3 font-mono font-bold text-purple-400">public</td>
+                                <td class="p-3 text-emerald-400 font-bold">✅ YA</td>
+                                <td class="p-3 text-emerald-400 font-bold">✅ YA</td>
+                                <td class="p-3 text-emerald-400 font-bold">✅ YA</td>
+                                <td class="p-3 text-emerald-400 font-bold">✅ YA</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- GATE ASSESSMENT 1 CARD -->
+            <div class="bg-gradient-to-r from-amber-950/40 via-slate-800 to-slate-900 border-2 border-amber-500/50 rounded-2xl p-6 shadow-2xl space-y-4">
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                    <div class="flex items-center space-x-3">
+                        <div class="p-3 bg-amber-500/20 text-amber-400 rounded-xl border border-amber-500/30">
+                            <i class="fa-solid fa-key text-xl"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs text-amber-400 font-bold uppercase tracking-wider block">Syarat Pembuka Modul 2</span>
+                            <h3 class="text-lg font-bold text-white">Gerbang Asesmen Pemahaman C4 (3 Soal Analisis)</h3>
+                        </div>
+                    </div>
+                    <span id="gate1-status-badge" class="px-3 py-1 bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-full text-xs font-bold">
+                        🔒 Modul Kode Masih Terkunci
+                    </span>
+                </div>
+                <p class="text-xs sm:text-sm text-slate-300">
+                    Jawablah 3 pertanyaan analisis tingkat tinggi (C4) di bawah ini dengan benar untuk membongkar kunci modul <strong>2. Komparasi Kode Program</strong>.
+                </p>
+
+                <!-- Gate 1 Questions Form -->
+                <div id="gate1-quiz-box" class="space-y-6 pt-2">
+                    <!-- Questions injected dynamically by JS -->
+                </div>
+
+                <div class="pt-4 border-t border-slate-700 flex justify-between items-center">
+                    <span class="text-xs text-slate-400" id="gate1-feedback">Jawab ketiga soal untuk membuka modul selanjutnya.</span>
+                    <button onclick="submitGateQuiz(1)" class="px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-xs rounded-xl transition flex items-center shadow-lg shadow-amber-500/20">
+                        <i class="fa-solid fa-unlock mr-2"></i> Verifikasi & Buka Modul Kode
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: KOMPARASI KODE (BEFORE VS AFTER) -->
+        <section id="tab-komparasi" class="tab-content hidden space-y-6">
+            <div class="bg-slate-800/90 border border-slate-700 rounded-2xl p-6">
+                <h3 class="text-xl font-bold text-white mb-2 flex items-center">
+                    <i class="fa-solid fa-code text-amber-400 mr-3"></i>
+                    Studi Kasus 1: Perbankan (Kasus Saldo Rekening)
+                </h3>
+                <p class="text-sm text-slate-300">
+                    Bandingkan struktur kode Java sebelum menggunakan enkapsulasi dan sesudah menerapkan aturan Enkapsulasi standar industri.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- BEFORE ENCAPSULATION -->
+                <div class="bg-slate-900 border-2 border-rose-500/40 rounded-2xl overflow-hidden shadow-2xl flex flex-col">
+                    <div class="bg-rose-950/80 px-4 py-3 border-b border-rose-800/50 flex justify-between items-center">
+                        <span class="text-xs font-bold uppercase tracking-wider text-rose-300 flex items-center">
+                            <i class="fa-solid fa-triangle-exclamation mr-2"></i> SEBELUM Enkapsulasi (BURUK)
+                        </span>
+                        <span class="text-[11px] px-2 py-0.5 bg-rose-500/20 text-rose-300 rounded font-mono">Public Variable</span>
+                    </div>
+                    <div class="p-4 bg-slate-950 flex-grow code-font text-xs text-slate-300 overflow-x-auto custom-scrollbar">
+<pre><code><span class="text-purple-400">public class</span> <span class="text-yellow-300">RekeningBank</span> {
+    <span class="text-slate-500">// BAHAYA: Variable public dapat diakses siapa saja!</span>
+    <span class="text-purple-400">public</span> String nomorRekening;
+    <span class="text-purple-400">public</span> String namaPemilik;
+    <span class="text-purple-400">public double</span> saldo; <span class="text-rose-400 font-bold">// <-- RISIKO TINGGI!</span>
+
+    <span class="text-purple-400">public</span> RekeningBank(String no, String nama, <span class="text-purple-400">double</span> saldoAwal) {
+        <span class="text-purple-400">this</span>.nomorRekening = no;
+        <span class="text-purple-400">this</span>.namaPemilik = nama;
+        <span class="text-purple-400">this</span>.saldo = saldoAwal;
+    }
+}
+
+<span class="text-purple-400">public class</span> <span class="text-yellow-300">MainBank</span> {
+    <span class="text-purple-400">public static void</span> main(String[] args) {
+        RekeningBank akun = <span class="text-purple-400">new</span> RekeningBank(<span class="text-emerald-300">"123-456"</span>, <span class="text-emerald-300">"Budi"</span>, <span class="text-orange-300">500000</span>);
+        
+        <span class="text-slate-500">// BISA DIPERMAINKAN TANPA VALIDASI:</span>
+        akun.saldo = -<span class="text-orange-300">99999999</span>; <span class="text-rose-400">// Tidak masuk akal tapi VALID di sintaks!</span>
+        
+        System.out.println(<span class="text-emerald-300">"Saldo saat ini: "</span> + akun.saldo);
+    }
+}</code></pre>
+                    </div>
+                    <div class="p-4 bg-rose-950/30 border-t border-rose-900/40 text-xs text-rose-200 space-y-1">
+                        <div class="font-bold">❌ Dampak Kerugian:</div>
+                        <div>1. Saldo bisa bernilai negatif tanpa halangan program.</div>
+                        <div>2. Tidak ada pencatatan riwayat (audit log) saat nilai saldo berubah.</div>
+                    </div>
+                </div>
+
+                <!-- AFTER ENCAPSULATION -->
+                <div class="bg-slate-900 border-2 border-emerald-500/40 rounded-2xl overflow-hidden shadow-2xl flex flex-col">
+                    <div class="bg-emerald-950/80 px-4 py-3 border-b border-emerald-800/50 flex justify-between items-center">
+                        <span class="text-xs font-bold uppercase tracking-wider text-emerald-300 flex items-center">
+                            <i class="fa-solid fa-shield-check mr-2"></i> SESUDAH Enkapsulasi (AMAN)
+                        </span>
+                        <span class="text-[11px] px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded font-mono">Private + Getter/Setter</span>
+                    </div>
+                    <div class="p-4 bg-slate-950 flex-grow code-font text-xs text-slate-300 overflow-x-auto custom-scrollbar">
+<pre><code><span class="text-purple-400">public class</span> <span class="text-yellow-300">RekeningBank</span> {
+    <span class="text-slate-500">// TERTUTUP: Atribut dilindungi dengan 'private'</span>
+    <span class="text-purple-400">private</span> String nomorRekening;
+    <span class="text-purple-400">private</span> String namaPemilik;
+    <span class="text-purple-400">private double</span> saldo;
+
+    <span class="text-purple-400">public</span> RekeningBank(String no, String nama, <span class="text-purple-400">double</span> saldoAwal) {
+        <span class="text-purple-400">this</span>.nomorRekening = no;
+        <span class="text-purple-400">this</span>.namaPemilik = nama;
+        <span class="text-purple-400">if</span>(saldoAwal >= <span class="text-orange-300">0</span>) { <span class="text-purple-400">this</span>.saldo = saldoAwal; }
+    }
+
+    <span class="text-slate-500">// GETTER: Pintu Khusus Membaca Data</span>
+    <span class="text-purple-400">public double</span> getSaldo() {
+        <span class="text-purple-400">return this</span>.saldo;
+    }
+
+    <span class="text-slate-500">// METHOD BISNIS TERKONTROL (Deposit)</span>
+    <span class="text-purple-400">public void</span> setorTuna(<span class="text-purple-400">double</span> jumlah) {
+        <span class="text-purple-400">if</span> (jumlah > <span class="text-orange-300">0</span>) {
+            <span class="text-purple-400">this</span>.saldo += jumlah;
+            System.out.println(<span class="text-emerald-300">"Berhasil setor: Rp"</span> + jumlah);
+        } <span class="text-purple-400">else</span> {
+            System.out.println(<span class="text-rose-400">"Jumlah setor harus positif!"</span>);
+        }
+    }
+}</code></pre>
+                    </div>
+                    <div class="p-4 bg-emerald-950/30 border-t border-emerald-900/40 text-xs text-emerald-200 space-y-1">
+                        <div class="font-bold">✅ Keuntungan:</div>
+                        <div>1. Saldo terlindungi dari perubahan ilegal (<code class="text-amber-300">akun.saldo = -100</code> akan Error Compile!).</div>
+                        <div>2. Menjamin data integritas melalui instruksi terstruktur.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Simulation Box -->
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl">
+                <h4 class="text-base font-bold text-white mb-3 flex items-center">
+                    <i class="fa-solid fa-terminal text-blue-400 mr-2"></i> Simulasi Konsol Java Interaktif (Bank Account Test)
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div>
+                        <label class="text-xs text-slate-400 block mb-1">Pilih Tindakan Simulasi:</label>
+                        <select id="sim-action" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-blue-500">
+                            <option value="direct_access">Akses Langsung: akun.saldo = -50000 (Sintaks Direct)</option>
+                            <option value="setor_valid">Setor Uang Valid: setorTuna(200000)</option>
+                            <option value="setor_invalid">Setor Uang Negatif: setorTuna(-100000)</option>
+                            <option value="get_saldo">Baca Saldo: getSaldo()</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="runBankSimulation()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-lg text-xs transition duration-200 flex items-center justify-center">
+                            <i class="fa-solid fa-play mr-2"></i> Jalankan Program Simulasi
+                        </button>
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 block mb-1">Status Saldo Objek Saat Ini:</label>
+                        <div id="sim-balance-display" class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-amber-400 font-mono text-xs font-bold">
+                            Rp 500.000
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-black/80 rounded-xl p-4 font-mono text-xs text-slate-300 border border-slate-800">
+                    <div class="text-slate-500 mb-1">// Console Output:</div>
+                    <div id="sim-console-output" class="text-emerald-400">Ready to execute simulation...</div>
+                </div>
+            </div>
+
+            <!-- GATE ASSESSMENT 2 CARD -->
+            <div class="bg-gradient-to-r from-amber-950/40 via-slate-800 to-slate-900 border-2 border-amber-500/50 rounded-2xl p-6 shadow-2xl space-y-4">
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                    <div class="flex items-center space-x-3">
+                        <div class="p-3 bg-amber-500/20 text-amber-400 rounded-xl border border-amber-500/30">
+                            <i class="fa-solid fa-key text-xl"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs text-amber-400 font-bold uppercase tracking-wider block">Syarat Pembuka Modul 3</span>
+                            <h3 class="text-lg font-bold text-white">Gerbang Asesmen Pemahaman C4 (3 Soal Analisis Kode)</h3>
+                        </div>
+                    </div>
+                    <span id="gate2-status-badge" class="px-3 py-1 bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-full text-xs font-bold">
+                        🔒 Modul Studi Kasus Terkunci
+                    </span>
+                </div>
+                <p class="text-xs sm:text-sm text-slate-300">
+                    Selesaikan 3 soal analisis C4 tentang kesalahan sintaks dan logika metode untuk membuka modul <strong>3. Studi Kasus Kedisiplinan SMK</strong>.
+                </p>
+
+                <!-- Gate 2 Questions Form -->
+                <div id="gate2-quiz-box" class="space-y-6 pt-2">
+                    <!-- Questions injected dynamically by JS -->
+                </div>
+
+                <div class="pt-4 border-t border-slate-700 flex justify-between items-center">
+                    <span class="text-xs text-slate-400" id="gate2-feedback">Jawab ketiga soal analisis untuk membuka modul kasus.</span>
+                    <button onclick="submitGateQuiz(2)" class="px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-xs rounded-xl transition flex items-center shadow-lg shadow-amber-500/20">
+                        <i class="fa-solid fa-unlock mr-2"></i> Verifikasi & Buka Modul Studi Kasus
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: STUDI KASUS SEKOLAH (E-KEDISIPLINAN SISWA SMK) -->
+        <section id="tab-studikasus" class="tab-content hidden space-y-6">
+            <div class="bg-gradient-to-r from-purple-900/40 via-slate-800 to-slate-900 border border-purple-500/30 rounded-2xl p-6">
+                <div class="flex items-center space-x-3 mb-2">
+                    <span class="p-2.5 bg-purple-500/20 text-purple-300 rounded-xl">
+                        <i class="fa-solid fa-school text-xl"></i>
+                    </span>
+                    <h3 class="text-xl font-bold text-white">Studi Kasus Kontekstual SMK: E-Kedisiplinan & Poin Karakter</h3>
+                </div>
+                <p class="text-sm text-slate-300 leading-relaxed">
+                    Di sekolah SMK, setiap siswa memiliki <strong>Poin Kedisiplinan (Awal: 100 Poin)</strong>. Jika siswa terlambat atau melanggar aturan, poin akan berkurang. Jika mengikuti lomba/prestasi, poin bertambah. 
+                    <br><strong class="text-amber-300">Problem:</strong> Jika variabel <code class="text-purple-300">poinKarakter</code> bersifat public, siswa nakal dapat mengubah poinnya sendiri menjadi 1000 dengan mudah!
+                </p>
+            </div>
+
+            <!-- Code Implementation Card -->
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden shadow-xl">
+                <div class="bg-slate-900 px-6 py-4 border-b border-slate-700 flex justify-between items-center">
+                    <h4 class="font-bold text-white text-sm flex items-center">
+                        <i class="fa-solid fa-code text-blue-400 mr-2"></i> Implementasi Class SiswaSMK.java
+                    </h4>
+                    <span class="text-xs bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full border border-purple-500/30">
+                        Encapsulated Rules
+                    </span>
+                </div>
+                <div class="p-6 bg-slate-950 code-font text-xs text-slate-300 overflow-x-auto custom-scrollbar">
+<pre><code><span class="text-purple-400">public class</span> <span class="text-yellow-300">SiswaSMK</span> {
+    <span class="text-slate-500">// Attributes bersifat PRIVATE agar aman dari peretasan/perubahan liar</span>
+    <span class="text-purple-400">private</span> String nisn;
+    <span class="text-purple-400">private</span> String nama;
+    <span class="text-purple-400">private</span> String kelas;
+    <span class="text-purple-400">private int</span> poinKarakter; <span class="text-slate-500">// Default: 100</span>
+
+    <span class="text-slate-500">// Constructor</span>
+    <span class="text-purple-400">public</span> SiswaSMK(String nisn, String nama, String kelas) {
+        <span class="text-purple-400">this</span>.nisn = nisn;
+        <span class="text-purple-400">this</span>.nama = nama;
+        <span class="text-purple-400">this</span>.kelas = kelas;
+        <span class="text-purple-400">this</span>.poinKarakter = <span class="text-orange-300">100</span>; <span class="text-slate-500">// Poin awal sempurna</span>
+    }
+
+    <span class="text-slate-500">// Getter Poin (Hanya Membaca)</span>
+    <span class="text-purple-400">public int</span> getPoinKarakter() {
+        <span class="text-purple-400">return this</span>.poinKarakter;
+    }
+
+    <span class="text-purple-400">public</span> String getNama() {
+        <span class="text-purple-400">return this</span>.nama;
+    }
+
+    <span class="text-slate-500">// Method khusus mencatat Pelanggaran (Mengurangi Poin secara terkontrol)</span>
+    <span class="text-purple-400">public void</span> catatPelanggaran(<span class="text-purple-400">int</span> poinPengurangan, String jenisPelanggaran) {
+        <span class="text-purple-400">if</span> (poinPengurangan > <span class="text-orange-300">0</span>) {
+            <span class="text-purple-400">this</span>.poinKarakter -= poinPengurangan;
+            <span class="text-purple-400">if</span> (<span class="text-purple-400">this</span>.poinKarakter < <span class="text-orange-300">0</span>) <span class="text-purple-400">this</span>.poinKarakter = <span class="text-orange-300">0</span>;
+            System.out.println(<span class="text-emerald-300">"[SISTEM] Pelanggaran '"</span> + jenisPelanggaran + <span class="text-emerald-300 font-mono">"' dicatat. Poin berkurang "</span> + poinPengurangan);
+        }
+    }
+
+    <span class="text-slate-500">// Method khusus mencatat Prestasi (Menambah Poin, Max 100)</span>
+    <span class="text-purple-400">public void</span> catatPrestasi(<span class="text-purple-400">int</span> poinBonus, String deskripsi) {
+        <span class="text-purple-400">if</span> (poinBonus > <span class="text-orange-300">0</span>) {
+            <span class="text-purple-400">this</span>.poinKarakter += poinBonus;
+            <span class="text-purple-400">if</span> (<span class="text-purple-400">this</span>.poinKarakter > <span class="text-orange-300">100</span>) <span class="text-purple-400">this</span>.poinKarakter = <span class="text-orange-300">100</span>; <span class="text-slate-500">// Maksimal poin 100</span>
+            System.out.println(<span class="text-emerald-300">"[SISTEM] Prestasi '"</span> + deskripsi + <span class="text-emerald-300">"' dicatat. Bonus Poin: "</span> + poinBonus);
+        }
+    }
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- Interactive App Demo -->
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl">
+                <h4 class="text-lg font-bold text-white mb-4 flex items-center">
+                    <i class="fa-solid fa-chalkboard-user text-purple-400 mr-2"></i> Live Demo: Aplikasi Guru BK / Kedisiplinan SMK
+                </h4>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Left: Control Panel -->
+                    <div class="space-y-4 bg-slate-900/60 p-5 rounded-xl border border-slate-700">
+                        <div class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Form Guru BK</div>
+                        
+                        <div>
+                            <label class="text-xs text-slate-400 block mb-1">Nama Siswa:</label>
+                            <input type="text" id="siswa-nama" value="Ahmad - XI RPL 1" readonly class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs text-slate-300 font-semibold">
+                        </div>
+
+                        <div>
+                            <label class="text-xs text-slate-400 block mb-1">Tindakan BK:</label>
+                            <select id="bk-action" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs text-white">
+                                <option value="terlambat">Pelanggaran: Terlambat Masuk Sekolah (-10 Poin)</option>
+                                <option value="atribut">Pelanggaran: Seragam Tidak Lengkap (-15 Poin)</option>
+                                <option value="lks">Prestasi: Juara 1 LKS Kab. Kendal (+25 Poin)</option>
+                                <option value="cheat">Hack Ilegal: siswa.poinKarakter = 999 (Public Access Test)</option>
+                            </select>
+                        </div>
+
+                        <button onclick="executeBKAction()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg text-xs transition duration-200">
+                            Proses Tindakan
+                        </button>
+                    </div>
+
+                    <!-- Right: Student Card State -->
+                    <div class="bg-slate-900 p-5 rounded-xl border border-slate-700 flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <span class="text-[10px] text-purple-400 font-bold uppercase">Kartu Kedisiplinan</span>
+                                    <h5 class="text-base font-bold text-white" id="card-student-name">Ahmad</h5>
+                                    <span class="text-xs text-slate-400">NISN: 0061234567 | Kelas XI RPL 1</span>
+                                </div>
+                                <span id="badge-status" class="px-2.5 py-1 bg-emerald-500/20 text-emerald-300 text-xs rounded-full border border-emerald-500/30 font-bold">
+                                    Sangat Baik
+                                </span>
+                            </div>
+
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-xs text-slate-300">
+                                    <span>Poin Karakter:</span>
+                                    <span class="font-bold font-mono text-amber-400 text-sm" id="card-poin-val">100 / 100</span>
+                                </div>
+                                <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden border border-slate-700">
+                                    <div id="card-poin-bar" class="bg-emerald-500 h-full transition-all duration-500 w-full"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-3 border-t border-slate-800 text-[11px] text-slate-400 font-mono" id="bk-log-output">
+                            > Sistem SI-KADET SMK Siap.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GATE ASSESSMENT 3 CARD -->
+            <div class="bg-gradient-to-r from-amber-950/40 via-slate-800 to-slate-900 border-2 border-amber-500/50 rounded-2xl p-6 shadow-2xl space-y-4">
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                    <div class="flex items-center space-x-3">
+                        <div class="p-3 bg-amber-500/20 text-amber-400 rounded-xl border border-amber-500/30">
+                            <i class="fa-solid fa-key text-xl"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs text-amber-400 font-bold uppercase tracking-wider block">Syarat Pembuka Modul 4</span>
+                            <h3 class="text-lg font-bold text-white">Gerbang Asesmen Pemahaman C4 (3 Soal Analisis Sistem SMK)</h3>
+                        </div>
+                    </div>
+                    <span id="gate3-status-badge" class="px-3 py-1 bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-full text-xs font-bold">
+                        🔒 Modul Evaluasi 30 Soal Terkunci
+                    </span>
+                </div>
+                <p class="text-xs sm:text-sm text-slate-300">
+                    Selesaikan 3 pertanyaan C4 berikut untuk membuka kunci modul puncak <strong>4. Evaluasi Akhir (30 Soal Interaktif)</strong>.
+                </p>
+
+                <!-- Gate 3 Questions Form -->
+                <div id="gate3-quiz-box" class="space-y-6 pt-2">
+                    <!-- Questions injected dynamically by JS -->
+                </div>
+
+                <div class="pt-4 border-t border-slate-700 flex justify-between items-center">
+                    <span class="text-xs text-slate-400" id="gate3-feedback">Jawab ketiga soal analisis untuk membuka evaluasi akhir.</span>
+                    <button onclick="submitGateQuiz(3)" class="px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-xs rounded-xl transition flex items-center shadow-lg shadow-amber-500/20">
+                        <i class="fa-solid fa-unlock mr-2"></i> Verifikasi & Buka Evaluasi 30 Soal
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: LATIHAN SOAL (30 SOAL INTERAKTIF) -->
+        <section id="tab-quiz" class="tab-content hidden space-y-6">
+            <!-- Quiz Header Banner -->
+            <div class="bg-gradient-to-r from-blue-900/80 via-slate-800 to-indigo-900/80 border border-blue-500/40 rounded-2xl p-6 shadow-2xl flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div>
+                    <span class="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs font-bold uppercase tracking-wider">
+                        Evaluasi Akhir Pemahaman
+                    </span>
+                    <h3 class="text-2xl font-extrabold text-white mt-1">Latihan Soal Enkapsulasi (30 Soal)</h3>
+                    <p class="text-xs sm:text-sm text-slate-300 mt-1">
+                        Uji pemahaman PBO materi Enkapsulasi Java untuk persiapan Asesmen / Ulangan Harian Kelas XI RPL.
+                    </p>
+                </div>
+                <div class="flex items-center space-x-3 bg-slate-900/80 p-3 rounded-xl border border-slate-700 text-center min-w-[180px]">
+                    <i class="fa-solid fa-trophy text-amber-400 text-3xl"></i>
+                    <div class="text-left">
+                        <span class="text-[10px] text-slate-400 uppercase font-bold block">Skor Saat Ini</span>
+                        <span id="quiz-score-badge" class="text-xl font-black text-emerald-400">0 / 30</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Main Container -->
+            <div id="quiz-container" class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-6 shadow-xl">
+                <!-- Quiz Progress Bar -->
+                <div class="mb-6">
+                    <div class="flex justify-between text-xs text-slate-400 font-bold mb-2">
+                        <span id="quiz-progress-text">Soal 1 dari 30</span>
+                        <span id="quiz-percent-text">3% Selesai</span>
+                    </div>
+                    <div class="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-700">
+                        <div id="quiz-progress-bar" class="bg-blue-500 h-full transition-all duration-300 w-[3%]"></div>
+                    </div>
+                </div>
+
+                <!-- Active Question Box -->
+                <div id="question-box" class="space-y-6">
+                    <div class="bg-slate-900/70 p-5 rounded-xl border border-slate-700/70">
+                        <span class="text-xs font-bold text-blue-400 uppercase tracking-wider block mb-2" id="q-category">Kategori: Konsep Dasar</span>
+                        <h4 class="text-base sm:text-lg font-bold text-white leading-relaxed" id="q-text">
+                            Loading question...
+                        </h4>
+                        <!-- Optional Code Snippet inside Question -->
+                        <div id="q-code-container" class="mt-3 hidden">
+                            <pre class="bg-slate-950 p-3 rounded-lg border border-slate-800 text-xs font-mono text-amber-300 overflow-x-auto"><code id="q-code"></code></pre>
+                        </div>
+                    </div>
+
+                    <!-- Options List -->
+                    <div class="grid grid-cols-1 gap-3" id="options-container">
+                        <!-- Options generated dynamically -->
+                    </div>
+
+                    <!-- Explanation Alert Box (hidden initially) -->
+                    <div id="explanation-box" class="hidden p-4 rounded-xl text-xs sm:text-sm border transition-all duration-300">
+                        <!-- Explanation inserted here -->
+                    </div>
+
+                    <!-- Nav buttons -->
+                    <div class="flex justify-between items-center pt-4 border-t border-slate-700/60">
+                        <button id="prev-q-btn" onclick="prevQuestion()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-xs font-bold transition disabled:opacity-50 disabled:cursor-not-allowed">
+                            <i class="fa-solid fa-arrow-left mr-2"></i> Sebelumnya
+                        </button>
+                        <button id="next-q-btn" onclick="nextQuestion()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition shadow-lg shadow-blue-500/20">
+                            Selanjutnya <i class="fa-solid fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quiz Results Box (Hidden until completed) -->
+                <div id="quiz-result-box" class="hidden text-center py-8 space-y-6">
+                    <div class="inline-block p-4 bg-emerald-500/20 text-emerald-400 rounded-full border border-emerald-500/30 text-4xl mb-2">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white">Selamat! Anda Telah Menyelesaikan Evaluasi!</h3>
+                    
+                    <div class="max-w-md mx-auto bg-slate-900 p-6 rounded-2xl border border-slate-700 space-y-3">
+                        <div class="text-slate-400 text-xs font-bold uppercase">Hasil Akhir Nilai Anda</div>
+                        <div class="text-5xl font-black text-amber-400" id="final-score-val">0</div>
+                        <div class="text-xs text-slate-300" id="final-score-msg">Predikat hasil belajar</div>
+                    </div>
+
+                    <div class="flex justify-center gap-4">
+                        <button onclick="restartQuiz()" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition">
+                            <i class="fa-solid fa-rotate-right mr-2"></i> Ulangi Latihan Soal
+                        </button>
+                        <button onclick="switchTab('materi')" class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-xs font-bold transition">
+                            <i class="fa-solid fa-book-open mr-2"></i> Pelajari Kembali Materi
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal Alert Notification for Locked Module Attempt -->
+    <div id="lock-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl p-6 max-w-sm w-full shadow-2xl text-center space-y-4">
+            <div class="w-14 h-14 bg-amber-500/20 border border-amber-500/30 text-amber-400 rounded-full flex items-center justify-center mx-auto text-2xl">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <h4 class="text-lg font-bold text-white">Modul Terkunci!</h4>
+            <p class="text-xs text-slate-300 leading-relaxed" id="lock-modal-msg">
+                Anda harus menyelesaikan Asesmen Gerbang C4 di modul sebelumnya terlebih dahulu sebelum dapat mengakses modul ini.
+            </p>
+            <button onclick="closeLockModal()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition">
+                Mengerti & Kembali
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 border-t border-slate-800 py-6 mt-12 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4">
+            <p>© 2026 Modul Pembelajaran RPL SMK Kelas XI - Enkapsulasi Java.</p>
+            <p class="mt-1">Dirancang khusus untuk siswa SMK Kurikulum Merdeka / Industri Teknologi Informasi.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Unlocked state status
+        const unlockedTabs = {
+            materi: true,
+            komparasi: false,
+            studikasus: false,
+            quiz: false
+        };
+
+        function trySwitchTab(tabId) {
+            if (unlockedTabs[tabId]) {
+                switchTab(tabId);
+            } else {
+                let prevModuleName = "";
+                if (tabId === 'komparasi') prevModuleName = "Modul 1 (Materi & Konsep)";
+                else if (tabId === 'studikasus') prevModuleName = "Modul 2 (Komparasi Kode)";
+                else if (tabId === 'quiz') prevModuleName = "Modul 3 (Studi Kasus SMK)";
+
+                document.getElementById('lock-modal-msg').innerHTML = 
+                    `Akses terkunci! Silakan selesaikan <strong>Gerbang Asesmen Pemahaman C4</strong> di bagian bawah <strong>${prevModuleName}</strong> dengan menjawab 3/3 soal benar untuk membuka modul ini.`;
+                document.getElementById('lock-modal').classList.remove('hidden');
+            }
+        }
+
+        function closeLockModal() {
+            document.getElementById('lock-modal').classList.add('hidden');
+        }
+
+        function unlockModule(tabId) {
+            unlockedTabs[tabId] = true;
+            
+            // Update lock icons in header
+            const lockIcon = document.getElementById(`lock-icon-${tabId}`);
+            if (lockIcon) {
+                lockIcon.className = "fa-solid fa-lock-open mr-2 text-emerald-400";
+            }
+            const mobileLockIcon = document.getElementById(`mobile-lock-${tabId}`);
+            if (mobileLockIcon) {
+                mobileLockIcon.className = "fa-solid fa-lock-open text-base mb-1 text-emerald-400";
+            }
+            const navBtn = document.getElementById(`nav-${tabId}`);
+            if (navBtn) {
+                navBtn.classList.remove('locked-tab');
+            }
+
+            // Update Progress Badge
+            let count = 0;
+            Object.values(unlockedTabs).forEach(val => { if (val) count++; });
+            document.getElementById('overall-progress-badge').innerHTML = `<i class="fa-solid fa-circle-check mr-1 text-emerald-400"></i>Modul ${count} / 4 Terbuka`;
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+
+            // Update Tab Nav Button Highlight
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white');
+                if(!btn.classList.contains('locked-tab')) {
+                    btn.classList.add('text-slate-400', 'hover:text-white');
+                }
+            });
+            const activeBtn = document.getElementById('nav-' + tabId);
+            if(activeBtn) {
+                activeBtn.classList.add('bg-blue-600', 'text-white');
+                activeBtn.classList.remove('text-slate-400');
+            }
+
+            // Update Mobile Tab
+            document.querySelectorAll('.mobile-tab').forEach(btn => {
+                btn.classList.remove('text-blue-400');
+                btn.classList.add('text-slate-400');
+            });
+            const mobileActive = document.getElementById('mobile-' + tabId);
+            if (mobileActive) {
+                mobileActive.classList.add('text-blue-400');
+                mobileActive.classList.remove('text-slate-400');
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // C4 Mini-Assessments Dataset
+        const gateQuizzes = {
+            1: [
+                {
+                    q: "1. [Analisis C4] Seorang pengembang aplikasi perbankan menetapkan 'public double saldo;' pada class Rekening. Akibat sistemik terbesar apa yang terjadi pada aplikasi saat dijalankan?",
+                    options: [
+                        "A. Komputer server bank akan langsung crash saat kompilasi",
+                        "B. Saldo akun dapat diubah secara langsung dari mana saja tanpa melalui pemeriksaan aturan bisnis (seperti saldo negatif)",
+                        "C. Kode program memerlukan kapasitas RAM 2 kali lebih banyak",
+                        "D. Method getter dan setter otomatis terhapus dari sistem"
+                    ],
+                    answer: 1
+                },
+                {
+                    q: "2. [Analisis C4] Perhatikan potongan kode berikut:\nclass Rekening { private double saldo; }\nJika class MainBank mencoba mengeksekusi 'akun.saldo = 50000;', apa reaksi spesifik compiler Java?",
+                    options: [
+                        "A. Program tetap berjalan lancar tetapi saldo tidak berubah",
+                        "B. Terjadi 'Compile-time Error': saldo has private access in Rekening",
+                        "C. Nilai saldo berubah menjadi 0 secara otomatis",
+                        "D. Muncul peringatan Runtime Exception pada console"
+                    ],
+                    answer: 1
+                },
+                {
+                    q: "3. [Analisis C4] Mengapa penggunaan Access Modifier 'protected' KURANG TEPAT untuk variabel 'saldo' jika tujuannya mencegah manipulasi dari class dalam package yang sama?",
+                    options: [
+                        "A. Karena protected memblokir akses untuk semua class turunan",
+                        "B. Karena protected masih memberikan hak akses ke class lain di dalam package yang sama",
+                        "C. Karena protected hanya berlaku untuk method bertipe void",
+                        "D. Karena protected menyebabkan variabel bernilai konstan (final)"
+                    ],
+                    answer: 1
+                }
+            ],
+            2: [
+                {
+                    q: "1. [Analisis C4] Diberikan kode Setter berikut:\npublic void setJudul(String judul) {\n    judul = judul;\n}\nAnalisis mengapa kode di atas gagal memperbarui variabel instance 'private String judul;'?",
+                    options: [
+                        "A. Karena tidak ada kata kunci 'this', sehingga terjadi variable shadowing di mana parameter mengisi dirinya sendiri",
+                        "B. Karena tipe data String tidak dapat digunakan dalam method void",
+                        "C. Karena variabel judul wajib bersifat public",
+                        "D. Karena method setter harus mengembalikan nilai String"
+                    ],
+                    answer: 0
+                },
+                {
+                    q: "2. [Analisis C4] Jika method Getter ditulis seperti ini:\npublic void getSaldo() { return this.saldo; }\nAnalisis penyebab terjadinya error kompilasi pada method tersebut!",
+                    options: [
+                        "A. Kata kunci 'this' tidak boleh digunakan di dalam getter",
+                        "B. Return type 'void' bertentangan dengan instruksi 'return this.saldo' yang mengembalikan nilai numerik double",
+                        "C. Method getter harus menerima parameter bertipe double",
+                        "D. Variable saldo bersifat private sehingga tidak bisa di-return"
+                    ],
+                    answer: 1
+                },
+                {
+                    q: "3. [Analisis C4] Apa perbedaan mendasar antara mengeksekusi 'akun.saldo = akun.saldo + 10000;' (Direct) dengan 'akun.setorTunai(10000);' (Enkapsulasi)?",
+                    options: [
+                        "A. Akses direct lebih aman karena diproses langsung oleh RAM",
+                        "B. Method setorTunai() dapat menyisipkan logika validasi (misal: jumlah > 0) dan pencatatan log transaksi",
+                        "C. Method setorTunai() berjalan lebih lambat dibanding direct access",
+                        "D. Akses direct secara otomatis mengunci nilai saldo dari kejahatan cyber"
+                    ],
+                    answer: 1
+                }
+            ],
+            3: [
+                {
+                    q: "1. [Analisis C4] Pada sistem E-Kedisiplinan Siswa SMK, jika variabel 'poinKarakter' dibuat dengan default access (tanpa modifier) di package 'id.smk.disiplin', analisis celah keamanannya!",
+                    options: [
+                        "A. Tidak ada celah keamanan sama sekali",
+                        "B. Class lain yang berada di dalam package 'id.smk.disiplin' masih dapat merubah poinKarakter siswa secara ilegal",
+                        "C. Poin siswa otomatis berkurang setiap hari saat aplikasi dijalankan",
+                        "D. Aplikasi tidak bisa di-deploy ke Android"
+                    ],
+                    answer: 1
+                },
+                {
+                    q: "2. [Analisis C4] Dalam method 'catatPelanggaran(int poinPengurangan, String jenis)', jika programmer lupa memasukkan batas 'if (this.poinKarakter < 0) this.poinKarakter = 0;', apa konsekuensi analisisnya?",
+                    options: [
+                        "A. Poin karakter siswa bisa bernilai negatif (misal -25) yang merusak konsistensi data poin sekolah (0 - 100)",
+                        "B. Poin karakter siswa otomatis menjadi 100 kembali",
+                        "C. Guru BK tidak bisa login ke aplikasi",
+                        "D. Program akan menampilkan NullPointerException"
+                    ],
+                    answer: 0
+                },
+                {
+                    q: "3. [Analisis C4] Mengapa method 'catatPrestasi(int bonus, String deskripsi)' membatasi poin maksimal di angka 100?",
+                    options: [
+                        "A. Agar memori database SMK tidak penuh",
+                        "B. Untuk menjaga kriteria integritas skala penilaian kedisiplinan sekolah yang disepakati (skala 0 - 100)",
+                        "C. Karena tipe data int di Java hanya menampung angka sampai 100",
+                        "D. Karena siswa yang berprestasi tidak boleh diberi poin tambahan"
+                    ],
+                    answer: 1
+                }
+            ]
+        };
+
+        // Render Gate Quizzes dynamically
+        function renderGateQuiz(gateNum) {
+            const container = document.getElementById(`gate${gateNum}-quiz-box`);
+            if (!container) return;
+
+            const questions = gateQuizzes[gateNum];
+            let html = '';
+
+            questions.forEach((qData, idx) => {
+                html += `
+                <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700/70 space-y-3">
+                    <p class="text-xs sm:text-sm font-bold text-slate-100 whitespace-pre-line">${qData.q}</p>
+                    <div class="space-y-2">
+                `;
+
+                qData.options.forEach((opt, optIdx) => {
+                    html += `
+                        <label class="flex items-start space-x-2 text-xs text-slate-300 p-2 bg-slate-950/60 rounded-lg border border-slate-800 hover:border-amber-500/40 cursor-pointer transition">
+                            <input type="radio" name="gate${gateNum}_q${idx}" value="${optIdx}" class="mt-0.5 text-amber-500 focus:ring-amber-500">
+                            <span>${opt}</span>
+                        </label>
+                    `;
+                });
+
+                html += `</div></div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Handle Gate Quiz Submission
+        function submitGateQuiz(gateNum) {
+            const questions = gateQuizzes[gateNum];
+            let allCorrect = true;
+            let answeredCount = 0;
+
+            for (let i = 0; i < questions.length; i++) {
+                const selected = document.querySelector(`input[name="gate${gateNum}_q${i}"]:checked`);
+                if (selected) {
+                    answeredCount++;
+                    if (parseInt(selected.value) !== questions[i].answer) {
+                        allCorrect = false;
+                    }
+                } else {
+                    allCorrect = false;
+                }
+            }
+
+            const feedbackEl = document.getElementById(`gate${gateNum}-feedback`);
+            const statusBadge = document.getElementById(`gate${gateNum}-status-badge`);
+
+            if (answeredCount < questions.length) {
+                feedbackEl.className = "text-xs font-bold text-amber-400";
+                feedbackEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> Mohon jawab seluruh ${questions.length} soal sebelum memverifikasi!`;
+                return;
+            }
+
+            if (allCorrect) {
+                feedbackEl.className = "text-xs font-bold text-emerald-400";
+                feedbackEl.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i> Luar biasa! Semua analisis C4 tepat. Modul berikutnya telah terbuka!`;
+                
+                statusBadge.className = "px-3 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full text-xs font-bold";
+                statusBadge.innerHTML = "🔓 Modul Terbuka!";
+
+                if (gateNum === 1) {
+                    unlockModule('komparasi');
+                    setTimeout(() => switchTab('komparasi'), 1200);
+                } else if (gateNum === 2) {
+                    unlockModule('studikasus');
+                    setTimeout(() => switchTab('studikasus'), 1200);
+                } else if (gateNum === 3) {
+                    unlockModule('quiz');
+                    setTimeout(() => switchTab('quiz'), 1200);
+                }
+            } else {
+                feedbackEl.className = "text-xs font-bold text-rose-400";
+                feedbackEl.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1"></i> Jawaban belum 100% tepat. Pelajari kembali analisis C4 di atas dan coba lagi!`;
+            }
+        }
+
+        // Bank Simulation Logic
+        let simCurrentSaldo = 500000;
+        function runBankSimulation() {
+            const action = document.getElementById('sim-action').value;
+            const consoleOut = document.getElementById('sim-console-output');
+            const displaySaldo = document.getElementById('sim-balance-display');
+
+            if (action === 'direct_access') {
+                consoleOut.className = "text-rose-400 font-bold";
+                consoleOut.innerHTML = "[COMPILE ERROR]: saldo has private access in RekeningBank!<br>akun.saldo = -50000; ^ (Cannot access private member directly)";
+            } else if (action === 'setor_valid') {
+                simCurrentSaldo += 200000;
+                consoleOut.className = "text-emerald-400";
+                consoleOut.innerHTML = "[SUCCESS]: akun.setorTuna(200000); Executed.<br>Log: Setor tunai Rp 200.000 berhasil disetujui sistem.";
+            } else if (action === 'setor_invalid') {
+                consoleOut.className = "text-amber-400";
+                consoleOut.innerHTML = "[VALIDATION REJECTED]: akun.setorTuna(-100000);<br>Log: GAGAL! Setor tunai tidak boleh kurang dari atau sama dengan 0.";
+            } else if (action === 'get_saldo') {
+                consoleOut.className = "text-blue-400";
+                consoleOut.innerHTML = "[GETTER EXECUTED]: double current = akun.getSaldo();<br>Returned value: Rp " + simCurrentSaldo.toLocaleString('id-ID');
+            }
+
+            displaySaldo.innerText = "Rp " + simCurrentSaldo.toLocaleString('id-ID');
+        }
+
+        // School BK Simulation Logic
+        let studentPoin = 100;
+        function executeBKAction() {
+            const action = document.getElementById('bk-action').value;
+            const logOut = document.getElementById('bk-log-output');
+            const valDisplay = document.getElementById('card-poin-val');
+            const barDisplay = document.getElementById('card-poin-bar');
+            const badgeDisplay = document.getElementById('badge-status');
+
+            if (action === 'terlambat') {
+                studentPoin = Math.max(0, studentPoin - 10);
+                logOut.className = "mt-4 pt-3 border-t border-slate-800 text-[11px] text-rose-400 font-mono";
+                logOut.innerText = "> catatPelanggaran(10, 'Terlambat Masuk'); // Poin -10";
+            } else if (action === 'atribut') {
+                studentPoin = Math.max(0, studentPoin - 15);
+                logOut.className = "mt-4 pt-3 border-t border-slate-800 text-[11px] text-rose-400 font-mono";
+                logOut.innerText = "> catatPelanggaran(15, 'Atribut Tidak Lengkap'); // Poin -15";
+            } else if (action === 'lks') {
+                studentPoin = Math.min(100, studentPoin + 25);
+                logOut.className = "mt-4 pt-3 border-t border-slate-800 text-[11px] text-emerald-400 font-mono";
+                logOut.innerText = "> catatPrestasi(25, 'Juara LKS'); // Bonus Poin +25";
+            } else if (action === 'cheat') {
+                logOut.className = "mt-4 pt-3 border-t border-slate-800 text-[11px] text-amber-400 font-mono";
+                logOut.innerText = "> ERROR: Variable 'poinKarakter' is private in SiswaSMK! Direct modification denied.";
+            }
+
+            // Update UI
+            valDisplay.innerText = studentPoin + " / 100";
+            barDisplay.style.width = studentPoin + "%";
+
+            if (studentPoin >= 85) {
+                barDisplay.className = "bg-emerald-500 h-full transition-all duration-500";
+                badgeDisplay.className = "px-2.5 py-1 bg-emerald-500/20 text-emerald-300 text-xs rounded-full border border-emerald-500/30 font-bold";
+                badgeDisplay.innerText = "Sangat Baik";
+            } else if (studentPoin >= 60) {
+                barDisplay.className = "bg-amber-500 h-full transition-all duration-500";
+                badgeDisplay.className = "px-2.5 py-1 bg-amber-500/20 text-amber-300 text-xs rounded-full border border-amber-500/30 font-bold";
+                badgeDisplay.innerText = "Cukup Baik";
+            } else {
+                barDisplay.className = "bg-rose-500 h-full transition-all duration-500";
+                badgeDisplay.className = "px-2.5 py-1 bg-rose-500/20 text-rose-300 text-xs rounded-full border border-rose-500/30 font-bold";
+                badgeDisplay.innerText = "Perlu Pembinaan BK";
+            }
+        }
+
+        const quizDataset = [
+            {
+                q: "1. Apa pengertian utama dari Enkapsulasi (Encapsulation) dalam Pemrograman Berorientasi Objek Java?",
+                category: "Konsep Dasar",
+                options: [
+                    "A. Merekam program ke dalam berkas executable",
+                    "B. Membungkus data (variabel) dan method ke dalam satu unit class serta menyembunyikan detail aksesnya",
+                    "C. Proses mendefinisikan class turunan dari class induk",
+                    "D. Mengubah tipe data secara otomatis dalam proses perkalian"
+                ],
+                answer: 1,
+                explanation: "Enkapsulasi adalah pilar PBO yang membungkus atribut dan method menjadi satu class, sekaligus membatasi akses langsung dari luar."
+            },
+            {
+                q: "2. Mengapa atribut 'saldo' pada class RekeningBank TIDAK BOLEH dibuat bersifat 'public'?",
+                category: "Studi Kasus Perbankan",
+                options: [
+                    "A. Karena variabel public menggunakan memori RAM dua kali lebih besar",
+                    "B. Karena variabel public dapat diubah nilainya secara bebas dari luar tanpa melalui validasi logika bisnis",
+                    "C. Karena program Java akan otomatis mengalami lag",
+                    "D. Karena atribut bernilai angka wajib bernilai protected"
+                ],
+                answer: 1,
+                explanation: "Jika saldo public, siapapun bisa menulis `akun.saldo = -1000000;` yang merusak validitas data keuangan."
+            },
+            {
+                q: "3. Access Modifier apa yang digunakan untuk mengunci variabel agar HANYA bisa diakses di dalam class itu sendiri?",
+                category: "Access Modifier",
+                options: [
+                    "A. public",
+                    "B. protected",
+                    "C. private",
+                    "D. default"
+                ],
+                answer: 2,
+                explanation: "Modifier `private` memberikan tingkat proteksi tertinggi, mencegah akses dari luar class."
+            },
+            {
+                q: "4. Method yang berfungsi khusus untuk MENGAMBIL atau MEMBACA nilai atribut private disebut...",
+                category: "Getter & Setter",
+                options: [
+                    "A. Mutator Method (Setter)",
+                    "B. Accessor Method (Getter)",
+                    "C. Constructor Method",
+                    "D. Destructor Method"
+                ],
+                answer: 1,
+                explanation: "Getter (Accessor Method) bertugas mengembalikan nilai variabel private kepada pemanggilnya."
+            },
+            {
+                q: "5. Method yang bertugas MENGUBAH atau MENGISI nilai dari atribut private dengan kriteria validasi disebut...",
+                category: "Getter & Setter",
+                options: [
+                    "A. Mutator Method (Setter)",
+                    "B. Accessor Method (Getter)",
+                    "C. Overriding Method",
+                    "D. Abstract Method"
+                ],
+                answer: 0,
+                explanation: "Setter (Mutator Method) digunakan untuk memperbarui nilai variabel private secara aman."
+            },
+            {
+                code: "public class Siswa {\n    private int poin;\n    // Manakah getter yang benar?\n}",
+                q: "6. Berdasarkan potongan kode di atas, manakah penulisan method Getter yang sesuai standar Java Naming Convention?",
+                category: "Sintaks Java",
+                options: [
+                    "A. public void getPoin() { return this.poin; }",
+                    "B. public int getPoin() { return this.poin; }",
+                    "C. private int getPoin() { return this.poin; }",
+                    "D. public static int getPoin() { System.out.println(poin); }"
+                ],
+                answer: 1,
+                explanation: "Getter harus bertipe data sesuai dengan variabel yang diakses (`int`) dan berstatus `public`."
+            },
+            {
+                q: "7. Pada aplikasi E-Kedisiplinan Sekolah, atribut 'poinKarakter' diberi nilai awal 100. Apa fungsi validasi di dalam Setter saat poin dikurangi?",
+                category: "Studi Kasus Sekolah",
+                options: [
+                    "A. Memastikan poin tidak pernah bernilai di bawah 0 (negatif)",
+                    "B. Menghapus data siswa otomatis jika terlambat",
+                    "C. Mempercepat proses kompilasi Java",
+                    "D. Mengubah nama siswa menjadi nomor registrasi"
+                ],
+                answer: 0,
+                explanation: "Validasi dalam Setter menjamin batas minimum dan maksimum poin (data integrity)."
+            },
+            {
+                q: "8. Manakah dari analogi dunia nyata berikut yang paling tepat menggambarkan Enkapsulasi?",
+                category: "Analogi Real-World",
+                options: [
+                    "A. Papan tulis kelas yang bebas dicoret siapa saja",
+                    "B. Mesin ATM, di mana kita bertransaksi via tombol/tombol layar tanpa menyentuh fisik uang dalam brankas",
+                    "C. Jendela kaca transparan tanpa tirai",
+                    "D. Kertas lembaran ujian yang dibagikan ke seluruh kelas"
+                ],
+                answer: 1,
+                explanation: "ATM menyembunyikan brankas uang (private variable) dan hanya memberikan antarmuka aman (getter/setter)."
+            },
+            {
+                q: "9. Kata kunci (keyword) yang digunakan di dalam Setter untuk membedakan antara atribut class dan parameter method adalah...",
+                category: "Sintaks Java",
+                options: [
+                    "A. super",
+                    "B. this",
+                    "C. static",
+                    "D. void"
+                ],
+                answer: 1,
+                explanation: "Keyword `this` merujuk pada atribut milik instance class saat ini."
+            },
+            {
+                q: "10. Apa yang terjadi jika sebuah class HANYA memiliki Getter tanpa Setter untuk suatu atribut private?",
+                category: "Pola Desain Enkapsulasi",
+                options: [
+                    "A. Atribut tersebut menjadi bersifat Read-Only (Hanya Dapat Dibaca)",
+                    "B. Program Java akan mengalami error sintaks",
+                    "C. Atribut menjadi bernilai null selamanya",
+                    "D. Atribut otomatis berubah menjadi public"
+                ],
+                answer: 0,
+                explanation: "Tanpa Setter, nilai variabel tidak dapat diubah setelah diinisialisasi (Read-Only property)."
+            },
+            {
+                q: "11. Jika tidak menuliskan kata kunci Access Modifier di depan variabel class Java (default access), maka variabel tersebut dapat diakses oleh...",
+                category: "Access Modifier",
+                options: [
+                    "A. Seluruh class di semua package tanpa terkecuali",
+                    "B. Hanya class di dalam package yang sama",
+                    "C. Hanya method di dalam class itu sendiri",
+                    "D. Tidak ada class manapun yang bisa mengaksesnya"
+                ],
+                answer: 1,
+                explanation: "Default access (package-private) membatasi akses hanya untuk class dalam package yang sama."
+            },
+            {
+                code: "public class Buku {\n    private String judul;\n    public void setJudul(String judul) {\n        judul = judul;\n    }\n}",
+                q: "12. Apa kelemahan dari potongan kode Setter buku di atas?",
+                category: "Analisis Kode Bug",
+                options: [
+                    "A. Penulisan judul = judul membingungkan compiler karena tidak menggunakan keyword 'this'",
+                    "B. Tipe data judul seharusnya int",
+                    "C. Method setJudul harus mengembalikan nilai String",
+                    "D. Class Buku harus berstatus private"
+                ],
+                answer: 0,
+                explanation: "Tanpa `this.judul = judul;`, Java akan menganggap variabel menetapkan nilai ke parameternya sendiri (shadowing bug)."
+            },
+            {
+                q: "13. Dalam pengembangan aplikasi sistem informasi sekolah, mengapa atribut 'nisn' siswa idealnya bersifat Read-Only setelah dibuat?",
+                category: "Studi Kasus Sekolah",
+                options: [
+                    "A. Agar NISN siswa dapat diubah setiap hari",
+                    "B. Karena NISN adalah nomor identitas unik permanen yang tidak boleh diubah sembarangan",
+                    "C. Agar database sekolah hemat kapasitas simpan",
+                    "D. Karena NISN wajib dihitung ulang setiap kenaikan kelas"
+                ],
+                answer: 1,
+                explanation: "Identitas seperti NISN tidak boleh berganti-ganti, sehingga hanya disiapkan Getter tanpa Setter publik."
+            },
+            {
+                q: "14. Apakah keutamaan Enkapsulasi bagi tim Software Developer saat melakukan refactoring (perbaikan) kode di kemudian hari?",
+                category: "Manfaat Enkapsulasi",
+                options: [
+                    "A. Perubahan struktur internal di dalam class tidak akan merusak kode class lain yang memanggilnya",
+                    "B. Jumlah baris kode Java otomatis menyusut 50%",
+                    "C. Aplikasi berjalan tanpa membutuhkan Java Virtual Machine",
+                    "D. Database SQL otomatis terhubung tanpa driver"
+                ],
+                answer: 0,
+                explanation: "Enkapsulasi mengurangi ketergantungan (loose coupling), sehingga perubahan internal class aman dari merusak sistem lain."
+            },
+            {
+                q: "15. Tipe data return apa yang umumnya digunakan pada method Setter (Mutator)?",
+                category: "Sintaks Java",
+                options: [
+                    "A. int",
+                    "B. String",
+                    "C. void",
+                    "D. boolean"
+                ],
+                answer: 2,
+                explanation: "Setter umumnya bertipe `void` karena fungsinya hanya memperbarui nilai tanpa mengembalikan data."
+            },
+            {
+                q: "16. Untuk variabel bertipe boolean seperti 'private boolean statusLulus;', manakah konvensi penulisan Getter yang direkomendasikan di Java?",
+                category: "Java JavaBeans Standards",
+                options: [
+                    "A. public boolean getStatusLulus() atau isLulus()",
+                    "B. public void checkLulus()",
+                    "C. public String statusLulus()",
+                    "D. public boolean setStatusLulus()"
+                ],
+                answer: 0,
+                explanation: "Untuk tipe boolean, konvensi standar Java menggunakan prefix `is` (contoh: `isLulus()`) atau `get`."
+            },
+            {
+                q: "17. Apa arti kata kunci Access Modifier 'protected'?",
+                category: "Access Modifier",
+                options: [
+                    "A. Hanya bisa diakses oleh class dalam package yang sama dan class turunan (subclass)",
+                    "B. Bebas diakses dari mana saja tanpa syarat",
+                    "C. Terkunci rapat dan tidak bisa diwariskan",
+                    "D. Hanya aktif saat jaringan internet terhubung"
+                ],
+                answer: 0,
+                explanation: "`protected` memberikan akses kepada class di package sama plus subclass-nya."
+            },
+            {
+                code: "RekeningBank r = new RekeningBank();\nr.setSaldo(100000);",
+                q: "18. Mengapa cara mengakses variabel saldo di atas dikategori aman?",
+                category: "Studi Kasus Perbankan",
+                options: [
+                    "A. Karena dipanggil melalui method Setter yang memiliki filter logika",
+                    "B. Karena variabel dipanggil secara langsung tanpa tanda kurung",
+                    "C. Karena nilai 100000 otomatis dikonversi ke Rupiah",
+                    "D. Karena menggunakan memori caching"
+                ],
+                answer: 0,
+                explanation: "Pengubahan nilai dikontrol lewat method `setSaldo()` yang dapat menolak input tidak valid."
+            },
+            {
+                q: "19. Jika siswa RPL membuat class 'KantinSekolah' dengan variabel 'private int stokJajanan;', bagaimana cara class lain mengurangi stok saat transaksi beli?",
+                category: "Studi Kasus Sekolah",
+                options: [
+                    "A. Memanggil method bisnis misal 'kurangiStok(int jumlah)' yang sudah dienkapsulasi",
+                    "B. Menulis perintah KantinSekolah.stokJajanan--",
+                    "C. Mengubah kata kunci private menjadi static",
+                    "D. Menghapus variabel stokJajanan"
+                ],
+                answer: 0,
+                explanation: "Akses variabel private harus melalui method publik seperti `kurangiStok()` yang memvalidasi sisa stok."
+            },
+            {
+                q: "20. Manakah kombinasi yang benar untuk mewujudkan Enkapsulasi yang ideal dalam class Java?",
+                category: "Konsep Dasar",
+                options: [
+                    "A. Variable bertipe public + Method bertipe private",
+                    "B. Variable bertipe private + Method Getter & Setter bertipe public",
+                    "C. Semua variable & method bertipe default",
+                    "D. Variable bertipe protected tanpa method sama sekali"
+                ],
+                answer: 1,
+                explanation: "Kombinasi standar: Private Attributes + Public Accessor/Mutator Methods."
+            },
+            {
+                q: "21. Apa bahayanya jika method Setter untuk 'password' akun LMS sekolah tidak dienkapsulasi dan di-validasi?",
+                category: "Keamanan Sistem",
+                options: [
+                    "A. User bisa menginput password kosong (empty) atau terlalu pendek secara tidak sengaja",
+                    "B. Server Java akan mendadak korsleting",
+                    "C. Tampilan CSS web sekolah akan berantakan",
+                    "D. Kapasitas RAM HP siswa cepat habis"
+                ],
+                answer: 0,
+                explanation: "Validasi Setter password menjamin aturan minimal karakter dan standar keamanan terpenuhi."
+            },
+            {
+                q: "22. Di bawah ini yang BUKAN merupakan manfaat Enkapsulasi adalah...",
+                category: "Manfaat Enkapsulasi",
+                options: [
+                    "A. Mencegah manipulasi data yang tidak sah",
+                    "B. Menjaga integritas data program",
+                    "C. Mempercepat koneksi jaringan internet komputer",
+                    "D. Memudahkan perawatan dan refactoring kode"
+                ],
+                answer: 2,
+                explanation: "Enkapsulasi adalah prinsip arsitektur software, tidak ada hubungannya dengan kecepatan koneksi internet."
+            },
+            {
+                q: "23. Pada Java, paket class yang berisi variabel private beserta getter setter-nya secara lengkap sering disebut sebagai pola...",
+                category: "Java Standard",
+                options: [
+                    "A. Java Framework",
+                    "B. JavaBean / POJO (Plain Old Java Object)",
+                    "C. Java Applet",
+                    "D. Java Servlet"
+                ],
+                answer: 1,
+                explanation: "JavaBean adalah standar class Java yang memiliki atribut private, constructor kosong, dan getter-setter."
+            },
+            {
+                code: "class Guru {\n    private double gaji;\n}",
+                q: "24. Pada kode di atas, jika kita menjalankan perintah 'Guru g = new Guru(); System.out.println(g.gaji);' dari class lain, apa hasilnya?",
+                category: "Analisis Error Java",
+                options: [
+                    "A. Mencetak angka 0.0",
+                    "B. Error Kompilasi (gaji has private access in Guru)",
+                    "C. Mencetak text 'null'",
+                    "D. Program hang/stuck"
+                ],
+                answer: 1,
+                explanation: "Akses langsung variabel private dari luar class akan memicu Error Kompilasi di Java."
+            },
+            {
+                q: "25. Mengapa Enkapsulasi sangat penting dalam pengerjaan proyek software skala besar di industri oleh tim programmer?",
+                category: "Praktik Industri RPL",
+                options: [
+                    "A. Agar antar programmer tidak saling merusak variabel internal buatan rekan timnya",
+                    "B. Agar tidak perlu menggunakan Git dan GitHub",
+                    "C. Supaya ukuran file .apk menjadi sangat kecil",
+                    "D. Menghindari pembuatan dokumentasi"
+                ],
+                answer: 0,
+                explanation: "Enkapsulasi menjaga batas tegas antar modul sehingga kerja tim lebih aman dan terstruktur."
+            },
+            {
+                q: "26. Dalam kelas 'NilaiSiswa', terdapat atribut 'private double nilaiUjian;'. Bagaimana sintaks Setter dengan validasi nilai 0 - 100?",
+                category: "Sintaks Java",
+                options: [
+                    "A. public void setNilaiUjian(double n) { if(n>=0 && n<=100) this.nilaiUjian = n; }",
+                    "B. public double setNilaiUjian() { return 100; }",
+                    "C. public void setNilaiUjian() { this.nilaiUjian = -1; }",
+                    "D. private void setNilaiUjian(double n) { this.nilaiUjian = n; }"
+                ],
+                answer: 0,
+                explanation: "Validasi `n>=0 && n<=100` memastikan nilai siswa selalu berada pada rentang yang valid."
+            },
+            {
+                q: "27. Jika variabel di-set 'private', apakah variabel tersebut masih bisa diisi nilai awal pada saat pembuatan Objek?",
+                category: "Constructor & Enkapsulasi",
+                options: [
+                    "A. Ya, bisa melalui Constructor class",
+                    "B. Tidak bisa sama sekali",
+                    "C. Hanya bisa jika komputer direstart",
+                    "D. Hanya bisa di OS Windows"
+                ],
+                answer: 0,
+                explanation: "Constructor berada di dalam class yang sama, sehingga berhak mengisi variabel private saat objek di-instansiasi."
+            },
+            {
+                q: "28. Apakah penerapan Enkapsulasi menambah keamanan kode terhadap peretasan tingkat lanjut?",
+                category: "Keamanan Sistem",
+                options: [
+                    "A. Ya, karena menyembunyikan logika internal (Information Hiding) dan membatasi pintu masuk data",
+                    "B. Tidak ada efeknya sama sekali",
+                    "C. Hanya berlaku jika memakai antivirus",
+                    "D. Menyebabkan program mudah diretas"
+                ],
+                answer: 0,
+                explanation: "Prinsip Information Hiding dalam Enkapsulasi meminimalisir celah eksploitasi data."
+            },
+            {
+                q: "29. Pernyataan manakah yang BENAR tentang Getter dan Setter?",
+                category: "Konsep Dasar",
+                options: [
+                    "A. Setter harus mengembalikan nilai, Getter bertipe void",
+                    "B. Getter bertipe data pengembali nilai, Setter biasanya bertipe void",
+                    "C. Both Getter and Setter must be private",
+                    "D. Getter and Setter only work for String variables"
+                ],
+                answer: 1,
+                explanation: "Getter punya return value (membaca), sedangkan Setter bertipe void (menulis)."
+            },
+            {
+                q: "30. Manakah kesimpulan paling mendasar dari pembelajaran modul Enkapsulasi ini?",
+                category: "Refleksi Akhir",
+                options: [
+                    "A. Lindungi data sensitif dengan 'private', dan sediakan kontrol akses resmi via 'Getter/Setter' ber-validasi",
+                    "B. Gunakan kata kunci public di semua tempat agar koding lebih cepat",
+                    "C. Jangan pernah menggunakan method dalam class Java",
+                    "D. Enkapsulasi hanya formalitas dan tidak wajib di dunia kerja"
+                ],
+                answer: 0,
+                explanation: "Prinsip emas Enkapsulasi: Protect data with `private`, expose safely via `getters/setters` with rules."
+            }
+        ];
+
+        // Quiz Engine State Variables
+        let currentQuestionIdx = 0;
+        let userAnswers = new Array(quizDataset.length).fill(null);
+
+        function renderQuestion() {
+            const qData = quizDataset[currentQuestionIdx];
+            
+            // Updates
+            document.getElementById('q-category').innerText = "Kategori: " + qData.category;
+            document.getElementById('q-text').innerText = qData.q;
+            
+            // Code snippet container
+            const codeContainer = document.getElementById('q-code-container');
+            if (qData.code) {
+                codeContainer.classList.remove('hidden');
+                document.getElementById('q-code').innerText = qData.code;
+            } else {
+                codeContainer.classList.add('hidden');
+            }
+
+            // Progress text
+            const qNum = currentQuestionIdx + 1;
+            document.getElementById('quiz-progress-text').innerText = `Soal ${qNum} dari ${quizDataset.length}`;
+            const pct = Math.round((qNum / quizDataset.length) * 100);
+            document.getElementById('quiz-progress-bar').style.width = pct + "%";
+            document.getElementById('quiz-percent-text').innerText = pct + "% Selesai";
+
+            // Render Options
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            const selectedAns = userAnswers[currentQuestionIdx];
+
+            qData.options.forEach((optText, optIdx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-xl border transition-all text-xs sm:text-sm font-semibold flex items-center justify-between ";
+                
+                if (selectedAns === null) {
+                    btn.className += "bg-slate-900 border-slate-700 text-slate-200 hover:bg-slate-800 hover:border-blue-500/50";
+                } else {
+                    if (optIdx === qData.answer) {
+                        btn.className += "bg-emerald-950/80 border-emerald-500 text-emerald-200";
+                    } else if (optIdx === selectedAns) {
+                        btn.className += "bg-rose-950/80 border-rose-500 text-rose-200";
+                    } else {
+                        btn.className += "bg-slate-900/50 border-slate-800 text-slate-500 opacity-60";
+                    }
+                }
+
+                btn.innerHTML = `<span>${optText}</span>`;
+                
+                if (selectedAns !== null) {
+                    if (optIdx === qData.answer) {
+                        btn.innerHTML += `<i class="fa-solid fa-circle-check text-emerald-400 text-base ml-2"></i>`;
+                    } else if (optIdx === selectedAns) {
+                        btn.innerHTML += `<i class="fa-solid fa-circle-xmark text-rose-400 text-base ml-2"></i>`;
+                    }
+                }
+
+                btn.onclick = () => selectOption(optIdx);
+                optionsContainer.appendChild(btn);
+            });
+
+            // Explanation box logic
+            const expBox = document.getElementById('explanation-box');
+            if (selectedAns !== null) {
+                expBox.classList.remove('hidden');
+                if (selectedAns === qData.answer) {
+                    expBox.className = "p-4 rounded-xl text-xs sm:text-sm border bg-emerald-950/60 border-emerald-700/80 text-emerald-200";
+                    expBox.innerHTML = `<div class="font-bold text-emerald-300 mb-1"><i class="fa-solid fa-circle-check mr-2"></i>Jawaban Anda Benar!</div>${qData.explanation}`;
+                } else {
+                    expBox.className = "p-4 rounded-xl text-xs sm:text-sm border bg-rose-950/60 border-rose-700/80 text-rose-200";
+                    expBox.innerHTML = `<div class="font-bold text-rose-300 mb-1"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Jawaban Kurang Tepat</div>${qData.explanation}`;
+                }
+            } else {
+                expBox.classList.add('hidden');
+            }
+
+            // Update Score Badge
+            calculateScore();
+
+            // Nav buttons state
+            document.getElementById('prev-q-btn').disabled = (currentQuestionIdx === 0);
+            const nextBtn = document.getElementById('next-q-btn');
+            if (currentQuestionIdx === quizDataset.length - 1) {
+                nextBtn.innerHTML = `Selesai & Lihat Hasil <i class="fa-solid fa-flag-checkered ml-2"></i>`;
+                nextBtn.className = "px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition shadow-lg shadow-emerald-500/20";
+            } else {
+                nextBtn.innerHTML = `Selanjutnya <i class="fa-solid fa-arrow-right ml-2"></i>`;
+                nextBtn.className = "px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition shadow-lg shadow-blue-500/20";
+            }
+        }
+
+        function selectOption(optIdx) {
+            if (userAnswers[currentQuestionIdx] !== null) return;
+            userAnswers[currentQuestionIdx] = optIdx;
+            renderQuestion();
+        }
+
+        function calculateScore() {
+            let correctCount = 0;
+            userAnswers.forEach((ans, idx) => {
+                if (ans === quizDataset[idx].answer) correctCount++;
+            });
+            document.getElementById('quiz-score-badge').innerText = `${correctCount} / ${quizDataset.length}`;
+            return correctCount;
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIdx < quizDataset.length - 1) {
+                currentQuestionIdx++;
+                renderQuestion();
+            } else {
+                showQuizResult();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIdx > 0) {
+                currentQuestionIdx--;
+                renderQuestion();
+            }
+        }
+
+        function showQuizResult() {
+            document.getElementById('question-box').classList.add('hidden');
+            const resultBox = document.getElementById('quiz-result-box');
+            resultBox.classList.remove('hidden');
+
+            const score = calculateScore();
+            const finalNilai = Math.round((score / quizDataset.length) * 100);
+            
+            document.getElementById('final-score-val').innerText = finalNilai;
+            
+            const msgEl = document.getElementById('final-score-msg');
+            if (finalNilai >= 85) {
+                msgEl.innerText = "Sangat Baik (A) - Anda Sangat Menguasai Konsep Enkapsulasi PBO Java!";
+                msgEl.className = "text-sm text-emerald-400 font-bold";
+            } else if (finalNilai >= 70) {
+                msgEl.innerText = "Baik (B) - Pemahaman Sudah Bagus, Tingkatkan Latihan Kode Java.";
+                msgEl.className = "text-sm text-blue-400 font-bold";
+            } else {
+                msgEl.innerText = "Cukup / Perlu Remedial (C) - Pelajari Kembali Card Materi & Studi Kasus.";
+                msgEl.className = "text-sm text-amber-400 font-bold";
+            }
+        }
+
+        function restartQuiz() {
+            currentQuestionIdx = 0;
+            userAnswers.fill(null);
+            document.getElementById('quiz-result-box').classList.add('hidden');
+            document.getElementById('question-box').classList.remove('hidden');
+            renderQuestion();
+        }
+
+        window.onload = function() {
+            renderGateQuiz(1);
+            renderGateQuiz(2);
+            renderGateQuiz(3);
+            renderQuestion();
+        };
+    </script>
+</body>
+</html>
